@@ -31,12 +31,8 @@ object DexPatcher {
     private val smaliJobs: Int
         get() {
             val maxMb = Runtime.getRuntime().maxMemory() / (1024 * 1024)
-            return when {
-                maxMb <= 220 -> 1
-                maxMb <= 384 -> 1
-                maxMb <= 512 -> 2
-                else -> 2
-            }
+            // <=220 und <=384 fuehrten beide zu jobs=1 (redundant, zusammengelegt)
+            return if (maxMb <= 384) 1 else 2
         }
 
     /**
@@ -146,6 +142,9 @@ object DexPatcher {
                 }
             }
         } catch (e: Exception) {
+            // NICHT stumm verschwinden lassen — ohne Log waere bei einem
+            // unerwarteten Fehler nur ein leeres Ergebnis sichtbar.
+            Log.e(TAG, "DexPatcher.patchAll abgebrochen (apk=${apk.name}, launcher=$launcherClass): ${e.javaClass.simpleName}: ${e.message}", e)
             return emptyMap()
         }
         return result
