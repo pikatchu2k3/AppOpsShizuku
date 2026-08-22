@@ -1,0 +1,62 @@
+[
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/drawable_ic_launcher.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/drawable/ic_launcher.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/menu_menu_appops.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/menu/menu_appops.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_activity_main.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/activity_main.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/drawable_ic_chevron.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/drawable/ic_chevron.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_dialog_progress.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/dialog_progress.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_item_component_header.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/item_component_header.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_activity_appops.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/activity_appops.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_activity_components.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/activity_components.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/drawable_ic_refresh.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/drawable/ic_refresh.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_item_category_header.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/item_category_header.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_item_appop.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/item_appop.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_item_app.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/item_app.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/drawable_ic_blocked.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/drawable/ic_blocked.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_item_component.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/item_component.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_item_section_actions.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/item_section_actions.xml"
+    }
+]

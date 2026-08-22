@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- App-Liste anzeigen (alle installierten Apps, Android 11+) -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <!-- Foreground-Service fuer den Stealth-Patch (laeuft auch bei App-Wechsel weiter) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- WakeLock: CPU nicht in Suspend gehen lassen waehrend des Patches -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Notification-Berechtigung (Android 13+): OHNE diesen Manifest-Eintrag
+         ist der Schalter in den App-Einstellungen ausgegraut/nicht vorhanden
+         (realer User-Fall 08/2026: "Benachrichtigungen kann ich nicht erlauben") -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:theme="@style/Theme.AppOpsShizuku"
+        android:largeHeap="true">
+
+        <!-- Shizuku 13+: Provider fuer den Permission-Request-Flow -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".AppOpsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ComponentsActivity"
+            android:exported="false" />
+
+        <!-- Stealth-Patch im Hintergrund (Foreground-Service, Fortschritt in Notification) -->
+        <service
+            android:name=".StealthPatchService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+    </application>
+</manifest>

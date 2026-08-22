@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Progress-Circle mit Prozent in der Kreismitte (Gesamtfortschritt).
+         Ring + zentrierte Prozent-TextView uebereinander im FrameLayout. -->
+    <FrameLayout
+        android:layout_width="88dp"
+        android:layout_height="88dp">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressRing"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:indeterminate="true"
+            app:indicatorSize="88dp"
+            app:trackThickness="7dp" />
+
+        <TextView
+            android:id="@+id/progressPercent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:text=""
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/progressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/stealth_phase_extract"
+        android:textAppearance="?attr/textAppearanceBodyMedium" />
+</LinearLayout>

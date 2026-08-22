@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.minipc.appopsshizuku.stealth.DeviceSpoofSmaliTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-08-11T06:52:32" hostname="Mini2" time="0.115">
+  <properties/>
+  <testcase name="androidIdSpoofErsetztSettingsSecure" classname="de.minipc.appopsshizuku.stealth.DeviceSpoofSmaliTest" time="0.002"/>
+  <testcase name="buildSpoofErsetztBuildFelder" classname="de.minipc.appopsshizuku.stealth.DeviceSpoofSmaliTest" time="0.001"/>
+  <testcase name="telephonySpoofErsetztImeiUndSubscriber" classname="de.minipc.appopsshizuku.stealth.DeviceSpoofSmaliTest" time="0.001"/>
+  <testcase name="deviceSpoofSmaliAssembliert" classname="de.minipc.appopsshizuku.stealth.DeviceSpoofSmaliTest" time="0.111"/>
+  <testcase name="keinSpoofLaesstTextUnveraendert" classname="de.minipc.appopsshizuku.stealth.DeviceSpoofSmaliTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

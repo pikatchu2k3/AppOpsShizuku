@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.minipc.appopsshizuku.stealth.DexPatcherTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-11T06:52:32" hostname="Mini2" time="4.909">
+  <properties/>
+  <testcase name="patchFossDex_erzeugtNeuesDex" classname="de.minipc.appopsshizuku.stealth.DexPatcherTest" time="4.909"/>
+  <system-out><![CDATA[DEXPATCH: DexPatcher: dex classes.dex (9354200 B), suche de/baumann/browser/activity/BrowserActivity.smali
+DEXPATCH: DexPatcher: Smali-Datei gefunden, patche...
+DEXPATCH: DexPatcher: patche Methode onCreate (Zeile 13121)
+DEXPATCH: DexPatcher: PATCH OK (secure=true vpn=false spoof=false), neues Dex 9463900 B
+DEXPATCH: DexPatcher: dex classes2.dex (1748524 B), suche de/baumann/browser/activity/BrowserActivity.smali
+DEXPATCH: DexPatcher: de/baumann/browser/activity/BrowserActivity.smali nicht in classes2.dex gefunden (smali-Dateien: 1427 )
+=== result keys: [classes.dex] ===
+classes.dex -> 9463900 B
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

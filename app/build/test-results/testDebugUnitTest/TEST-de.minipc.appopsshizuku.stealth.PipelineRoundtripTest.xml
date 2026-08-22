@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.minipc.appopsshizuku.stealth.PipelineRoundtripTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-11T06:52:37" hostname="Mini2" time="6.488">
+  <properties/>
+  <testcase name="roundtrip" classname="de.minipc.appopsshizuku.stealth.PipelineRoundtripTest" time="6.488"/>
+  <system-out><![CDATA[DEXPATCH: DexPatcher: patche Methode onCreate (Zeile 13121)
+=== GEPATCHTE Smali (onCreate-Anfang) ===
+  .method public onCreate(Landroid/os/Bundle;)V
+  .registers 15
+  invoke-virtual {p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+  move-result-object v11
+  const/16 v12, 0x2000
+  invoke-virtual {v11, v12}, Landroid/view/Window;->addFlags(I)V
+  
+  .line 225
+
+=== neues Dex: 9463900 B ===
+=== ROUNDTRIP onCreate (assembliert + zurueck) ===
+  .method public onCreate(Landroid/os/Bundle;)V
+  .registers 15
+  
+  invoke-virtual {p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
+  
+  move-result-object v11
+  
+  const/16 v12, 0x2000
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
