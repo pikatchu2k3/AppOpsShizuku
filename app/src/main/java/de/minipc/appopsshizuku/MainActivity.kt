@@ -47,8 +47,8 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val executor = Executors.newFixedThreadPool(4)
 
-    /** Alle Apps (ungefiltert, Basis fuer Filter+Sortierung) */
-    private val allApps = mutableListOf<AppItem>()
+    /** Alle Apps (ungefiltert, Basis fuer Filter+Sortierung). Nur per Referenz-Tausch aendern. */
+    private var allApps: List<AppItem> = emptyList()
     private lateinit var adapter: AppListAdapter
 
     private var sortMode = SORT_NAME
@@ -235,8 +235,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             handler.post {
-                allApps.clear()
-                allApps.addAll(loaded)
+                // Atomare Zuweisung: keine Mutation, kein Datenrennen mit
+                // scanBlockedState()/applyFilterAndSort()
+                allApps = loaded
                 applyFilterAndSort()
             }
         }
@@ -273,7 +274,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         Toast.makeText(this, R.string.scanning_apps, Toast.LENGTH_SHORT).show()
-        val list = allApps.toList()
+        val list = allApps
         executor.execute {
             for (app in list) {
                 val res = backend.exec("cmd", "appops", "get", app.packageName)
