@@ -493,13 +493,12 @@ object DexPatcher {
                 try {
                     disassembleInternal(dexFile, outDir, 1)
                 } catch (e2: Exception) {
-                    debug("baksmali EXCEPTION (jobs=1): ${e2.message}")
+                    Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=1, exit=-1)", e2)
                     false
                 }
             } catch (e: Exception) {
                 val cause = if (e is java.lang.reflect.InvocationTargetException) e.cause else e
-                debug("baksmali EXCEPTION: ${e.javaClass.simpleName}: ${e.message} -> CAUSE: ${cause}")
-                cause?.printStackTrace()
+                Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=$jobs, exit=-1): ${cause?.javaClass?.simpleName}: ${cause?.message}", cause ?: e)
                 false
             }
         }
@@ -510,8 +509,7 @@ object DexPatcher {
             false
         } catch (e: Exception) {
             val cause = if (e is java.lang.reflect.InvocationTargetException) e.cause else e
-            debug("baksmali EXCEPTION: ${e.javaClass.simpleName}: ${e.message} -> CAUSE: ${cause}")
-            cause?.printStackTrace()
+            Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=1, exit=-1): ${cause?.javaClass?.simpleName}: ${cause?.message}", cause ?: e)
             false
         }
     }
@@ -550,12 +548,11 @@ object DexPatcher {
                     debug("smali OOM auch bei jobs=1")
                     false
                 } catch (e2: Exception) {
-                    debug("smali EXCEPTION (jobs=1): ${e2.message}")
+                    Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=1, exit=-1)", e2)
                     false
                 }
             } catch (e: Exception) {
-                debug("smali EXCEPTION (jobs=$jobs): ${e.message}")
-                e.printStackTrace()
+                Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=$jobs, exit=-1): ${e.javaClass.simpleName}: ${e.message}", e)
                 false
             }
         }
@@ -565,8 +562,7 @@ object DexPatcher {
             debug("smali OOM bei jobs=1")
             false
         } catch (e: Exception) {
-            debug("smali EXCEPTION: ${e.message}")
-            e.printStackTrace()
+            Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=1, exit=-1): ${e.javaClass.simpleName}: ${e.message}", e)
             false
         }
     }
