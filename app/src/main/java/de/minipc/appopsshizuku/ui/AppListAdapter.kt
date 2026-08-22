@@ -46,7 +46,12 @@ class AppListAdapter(
         override fun areItemsTheSame(oldItem: AppItem, newItem: AppItem): Boolean =
             oldItem.packageName == newItem.packageName
 
+        // Nur Datenfelder vergleichen: Das Drawable ist per Referenz immer
+        // verschieden -> volles Rebind bei jedem Resume. Icon wird separat
+        // in onBindViewHolder gesetzt.
         override fun areContentsTheSame(oldItem: AppItem, newItem: AppItem): Boolean =
-            oldItem == newItem
+            oldItem.packageName == newItem.packageName &&
+                oldItem.label == newItem.label &&
+                oldItem.lastUpdateTime == newItem.lastUpdateTime
     }
 }
