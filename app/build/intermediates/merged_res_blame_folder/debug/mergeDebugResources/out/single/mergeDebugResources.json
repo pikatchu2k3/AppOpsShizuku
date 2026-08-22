@@ -4,10 +4,6 @@
         "source": "/home/mini/.gradle/daemon/8.14/de.minipc.appopsshizuku.app-main-34:/layout/item_component.xml"
     },
     {
-        "merged": "de.minipc.appopsshizuku.app-debug-32:/menu_menu_appops.xml.flat",
-        "source": "de.minipc.appopsshizuku.app-main-34:/menu/menu_appops.xml"
-    },
-    {
         "merged": "/home/mini/.gradle/daemon/8.14/de.minipc.appopsshizuku.app-debug-32:/layout_item_app.xml.flat",
         "source": "/home/mini/.gradle/daemon/8.14/de.minipc.appopsshizuku.app-main-34:/layout/item_app.xml"
     },
@@ -30,6 +26,10 @@
     {
         "merged": "/home/mini/.gradle/daemon/8.14/de.minipc.appopsshizuku.app-debug-32:/drawable_ic_launcher.xml.flat",
         "source": "/home/mini/.gradle/daemon/8.14/de.minipc.appopsshizuku.app-main-34:/drawable/ic_launcher.xml"
+    },
+    {
+        "merged": "de.minipc.appopsshizuku.app-debug-32:/layout_activity_components.xml.flat",
+        "source": "de.minipc.appopsshizuku.app-main-34:/layout/activity_components.xml"
     },
     {
         "merged": "/home/mini/.gradle/daemon/8.14/de.minipc.appopsshizuku.app-debug-32:/drawable_ic_refresh.xml.flat",

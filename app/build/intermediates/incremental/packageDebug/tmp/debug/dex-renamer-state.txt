@@ -1,4 +1,4 @@
-#Thu Aug 20 17:38:14 CEST 2026
+#Sat Aug 22 13:33:37 CEST 2026
 base.0=/home/mini/AppOpsShizuku/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/home/mini/AppOpsShizuku/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
 base.2=/home/mini/AppOpsShizuku/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
