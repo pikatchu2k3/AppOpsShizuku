@@ -2,11 +2,13 @@ package de.minipc.appopsshizuku
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.LruCache
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -57,6 +59,17 @@ class MainActivity : AppCompatActivity() {
 
     /** Cache: Paketname -> hat mind. eine blockierte Op (ignore/deny auf UID-Ebene) */
     private val blockedCache = mutableMapOf<String, Boolean>()
+
+    /** Cache: Paketname -> Icon (max. 100 Eintraege, sonst Icon-Neuladen bei jedem onResume) */
+    private val iconCache = LruCache<String, Drawable>(100)
+
+    /** Icon aus dem Cache; nur bei Cache-Miss den PackageManager fragen. */
+    private fun cachedIcon(pm: PackageManager, pkg: String): Drawable? =
+        iconCache.get(pkg) ?: try {
+            pm.getApplicationIcon(pkg).also { iconCache.put(pkg, it) }
+        } catch (e: Exception) {
+            null
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,11 +166,7 @@ class MainActivity : AppCompatActivity() {
                 } catch (e: PackageManager.NameNotFoundException) {
                     pkg
                 }
-                val icon = try {
-                    pm.getApplicationIcon(pkg)
-                } catch (e: PackageManager.NameNotFoundException) {
-                    null
-                }
+                val icon = cachedIcon(pm, pkg)
                 var firstInstall = 0L
                 var lastUpdate = 0L
                 try {
@@ -190,12 +199,7 @@ class MainActivity : AppCompatActivity() {
                         android.util.Log.d("AppOpsShizuku", "label fail $pkg: ${e.message}")
                         pkg
                     }
-                    val icon = try {
-                        pm.getApplicationIcon(pkg)
-                    } catch (e: Exception) {
-                        android.util.Log.d("AppOpsShizuku", "icon fail $pkg: ${e.message}")
-                        null
-                    }
+                    val icon = cachedIcon(pm, pkg)
                     loaded.add(
                         AppItem(
                             pkg,
@@ -219,11 +223,7 @@ class MainActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     pkg
                 }
-                val icon = try {
-                    pm.getApplicationIcon(pkg)
-                } catch (e: Exception) {
-                    null
-                }
+                val icon = cachedIcon(pm, pkg)
                 loaded.add(
                     AppItem(
                         pkg,
