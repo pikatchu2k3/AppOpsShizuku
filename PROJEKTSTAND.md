@@ -1,5 +1,5 @@
 ---
-Status: funktionsfähig (v1.12.4 — CLIPBOARD-CRASH GEFIXT: getMode-Paket-Ebene + setOpMode-JSON, E2E-verifiziert Emulator)
+Status: funktionsfähig (v1.12.5 — CLIPBOARD-CRASH GEFIXT + deny-WARNUNG, E2E-verifiziert Emulator)
 Datum: 2026-08-22
 Projekt: AppOpsShizuku — Privacy-AppOps/Shizuku-Verwaltung für beliebige Apps (on-device, kein Root)
 Pfade:
@@ -14,6 +14,19 @@ Abhängigkeiten: dev.rikka.shizuku:api:13.1.5, dev.rikka.shizuku:provider:13.1.5
 Separate App neben AppClonerLite: verwaltet AppOps/Permissions beliebiger installierter Apps
 über Shizuku (adb-Rechte, KEIN Root, KEIN Xposed). Feature 1 = Privacy-Profil: Kamera,
 Mikrofon, Kontakte, Kalender, Anrufliste, Konten, Zwischenablage, Sensoren blockieren/freigeben.
+
+# v1.12.5 (08/2026) — deny-Warnung bei Zwischenablage (User-Frage: „Öffnet die App noch?")
+
+**Live-Test (Emulator):** READ/WRITE_CLIPBOARD auf `deny` → **FOSS Browser crasht beim Start**
+(`SecurityException: de.baumann.browser … not allowed to perform READ_CLIPBOARD`). Mit
+`ignore` → App öffnet normal, Clipboard ist trotzdem blockiert (stille Blockade, App bekommt
+leere Daten). Bestätigt das Skill-Wissen: deny = harte Ablehnung (Crash-Gefahr), ignore =
+empfohlener Modus für Clipboard.
+
+**Fix:** Warn-Toast (`op_deny_warning`), wenn bei einer reinen AppOp (permissionName == null,
+also READ/WRITE_CLIPBOARD) der Modus `deny` gewählt wird: „Achtung: deny kann die App beim
+Start crashen lassen (SecurityException). Für die Zwischenablage ist ignore die bessere
+Wahl (stille Blockade)." E2E: deny gesetzt → 2 Toasts (op_set_ok + Warnung), kein Crash.
 
 # v1.12.4 (08/2026) — Clipboard-Crash behoben (User-Report: App sprang zum Hauptmenü)
 

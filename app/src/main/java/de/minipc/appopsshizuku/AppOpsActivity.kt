@@ -289,6 +289,11 @@ class AppOpsActivity : AppCompatActivity() {
                         getString(R.string.op_set_ok, op.label, mode),
                         Toast.LENGTH_SHORT
                     ).show()
+                    // deny auf reinen AppOps (Zwischenablage) laesst die Ziel-App beim
+                    // Start crashen (SecurityException, live verifiziert) -> Hinweis.
+                    if (mode == "deny" && op.permissionName == null) {
+                        Toast.makeText(this, R.string.op_deny_warning, Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     adapter.submitList(buildItems())
                     Toast.makeText(

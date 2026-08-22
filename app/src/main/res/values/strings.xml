@@ -34,6 +34,7 @@
     <string name="app_disabled_label">%1$s (deaktiviert)</string>
     <string name="op_set_ok">%1$s → %2$s gesetzt</string>
     <string name="op_set_fail">Fehler bei %1$s: Exit %2$d</string>
+    <string name="op_deny_warning">Achtung: deny kann die App beim Start crashen lassen (SecurityException). Für die Zwischenablage ist ignore die bessere Wahl (stille Blockade).</string>
     <string name="restore_done">Alle Ops zurückgesetzt</string>
     <string name="no_apps">Keine Apps gefunden</string>
     <string name="scanning_apps">Berechtigungen werden geprüft…</string>
