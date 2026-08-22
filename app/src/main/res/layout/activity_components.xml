@@ -217,35 +217,40 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:checked="false"
-                        android:text="@string/stealth_exclude_from_recents" />
+                        android:text="@string/stealth_exclude_from_recents"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/stealthRemoveLauncherIconSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/stealth_remove_launcher_icon" />
+                        android:text="@string/stealth_remove_launcher_icon"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/stealthSecureSnapshotSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/stealth_secure_snapshot" />
+                        android:text="@string/stealth_secure_snapshot"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/stealthRequireVpnSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/stealth_require_vpn" />
+                        android:text="@string/stealth_require_vpn"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/stealthVaultCalcSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/stealth_vault_calc" />
+                        android:text="@string/stealth_vault_calc"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/stealthVaultPinLayout"
@@ -287,7 +292,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:checked="true"
-                        android:text="@string/stealth_clone_switch" />
+                        android:text="@string/stealth_clone_switch"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/stealthClonePkgLayout"
@@ -335,7 +341,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="@string/stealth_spoof_build" />
+                        android:text="@string/stealth_spoof_build"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <LinearLayout
                         android:id="@+id/spoofBuildFields"
@@ -350,7 +357,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="@string/stealth_spoof_random" />
+                            android:text="@string/stealth_spoof_random"
+                            android:textColor="?attr/colorOnPrimaryContainer" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
@@ -403,14 +411,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/stealth_spoof_android_id" />
+                        android:text="@string/stealth_spoof_android_id"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/stealthSpoofTelephonySwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/stealth_spoof_telephony" />
+                        android:text="@string/stealth_spoof_telephony"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
