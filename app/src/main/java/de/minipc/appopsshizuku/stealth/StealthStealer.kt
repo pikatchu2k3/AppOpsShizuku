@@ -432,6 +432,19 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         var res = installSession(tmpApks, splitNames, sizes, totalSize, replace = true)
         var out = res.stdout + "\n" + res.stderr
 
+        // INSTALL_FAILED_USER_RESTRICTED ist KEIN Signaturkonflikt, sondern eine
+        // Geraete-/MDM-Restriktion (z.B. "USB-Installation" deaktiviert). Ein
+        // destruktives Auto-Uninstall wuerde die Original-App ohne Wiederherstellungs-
+        // moeglichkeit entfernen -> stattdessen Fehlermeldung an den User.
+        if (out.contains("INSTALL_FAILED_USER_RESTRICTED", ignoreCase = true)) {
+            tmpApks.forEach { backend.exec("rm", "-f", it) }
+            return InstallResult(
+                false,
+                "Installation vom Geraet blockiert (INSTALL_FAILED_USER_RESTRICTED): " +
+                    "'USB-Installation' in den Entwickleroptionen bzw. MDM-Restriktion pruefen."
+            )
+        }
+
         // Signaturkonflikt -> Original deinstallieren und neu installieren
         if (allowAutoUninstall && isSignatureConflict(out)) {
             val uninstall = backend.exec("pm", "uninstall", packageName)
@@ -500,8 +513,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
 
     private fun isSignatureConflict(out: String): Boolean =
         out.contains("UPDATE_INCOMPATIBLE", ignoreCase = true) ||
-            out.contains("signatures do not match", ignoreCase = true) ||
-            out.contains("INSTALL_FAILED_USER_RESTRICTED", ignoreCase = true)
+            out.contains("signatures do not match", ignoreCase = true)
 
     /** Original-APK(s) zurueckspielen (Rollback) — deinstalliert die Stealth-Version automatisch. */
     fun restore(originalApk: File, packageName: String): InstallResult =
