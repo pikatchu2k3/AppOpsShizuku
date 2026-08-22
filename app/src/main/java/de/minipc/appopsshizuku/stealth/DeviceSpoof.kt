@@ -16,6 +16,7 @@ data class DeviceSpoofOptions(
     val fakeManufacturer: String = "",
     val fakeBrand: String = "",
     val fakeDevice: String = "",
+    val fakeProduct: String = "",
     val fakeFingerprint: String = "",
     val fakeAndroidId: String = "",
     val fakeImei: String = "",
@@ -64,12 +65,20 @@ object DeviceSpoofPatch {
         }
 
         if (options.spoofTelephony) {
-            // getDeviceId/getImei -> telephony() (IMEI-Fake)
+            // getDeviceId()/getImei() -> telephony() (IMEI-Fake)
             val imeiRegex = Regex(
                 """invoke-virtual\s*\{([vp]\d+)\s*\}\s*,\s*Landroid/telephony/TelephonyManager;->(getDeviceId|getImei)\(\)Ljava/lang/String;"""
             )
             out = imeiRegex.replace(out) { m ->
                 "invoke-static {${m.groupValues[1]}}, Lde/minipc/spoof/DeviceSpoof;->telephony(Landroid/telephony/TelephonyManager;)Ljava/lang/String;"
+            }
+            // getDeviceId(slot)/getImei(slot) -> telephonySlot() (Slot-Varianten,
+            // API 23+: Dual-SIM-Geraete rufen die Version mit int-Parameter auf)
+            val imeiSlotRegex = Regex(
+                """invoke-virtual\s*\{([vp]\d+)\s*,\s*([vp]\d+)\s*\}\s*,\s*Landroid/telephony/TelephonyManager;->(getDeviceId|getImei)\(I\)Ljava/lang/String;"""
+            )
+            out = imeiSlotRegex.replace(out) { m ->
+                "invoke-static {${m.groupValues[1]}, ${m.groupValues[2]}}, Lde/minipc/spoof/DeviceSpoof;->telephonySlot(Landroid/telephony/TelephonyManager;I)Ljava/lang/String;"
             }
             // getSubscriberId -> subscriberId() (IMSI-Fake)
             val imsiRegex = Regex(

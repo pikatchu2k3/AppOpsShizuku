@@ -157,7 +157,13 @@ object DexPatcher {
         val manufacturer = options.fakeManufacturer.ifBlank { android.os.Build.MANUFACTURER }.smaliEscape()
         val brand = options.fakeBrand.ifBlank { android.os.Build.BRAND }.smaliEscape()
         val device = options.fakeDevice.ifBlank { android.os.Build.DEVICE }.smaliEscape()
-        val product = options.fakeDevice.ifBlank { android.os.Build.PRODUCT }.smaliEscape()
+        // PRODUCT hat ein eigenes fakeProduct-Feld; ist es (wie bei Alt-Optionen)
+        // leer, wird sinnvollerweise aus fakeDevice abgeleitet statt blind
+        // fakeDevice zu zuweisen (alter Copy-Paste-Bug: PRODUCT == DEVICE).
+        val product = options.fakeProduct
+            .ifBlank { options.fakeDevice }
+            .ifBlank { android.os.Build.PRODUCT }
+            .smaliEscape()
         val fingerprint = options.fakeFingerprint.ifBlank { android.os.Build.FINGERPRINT }.smaliEscape()
         val hardware = android.os.Build.HARDWARE.smaliEscape()
         val androidId = options.fakeAndroidId
@@ -350,6 +356,22 @@ object DexPatcher {
 .end method
 
 .method public static telephony(Landroid/telephony/TelephonyManager;)Ljava/lang/String;
+    .locals 2
+
+    sget-object v0, Lde/minipc/spoof/DeviceSpoof;->IMEI:Ljava/lang/String;
+    if-eqz v0, :cond_empty
+    invoke-virtual {v0}, Ljava/lang/String;->length()I
+    move-result v1
+    if-nez v1, :cond_empty
+
+    return-object v0
+
+    :cond_empty
+    const-string v0, "000000000000000"
+    return-object v0
+.end method
+
+.method public static telephonySlot(Landroid/telephony/TelephonyManager;I)Ljava/lang/String;
     .locals 2
 
     sget-object v0, Lde/minipc/spoof/DeviceSpoof;->IMEI:Ljava/lang/String;
