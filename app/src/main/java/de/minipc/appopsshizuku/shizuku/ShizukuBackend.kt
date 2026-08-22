@@ -20,6 +20,16 @@ import java.util.concurrent.TimeUnit
  */
 class ShizukuBackend : ShellBackend {
 
+    companion object {
+        /** Gemeinsamer IO-Pool fuer stdout/stderr (statt einem neuen Pool pro Aufruf). */
+        private val ioExecutor: ExecutorService = Executors.newFixedThreadPool(2)
+    }
+
+    /** Gemeinsamen IO-Pool herunterfahren (z.B. beim Beenden der App). */
+    fun close() {
+        ioExecutor.shutdown()
+    }
+
     override fun isAvailable(): Boolean = try {
         Shizuku.pingBinder()
     } catch (e: Exception) {
@@ -82,7 +92,6 @@ class ShizukuBackend : ShellBackend {
         val outStream = remote.inputStream?.let { ParcelFileDescriptor.AutoCloseInputStream(it) }
         val errStream = remote.errorStream?.let { ParcelFileDescriptor.AutoCloseInputStream(it) }
 
-        val ioExecutor: ExecutorService = Executors.newFixedThreadPool(2)
         val stdoutFuture = FutureTask<String> {
             if (outStream != null) {
                 BufferedReader(InputStreamReader(outStream, Charsets.UTF_8)).use { it.readText() }
@@ -103,14 +112,12 @@ class ShizukuBackend : ShellBackend {
         }
         if (!finished) {
             try { remote.destroy() } catch (e: Throwable) { /* egal */ }
-            ioExecutor.shutdownNow()
             return ShellResult(124, "", "timeout")
         }
 
         val exitCode = try { remote.exitValue() } catch (e: Throwable) { -1 }
         val stdout = try { stdoutFuture.get() } catch (e: Exception) { "" }
         val stderr = try { stderrFuture.get() } catch (e: Exception) { "" }
-        ioExecutor.shutdownNow()
         return ShellResult(exitCode, stdout, stderr)
     }
 
@@ -144,7 +151,6 @@ class ShizukuBackend : ShellBackend {
         val outStream = remote.inputStream?.let { ParcelFileDescriptor.AutoCloseInputStream(it) }
         val errStream = remote.errorStream?.let { ParcelFileDescriptor.AutoCloseInputStream(it) }
 
-        val ioExecutor: ExecutorService = Executors.newFixedThreadPool(2)
         val stdoutFuture = FutureTask<String> {
             if (outStream != null) {
                 BufferedReader(InputStreamReader(outStream, Charsets.UTF_8)).use { it.readText() }
@@ -165,14 +171,12 @@ class ShizukuBackend : ShellBackend {
         }
         if (!finished) {
             try { remote.destroy() } catch (e: Throwable) { /* egal */ }
-            ioExecutor.shutdownNow()
             return ShellResult(124, "", "timeout")
         }
 
         val exitCode = try { remote.exitValue() } catch (e: Throwable) { -1 }
         val stdout = try { stdoutFuture.get() } catch (e: Exception) { "" }
         val stderr = try { stderrFuture.get() } catch (e: Exception) { "" }
-        ioExecutor.shutdownNow()
         return ShellResult(exitCode, stdout, stderr)
     }
 }
