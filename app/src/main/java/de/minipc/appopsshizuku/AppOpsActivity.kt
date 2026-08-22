@@ -102,6 +102,10 @@ class AppOpsActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_appops, menu)
+        // Icon-Tint fuer Dark Mode: ic_blocked hat Schwarzes fillColor (#FF000000)
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+        menu.findItem(R.id.action_components)?.icon?.setTint(typedValue.data)
         return true
     }
 
