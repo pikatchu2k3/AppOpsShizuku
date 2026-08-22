@@ -22,7 +22,13 @@ class PrivacyProfileStore(context: Context) {
 
     /** Letzten gesetzten Modus einer Op merken (auch "default"). */
     fun setOpMode(packageName: String, opName: String, mode: String) {
-        val profile = JSONObject(getProfileJson(packageName))
+        // Leeres/ungueltiges JSON absichern: ohne gespeichertes Profil liefert
+        // getString() null -> orEmpty() -> "" -> JSONObject("") wuerde mit
+        // JSONException crashen (live reproduziert: App stuerzte beim Setzen
+        // der ersten Op einer App auf den Main-Thread ab, "springt zurueck").
+        val json = getProfileJson(packageName)
+        val profile = if (json.isBlank()) JSONObject()
+        else runCatching { JSONObject(json) }.getOrElse { JSONObject() }
         profile.put(opName, mode)
         prefs.edit().putString(packageName, profile.toString()).apply()
     }

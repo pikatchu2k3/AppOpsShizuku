@@ -279,7 +279,9 @@ class AppOpsActivity : AppCompatActivity() {
             handler.post {
                 if (res.exitCode == 0) {
                     opStates[op.opName] = mode
-                    profileStore.setOpMode(packageName, op.opName, mode)
+                    // Profil-Speicherung darf den UI-Thread NIE crashen
+                    // (z.B. korruptes/leeres JSON in den Prefs -> JSONException).
+                    runCatching { profileStore.setOpMode(packageName, op.opName, mode) }
                     adapter.submitList(buildItems())
                     updateStats()
                     Toast.makeText(

@@ -1,6 +1,6 @@
 ---
-Status: funktionsfähig (v1.12.3 — VERSTECKEN-DEFAULT AUS + LAUNCHER-FIX, E2E-verifiziert Emulator, User-bestätigt)
-Datum: 2026-08-11
+Status: funktionsfähig (v1.12.4 — CLIPBOARD-CRASH GEFIXT: getMode-Paket-Ebene + setOpMode-JSON, E2E-verifiziert Emulator)
+Datum: 2026-08-22
 Projekt: AppOpsShizuku — Privacy-AppOps/Shizuku-Verwaltung für beliebige Apps (on-device, kein Root)
 Pfade:
   Quellcode: ~/AppOpsShizuku/app/src/main/java/de/minipc/appopsshizuku/
@@ -14,6 +14,35 @@ Abhängigkeiten: dev.rikka.shizuku:api:13.1.5, dev.rikka.shizuku:provider:13.1.5
 Separate App neben AppClonerLite: verwaltet AppOps/Permissions beliebiger installierter Apps
 über Shizuku (adb-Rechte, KEIN Root, KEIN Xposed). Feature 1 = Privacy-Profil: Kamera,
 Mikrofon, Kontakte, Kalender, Anrufliste, Konten, Zwischenablage, Sensoren blockieren/freigeben.
+
+# v1.12.4 (08/2026) — Clipboard-Crash behoben (User-Report: App sprang zum Hauptmenü)
+
+**User-Report (real):** „Wenn ich … Zwischenablage lesen/Zwischenablage schreiben … zu deny
+verändern will, springt App Ops Shizuku zurück zum Hauptmenü" (FOSS Browser).
+
+**Zwei Root Causes (beide live im Emulator reproduziert und gefixt):**
+
+1. **`PrivacyProfileStore.setOpMode()` crashte mit `JSONException: End of input`**
+   (FATAL EXCEPTION: main → App stürzt ab → „zurück zum Hauptmenü"). Ursache: Beim ersten
+   Setzen einer Op einer App (kein gespeichertes Profil) lieferte `getString(pkg, null)
+   .orEmpty()` einen LEEREN String → `JSONObject("")` → JSONException auf dem Main-Thread
+   (handler.post in onModeSelected). Fix: leeres/ungültiges JSON → neues `JSONObject()`;
+   zusätzlich defensiv `runCatching` um setOpMode in onModeSelected (UI-Thread darf nie
+   crashen).
+2. **`AppOpsController.getMode()` erkannte reine AppOps nicht:** `cmd appops get <pkg>
+   READ_CLIPBOARD` liefert NUR die Paket-Ebene (`READ_CLIPBOARD: deny`) — OHNE
+   `Uid mode:`-Zeile (die gibt es nur bei Permission-Ops). Der Parser gab deshalb
+   fälschlich `default` zurück → UI zeigte nach jedem Reload den falschen Zustand (deny
+   „sprang zurück" auf default). Fix: Paket-Ebene parsen (nur wenn der Präfix zum
+   Op-Namen passt, damit „Default mode: allow" nicht verfälscht).
+
+**E2E-verifiziert (Emulator API 35, frische App-Daten via pm clear — exakt der
+User-Zustand):** Alle 13 Privacy-Ops einzeln auf deny/allow/default geändert — KEIN Crash;
+„Alle auf Standard" ohne Crash; Neustart zeigt korrekte Zustände. Unit-Tests erweitert
+(5 neue getMode-Parser-Fälle, AppOpsControllerTest 18/18 grün). APK v1.12.4, MD5 siehe
+Build-Ausgabe. Hinweis: Bei FOSS Browser sind viele Permissions (CAMERA, READ_CONTACTS, …)
+nicht deklariert → `pm grant`/`pm revoke` ist ein No-op (Uid mode bleibt ignore) — die UI
+zeigt nach Reload den echten Zustand; kein Crash, bekanntes Verhalten.
 
 # v1.12.3 (08/2026) — „Im Verlauf verstecken" default AUS (User-Korrektur)
 

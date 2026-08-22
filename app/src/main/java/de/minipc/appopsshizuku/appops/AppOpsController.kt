@@ -34,6 +34,8 @@ class AppOpsController(private val backend: ShellBackend) {
      *   "Uid mode: CAMERA: foreground"  -> granted, Zugriff normal  -> "allow"
      *   "Uid mode: CAMERA: ignore"      -> blockiert (revoked)       -> "ignore"
      *   "Uid mode: CAMERA: deny"        -> blockiert (hart)          -> "deny"
+     *   "READ_CLIPBOARD: deny"          -> reine AppOps OHNE Permission:
+     *                                      nur Paket-Ebene, KEINE "Uid mode:"-Zeile
      *   "No operations." / "No mode"    -> kein expliziter Modus     -> "default"
      */
     fun getMode(packageName: String, op: AppOp): String? {
@@ -42,12 +44,20 @@ class AppOpsController(private val backend: ShellBackend) {
         val stdout = result.stdout.trim()
         if (stdout.contains("No mode", ignoreCase = true)) return "default"
         if (stdout.contains("No operations", ignoreCase = true)) return "default"
+        val opPrefix = op.opName.lowercase() + ":"
         for (line in stdout.split("\n")) {
             val t = line.trim()
             if (t.isEmpty()) continue
             if (t.startsWith("Uid mode:", ignoreCase = true)) {
                 val after = t.substringAfter(":").trim()          // "CAMERA: foreground" oder "foreground"
                 val mode = after.substringAfterLast(":").trim().lowercase()
+                return normalizeMode(mode) ?: "default"
+            }
+            // Paket-Ebene bei reinen AppOps (READ_CLIPBOARD, WRITE_CLIPBOARD):
+            // "<OP>: <mode>" — die Zeile NUR parsen, wenn der Praefix zum Op passt
+            // (sonst koennte "Default mode: allow" faelschlich als "default" gelesen werden).
+            if (t.lowercase().startsWith(opPrefix)) {
+                val mode = t.substringAfterLast(":").trim().lowercase()
                 return normalizeMode(mode) ?: "default"
             }
             val m = normalizeMode(t)

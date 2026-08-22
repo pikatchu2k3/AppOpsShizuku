@@ -135,6 +135,58 @@ class AppOpsControllerTest {
         assertEquals(null, controller.getMode("com.example.app", cameraOp))
     }
 
+    // ---------- getMode: reine AppOps (Paket-Ebene, KEINE Uid-mode-Zeile) ----------
+    // Live-Format (Android 15/16): `cmd appops get <pkg> READ_CLIPBOARD` liefert NUR
+    // "READ_CLIPBOARD: <mode>" — ohne "Uid mode:"-Zeile. Der alte Parser gab dafuer
+    // faelschlich "default" zurueck (Bug: UI zeigte deny-Zustand nicht).
+
+    @Test
+    fun `getMode parses pure appop package-level deny as deny`() {
+        val backend = FakeBackend()
+        backend.result = ShellResult(0, "READ_CLIPBOARD: deny", "")
+        val controller = AppOpsController(backend)
+
+        assertEquals("deny", controller.getMode("com.example.app", clipboardOp))
+    }
+
+    @Test
+    fun `getMode parses pure appop package-level allow as allow`() {
+        val backend = FakeBackend()
+        backend.result = ShellResult(0, "READ_CLIPBOARD: allow", "")
+        val controller = AppOpsController(backend)
+
+        assertEquals("allow", controller.getMode("com.example.app", clipboardOp))
+    }
+
+    @Test
+    fun `getMode parses pure appop package-level ignore as ignore`() {
+        val backend = FakeBackend()
+        backend.result = ShellResult(0, "READ_CLIPBOARD: ignore", "")
+        val controller = AppOpsController(backend)
+
+        assertEquals("ignore", controller.getMode("com.example.app", clipboardOp))
+    }
+
+    @Test
+    fun `getMode ignores Default mode line when package-level line present`() {
+        val backend = FakeBackend()
+        backend.result = ShellResult(0, "WRITE_CLIPBOARD: deny\nDefault mode: allow", "")
+        val controller = AppOpsController(backend)
+        val writeOp = AppOp("WRITE_CLIPBOARD", "Zwischenablage schreiben", null)
+
+        assertEquals("deny", controller.getMode("com.example.app", writeOp))
+    }
+
+    @Test
+    fun `getMode does not match other ops package-level line`() {
+        val backend = FakeBackend()
+        // Paket-Ebene einer ANDEREN Op (READ_CLIPBOARD) darf den CAMERA-Get nicht verfaelschen
+        backend.result = ShellResult(0, "READ_CLIPBOARD: deny", "")
+        val controller = AppOpsController(backend)
+
+        assertEquals("default", controller.getMode("com.example.app", cameraOp))
+    }
+
     // ---------- restoreAll / Noop ----------
 
     @Test
