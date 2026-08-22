@@ -102,6 +102,7 @@ class ComponentsActivity : AppCompatActivity() {
         }
 
         setupDisableAppSwitch()
+        setupFreezeAppSwitch()
         setupStealth()
 
         loadComponents()
@@ -212,6 +213,76 @@ class ComponentsActivity : AppCompatActivity() {
                 toggleApp(true)
             }
         }
+    }
+
+    /**
+     * App-Freeze via pm suspend (Shizuku-Shell, kein Root): App wird sofort
+     * beendet und kann nicht gestartet werden, bleibt aber mit Daten installiert.
+     * Ist-Zustand ueber PackageManager.isPackageSuspended() — `pm list packages`
+     * hat keinen Suspended-Filter (-s listet System-Apps).
+     */
+    private fun setupFreezeAppSwitch() {
+        val sw = findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
+        val subtitle = findViewById<TextView>(R.id.freezeAppSubtitle)
+        val isSelf = packageName == applicationContext.packageName
+
+        sw.isEnabled = !isSelf
+        subtitle.text = if (isSelf) {
+            getString(R.string.components_own_app)
+        } else {
+            getString(R.string.components_freeze_warning)
+        }
+
+        val suspended = runCatching { packageManager.isPackageSuspended(packageName) }
+            .getOrDefault(false)
+        sw.isChecked = suspended
+
+        sw.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.components_freeze_app)
+                    .setMessage(R.string.components_freeze_warning)
+                    .setNegativeButton(R.string.btn_cancel) { _, _ ->
+                        sw.isChecked = false
+                    }
+                    .setPositiveButton(R.string.btn_freeze) { _, _ ->
+                        toggleFreeze(true)
+                    }
+                    .show()
+            } else {
+                toggleFreeze(false)
+            }
+        }
+    }
+
+    private fun toggleFreeze(freeze: Boolean) {
+        val sw = findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
+        executor.execute {
+            val res = if (freeze) backend.suspendPackage(packageName)
+            else backend.unsuspendPackage(packageName)
+            handler.post {
+                if (isFailed(res)) {
+                    sw.isChecked = !freeze
+                    Toast.makeText(this, R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        this,
+                        getString(
+                            if (freeze) R.string.components_frozen else R.string.components_unfrozen
+                        ),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                refreshSuspendState()
+            }
+        }
+    }
+
+    /** Switch nach dem Freeze-Wechsel neu synchronisieren (Shell-Ergebnis ist massgeblich). */
+    private fun refreshSuspendState() {
+        val sw = findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
+        sw.isChecked = runCatching { packageManager.isPackageSuspended(packageName) }
+            .getOrDefault(false)
     }
 
     private fun toggleApp(enable: Boolean) {

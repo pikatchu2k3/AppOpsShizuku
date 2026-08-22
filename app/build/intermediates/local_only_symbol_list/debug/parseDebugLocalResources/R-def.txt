@@ -7,6 +7,7 @@ drawable ic_launcher
 drawable ic_refresh
 id action_components
 id appDisableSwitch
+id appFreezeSwitch
 id appIcon
 id appLabel
 id appList
@@ -26,6 +27,7 @@ id disableAppSubtitle
 id emptyState
 id fabRefresh
 id filterChipGroup
+id freezeAppSubtitle
 id itemIcon
 id itemLabel
 id itemPackage
@@ -90,6 +92,7 @@ string btn_cancel
 string btn_connect
 string btn_disable
 string btn_disconnect
+string btn_freeze
 string btn_ok
 string btn_refresh
 string btn_restore_all
@@ -104,6 +107,9 @@ string components_disable_app
 string components_disable_warning
 string components_enable_all
 string components_enable_app
+string components_freeze_app
+string components_freeze_warning
+string components_frozen
 string components_launcher
 string components_no_component_permission
 string components_not_exported
@@ -112,6 +118,7 @@ string components_receivers
 string components_start
 string components_system_app
 string components_title
+string components_unfrozen
 string components_widgets
 string empty_no_apps
 string empty_try_search

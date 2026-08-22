@@ -3086,6 +3086,7 @@ id always
 id animateToEnd
 id animateToStart
 id appDisableSwitch
+id appFreezeSwitch
 id appIcon
 id appLabel
 id appList
@@ -3206,6 +3207,7 @@ id flip
 id floating
 id forever
 id fragment_container_view_tag
+id freezeAppSubtitle
 id fullscreen_header
 id ghost_view
 id ghost_view_holder
@@ -3779,6 +3781,7 @@ string btn_cancel
 string btn_connect
 string btn_disable
 string btn_disconnect
+string btn_freeze
 string btn_ok
 string btn_refresh
 string btn_restore_all
@@ -3804,6 +3807,9 @@ string components_disable_app
 string components_disable_warning
 string components_enable_all
 string components_enable_app
+string components_freeze_app
+string components_freeze_warning
+string components_frozen
 string components_launcher
 string components_no_component_permission
 string components_not_exported
@@ -3812,6 +3818,7 @@ string components_receivers
 string components_start
 string components_system_app
 string components_title
+string components_unfrozen
 string components_widgets
 string empty_no_apps
 string empty_try_search

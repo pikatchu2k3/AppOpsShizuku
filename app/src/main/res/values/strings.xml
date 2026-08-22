@@ -70,6 +70,13 @@
     <string name="error_start_activity">Activity konnte nicht gestartet werden</string>
     <string name="components_no_component_permission">Einzelne Komponenten nur bei Apps mit CHANGE_COMPONENT_ENABLED_STATE möglich (meist System-Apps) — nutze „App deaktivieren" für das Icon</string>
 
+    <!-- App-Freeze (pm suspend) -->
+    <string name="components_freeze_app">App einfrieren (Suspend)</string>
+    <string name="components_freeze_warning">Die App wird sofort beendet und kann nicht gestartet werden — installierte Daten bleiben erhalten. Zum Auftauen den Schalter wieder ausschalten.</string>
+    <string name="btn_freeze">Einfrieren</string>
+    <string name="components_frozen">App eingefroren</string>
+    <string name="components_unfrozen">App aufgetaut</string>
+
     <!-- Stealth-Modus (Feature 2b) -->
     <string name="stealth_title">Stealth-Modus</string>
     <string name="stealth_description">Patcht die App so, dass sie dauerhaft nicht im Verlauf (letzte Apps) erscheint. Optional wird zusätzlich das Launcher-Icon entfernt. Die App wird dabei neu signiert.</string>

@@ -12,4 +12,12 @@ interface ShellBackend {
 
     /** Binaerdaten ueber den Prozess-Stdin schreiben (Default: ohne Stdin). */
     fun execWithStdin(stdin: ByteArray, vararg args: String): ShellResult = exec(*args)
+
+    /** App per pm suspend einfrieren (Default: nicht unterstuetzt). */
+    fun suspendPackage(packageName: String): ShellResult =
+        ShellResult(-1, "", "suspend nicht unterstuetzt")
+
+    /** Eingefrorene App per pm unsuspend wieder freigeben (Default: nicht unterstuetzt). */
+    fun unsuspendPackage(packageName: String): ShellResult =
+        ShellResult(-1, "", "unsuspend nicht unterstuetzt")
 }

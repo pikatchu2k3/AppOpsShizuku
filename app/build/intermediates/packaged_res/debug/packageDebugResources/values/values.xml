@@ -13,6 +13,7 @@
     <string name="btn_connect">Verbinden</string>
     <string name="btn_disable">Deaktivieren</string>
     <string name="btn_disconnect">Trennen</string>
+    <string name="btn_freeze">Einfrieren</string>
     <string name="btn_ok">OK</string>
     <string name="btn_refresh">Aktualisieren</string>
     <string name="btn_restore_all">Alle auf Standard</string>
@@ -27,6 +28,9 @@
     <string name="components_disable_warning">Die App wird beendet und aus dem Launcher entfernt. Installierte Daten bleiben erhalten.</string>
     <string name="components_enable_all">Alle aktivieren</string>
     <string name="components_enable_app">App aktiviert</string>
+    <string name="components_freeze_app">App einfrieren (Suspend)</string>
+    <string name="components_freeze_warning">Die App wird sofort beendet und kann nicht gestartet werden — installierte Daten bleiben erhalten. Zum Auftauen den Schalter wieder ausschalten.</string>
+    <string name="components_frozen">App eingefroren</string>
     <string name="components_launcher">Launcher</string>
     <string name="components_no_component_permission">Einzelne Komponenten nur bei Apps mit CHANGE_COMPONENT_ENABLED_STATE möglich (meist System-Apps) — nutze „App deaktivieren" für das Icon</string>
     <string name="components_not_exported">nicht exportiert</string>
@@ -35,6 +39,7 @@
     <string name="components_start">Starten</string>
     <string name="components_system_app">System-Apps können nicht komplett deaktiviert werden</string>
     <string name="components_title">Komponenten</string>
+    <string name="components_unfrozen">App aufgetaut</string>
     <string name="components_widgets">Widgets</string>
     <string name="empty_no_apps">Keine Apps gefunden</string>
     <string name="empty_try_search">Versuche eine andere Suche</string>

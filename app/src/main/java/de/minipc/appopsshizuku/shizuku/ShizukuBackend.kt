@@ -35,6 +35,17 @@ class ShizukuBackend : ShellBackend {
     override fun exec(vararg args: String): ShellResult = execTimeout(15, *args)
 
     /**
+     * App einfrieren: Prozess wird sofort beendet, Starten ist blockiert,
+     * App bleibt aber mit Daten installiert (pm suspend, kein Root noetig).
+     */
+    override fun suspendPackage(packageName: String): ShellResult =
+        exec("pm", "suspend", "--user", "0", packageName)
+
+    /** Eingefrorene App wieder auftauen (pm unsuspend). */
+    override fun unsuspendPackage(packageName: String): ShellResult =
+        exec("pm", "unsuspend", "--user", "0", packageName)
+
+    /**
      * Binaerdaten ueber den Prozess-Stdin in die Shell schreiben (z.B.
      * `sh -c "cat > /data/local/tmp/x.apk"`). Stdin bleibt dafuer offen,
      * die Bytes werden geschrieben und der Stream geschlossen.
