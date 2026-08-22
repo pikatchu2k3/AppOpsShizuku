@@ -185,7 +185,7 @@ class StealthPatchService : Service() {
             finish(false, getString(R.string.status_no_permission))
             return
         }
-        val stealer = StealthStealer(backend)
+        val stealer = StealthStealer(backend, applicationContext)
         // Eigene App vor App-Standby/Doze schuetzen (als shell-UID setzbar,
         // app-spezifisch fuer die EIGENE App, reversibel). Ohne das kann
         // OxygenOS den Patch-Prozess im Hintergrund einfrieren (realer

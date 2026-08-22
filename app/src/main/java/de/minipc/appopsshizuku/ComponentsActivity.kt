@@ -533,7 +533,7 @@ class ComponentsActivity : AppCompatActivity() {
             findViewById<MaterialButton>(R.id.stealthRestoreButton).isEnabled = false
             return
         }
-        stealthStealer = StealthStealer(backend)
+        stealthStealer = StealthStealer(backend, applicationContext)
         originalApkFile = File(stealthWorkDir(), "original.apk")
         val restoreBtn = findViewById<MaterialButton>(R.id.stealthRestoreButton)
         restoreBtn.isEnabled = originalApkFile?.exists() == true

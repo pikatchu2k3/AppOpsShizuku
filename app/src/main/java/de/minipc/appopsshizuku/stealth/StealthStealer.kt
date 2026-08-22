@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.stealth
 
+import android.content.Context
 import android.util.Base64
 import android.util.Log
 import de.minipc.appopsshizuku.shizuku.ShellBackend
@@ -47,7 +48,7 @@ enum class StealthPhase {
  * OOM-Fall bei smali-Assembly, gleiche Heap-Grenze) und (b) echte Prozente gemeldet
  * werden koennen. Der Single-Call-Base64 war ausserdem nahe am 180s-Timeout.
  */
-class StealthStealer(private val backend: ShellBackend) {
+class StealthStealer(private val backend: ShellBackend, private val appContext: Context) {
 
     companion object {
         private const val TAG = "StealthStealer"
@@ -280,7 +281,7 @@ class StealthStealer(private val backend: ShellBackend) {
             )
             val signed = File(workDir, "signed.apk")
             report(StealthPhase.SIGN, null)
-            ApkSigner.sign(repacked, signed)
+            ApkSigner.sign(appContext, repacked, signed)
             // Shell (cp) muss das signierte APK lesen koennen
             signed.setReadable(true, false)
             signed
@@ -344,7 +345,7 @@ class StealthStealer(private val backend: ShellBackend) {
                 val splitName = split.name.removePrefix("original_split_")
                 val signedSplit = File(workDir, splitName)
                 report(StealthPhase.SIGN, null)
-                ApkSigner.sign(repackedSplit, signedSplit)
+                ApkSigner.sign(appContext, repackedSplit, signedSplit)
                 signedSplit.setReadable(true, false)
                 result.add(signedSplit)
             } catch (e: Exception) {
