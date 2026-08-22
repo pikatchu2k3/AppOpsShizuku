@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.minipc.appopsshizuku.stealth.AddPermissionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-08-11T06:52:31" hostname="Mini2" time="0.173">
+<testsuite name="de.minipc.appopsshizuku.stealth.AddPermissionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-08-22T07:44:38.094Z" hostname="Mini2" time="0.173">
   <properties/>
-  <testcase name="addPermissionWirdVonAapt2Erkannt" classname="de.minipc.appopsshizuku.stealth.AddPermissionTest" time="0.09"/>
-  <testcase name="addPermissionIstIdempotent" classname="de.minipc.appopsshizuku.stealth.AddPermissionTest" time="0.082"/>
+  <testcase name="addPermissionWirdVonAapt2Erkannt" classname="de.minipc.appopsshizuku.stealth.AddPermissionTest" time="0.087"/>
+  <testcase name="addPermissionIstIdempotent" classname="de.minipc.appopsshizuku.stealth.AddPermissionTest" time="0.085"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

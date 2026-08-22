@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.minipc.appopsshizuku.stealth.PatchMiniApkTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-11T06:52:37" hostname="Mini2" time="0.497">
+<testsuite name="de.minipc.appopsshizuku.stealth.PatchMiniApkTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-22T07:44:38.423Z" hostname="Mini2" time="0.0">
   <properties/>
-  <testcase name="patchMiniApk" classname="de.minipc.appopsshizuku.stealth.PatchMiniApkTest" time="0.497"/>
-  <system-out><![CDATA[original=12140 patched=12504
-APK: /tmp/foss_patched_v4.apk (6375380 B)
+  <testcase name="patchMiniApk" classname="de.minipc.appopsshizuku.stealth.PatchMiniApkTest" time="0.0"/>
+  <system-out><![CDATA[SKIP: mini5 fehlt
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

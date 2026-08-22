@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.stealth
 
+import android.util.Log
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -17,6 +18,7 @@ import java.util.zip.ZipFile
  */
 object DexPatcher {
 
+    private const val TAG = "DexPatcher"
     const val FLAG_SECURE = 0x2000
     private const val API_LEVEL = 35
     /**
@@ -521,7 +523,17 @@ object DexPatcher {
         setField(cmd, "outputDir", outDir.absolutePath)
         setField(cmd, "apiLevel", API_LEVEL)
         setField(cmd, "jobs", jobs)
-        cmd.javaClass.getMethod("run").invoke(cmd)
+        val exit = invokeRun(cmd)
+        if (exit != 0) {
+            Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} -> ${outDir.absolutePath} (jobs=$jobs, exit=$exit)")
+            return false
+        }
+        // Die Library schreibt Fehler nur auf stderr und run() kann trotzdem
+        // "erfolgreich" enden -> Output-Artefakt verifizieren.
+        if (outDir.walkTopDown().none { it.isFile }) {
+            Log.e(TAG, "baksmali lieferte kein Ergebnis: disassemble ${dexFile.absolutePath} -> ${outDir.absolutePath} (jobs=$jobs, exit=$exit, keine Smali-Dateien erzeugt)")
+            return false
+        }
         return true
     }
 
@@ -566,9 +578,34 @@ object DexPatcher {
         setField(cmd, "output", outDex.absolutePath)
         setField(cmd, "apiLevel", API_LEVEL)
         setField(cmd, "jobs", jobs)
-        cmd.javaClass.getMethod("run").invoke(cmd)
+        val exit = invokeRun(cmd)
+        if (exit != 0) {
+            Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} -> ${outDex.absolutePath} (jobs=$jobs, exit=$exit)")
+            return false
+        }
+        if (!outDex.exists() || outDex.length() <= 0L) {
+            Log.e(TAG, "smali lieferte kein Ergebnis: assemble ${smaliDir.absolutePath} -> ${outDex.absolutePath} (jobs=$jobs, exit=$exit, Dex fehlt/leer)")
+            return false
+        }
         return true
     }
+
+    /**
+     * Ruft run() per Reflection auf und wertet den Exit-Code aus:
+     * void/null-Rueckgabe = 0, numerische Rueckgabe = Exit-Code.
+     * Exceptions werden ent-wrapped weitergeworfen (InvocationTargetException ->
+     * Cause), damit die OOM-Fallback-Wrapper oben greifen.
+     */
+    private fun invokeRun(cmd: Any): Int =
+        try {
+            when (val r = cmd.javaClass.getMethod("run").invoke(cmd)) {
+                null -> 0
+                is Number -> r.toInt()
+                else -> 0
+            }
+        } catch (e: java.lang.reflect.InvocationTargetException) {
+            throw e.cause ?: e
+        }
 
     private fun setField(obj: Any, name: String, value: Any) {
         var cls: Class<*>? = obj.javaClass

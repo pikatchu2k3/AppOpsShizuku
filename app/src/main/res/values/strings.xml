@@ -77,6 +77,15 @@
     <string name="components_frozen">App eingefroren</string>
     <string name="components_unfrozen">App aufgetaut</string>
 
+    <!-- Privacy-Profil-Export/-Import (JSON) -->
+    <string name="menu_export_profiles">Profile exportieren</string>
+    <string name="menu_import_profiles">Profile importieren</string>
+    <string name="profiles_export_empty">Keine gespeicherten Profile vorhanden</string>
+    <string name="profiles_export_ok">%1$d Profile exportiert: privacy_profiles.json (App-Ordner)</string>
+    <string name="profiles_export_fail">Export fehlgeschlagen: %1$s</string>
+    <string name="profiles_import_ok">%1$d Apps importiert, %2$d Ops auf diese App angewendet</string>
+    <string name="profiles_import_fail">Import fehlgeschlagen: %1$s</string>
+
     <!-- Stealth-Modus (Feature 2b) -->
     <string name="stealth_title">Stealth-Modus</string>
     <string name="stealth_description">Patcht die App so, dass sie dauerhaft nicht im Verlauf (letzte Apps) erscheint. Optional wird zusätzlich das Launcher-Icon entfernt. Die App wird dabei neu signiert.</string>

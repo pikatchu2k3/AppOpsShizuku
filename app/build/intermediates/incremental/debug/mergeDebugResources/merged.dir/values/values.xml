@@ -2013,6 +2013,8 @@
     <string description="Title for the dialog with a time picker. [CHAR_LIMIT=32]" name="material_timepicker_select_time">Select time</string>
     <string name="material_timepicker_text_input_mode_description">Switch to text input mode for the time input.</string>
     <string name="menu_components">Komponenten</string>
+    <string name="menu_export_profiles">Profile exportieren</string>
+    <string name="menu_import_profiles">Profile importieren</string>
     <string description="Content description for new notification (no number count) [CHAR_LIMIT=NONE]" name="mtrl_badge_numberless_content_description">New notification</string>
     <string name="mtrl_checkbox_button_icon_path_checked" translatable="false">M14,18.2 11.4,15.6 10,17 14,21 22,13 20.6,11.6z</string>
     <string name="mtrl_checkbox_button_icon_path_group_name" translatable="false">icon</string>
@@ -2091,6 +2093,11 @@
     <string name="path_password_eye_mask_visible" translatable="false">M2,4.27 L2,4.27 L4.54,1.73 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z</string>
     <string name="path_password_strike_through" translatable="false">M3.27,4.27 L19.74,20.74</string>
     <string name="permissions_loaded">Berechtigungen geladen</string>
+    <string name="profiles_export_empty">Keine gespeicherten Profile vorhanden</string>
+    <string name="profiles_export_fail">Export fehlgeschlagen: %1$s</string>
+    <string name="profiles_export_ok">%1$d Profile exportiert: privacy_profiles.json (App-Ordner)</string>
+    <string name="profiles_import_fail">Import fehlgeschlagen: %1$s</string>
+    <string name="profiles_import_ok">%1$d Apps importiert, %2$d Ops auf diese App angewendet</string>
     <string name="restore_done">Alle Ops zurückgesetzt</string>
     <string name="scanning_apps">Berechtigungen werden geprüft…</string>
     <string name="search_hint">App suchen…</string>

@@ -1,61 +1,7 @@
-original=12140 patched=12504
-8--- aapt2 dump (activity/excludeFromRecents-Zeilen) ---
-           E: activity (line=52)
-®            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.BrowserActivity" (Raw: "de.baumann.browser.activity.BrowserActivity")
-^            A: http://schemas.android.com/apk/res/android:excludeFromRecents(0x01010017)=true
-”                    A: http://schemas.android.com/apk/res/android:name(0x01010003)="android.intent.action.MAIN" (Raw: "android.intent.action.MAIN")
-                     A: http://schemas.android.com/apk/res/android:name(0x01010003)="android.intent.category.LAUNCHER" (Raw: "android.intent.category.LAUNCHER")
-           E: activity (line=95)
-ª            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.ActivityShare" (Raw: "de.baumann.browser.activity.ActivityShare")
-!          E: activity (line=108)
-¼            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.ActivityCustomSearches" (Raw: "de.baumann.browser.activity.ActivityCustomSearches")
-!          E: activity (line=123)
-²            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Activity" (Raw: "de.baumann.browser.activity.Settings_Activity")
-!          E: activity (line=126)
-¸            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_ProfileList" (Raw: "de.baumann.browser.activity.Settings_ProfileList")
-!          E: activity (line=129)
-®            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Delete" (Raw: "de.baumann.browser.activity.Settings_Delete")
-!          E: activity (line=132)
-®            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Backup" (Raw: "de.baumann.browser.activity.Settings_Backup")
-!          E: activity (line=135)
-°            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Gesture" (Raw: "de.baumann.browser.activity.Settings_Gesture")
-!          E: activity (line=138)
-®            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Filter" (Raw: "de.baumann.browser.activity.Settings_Filter")
-!          E: activity (line=141)
-°            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Profile" (Raw: "de.baumann.browser.activity.Settings_Profile")
-!          E: activity (line=144)
-ª            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Menu" (Raw: "de.baumann.browser.activity.Settings_Menu")
-!--- kombiniertes Manifest ok ---
-<DEBUG spooftest apksig liefert: de.minipc.spooftest.stealth
-1DEBUG apksig liefert: de.baumann.browser.stealth
-'&kDEXPATCH: DexPatcher: dex classes.dex (9354200 B), suche de/baumann/browser/activity/BrowserActivity.smali
-'&6DEXPATCH: DexPatcher: Smali-Datei gefunden, patche...
-'&<DEXPATCH: DexPatcher: patche Methode onCreate (Zeile 13121)
-'&XDEXPATCH: DexPatcher: PATCH OK (secure=true vpn=false spoof=false), neues Dex 9463900 B
-'&lDEXPATCH: DexPatcher: dex classes2.dex (1748524 B), suche de/baumann/browser/activity/BrowserActivity.smali
-'&~DEXPATCH: DexPatcher: de/baumann/browser/activity/BrowserActivity.smali nicht in classes2.dex gefunden (smali-Dateien: 1427 )
-'&#=== result keys: [classes.dex] ===
-'&classes.dex -> 9463900 B
-)(original=12140 patched=12504
-)(*APK: /tmp/foss_patched_v4.apk (6375380 B)
-+*<DEXPATCH: DexPatcher: patche Methode onCreate (Zeile 13121)
-+**=== GEPATCHTE Smali (onCreate-Anfang) ===
-+*0  .method public onCreate(Landroid/os/Bundle;)V
-+*  .registers 15
-+*P  invoke-virtual {p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
-+*  move-result-object v11
-+*  const/16 v12, 0x2000
-+*A  invoke-virtual {v11, v12}, Landroid/view/Window;->addFlags(I)V
-+*  
-+*  .line 225
-+*
-+*=== neues Dex: 9463900 B ===
-+*3=== ROUNDTRIP onCreate (assembliert + zurueck) ===
-+*0  .method public onCreate(Landroid/os/Bundle;)V
-+*  .registers 15
-+*  
-+*P  invoke-virtual {p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
-+*  
-+*  move-result-object v11
-+*  
-+*  const/16 v12, 0x2000
+#SKIP: /tmp/foss_original.apk fehlt
+#SKIP: /tmp/foss_original.apk fehlt
+#SKIP: /tmp/foss_original.apk fehlt
+<DEBUG spooftest apksig liefert: de.minipc.spooftest.stealth
+1DEBUG apksig liefert: de.baumann.browser.stealth
+)(#SKIP: /tmp/foss_original.apk fehlt
++*SKIP: mini5 fehlt

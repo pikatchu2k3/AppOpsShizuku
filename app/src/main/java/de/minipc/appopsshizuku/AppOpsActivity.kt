@@ -2,6 +2,7 @@ package de.minipc.appopsshizuku
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +12,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +22,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.minipc.appopsshizuku.appops.AppOpsController
 import de.minipc.appopsshizuku.appops.AppOp
 import de.minipc.appopsshizuku.appops.PrivacyOps
+import de.minipc.appopsshizuku.appops.PrivacyProfileStore
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import de.minipc.appopsshizuku.ui.AppOpsAdapter
@@ -50,6 +53,7 @@ class AppOpsActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var backend: de.minipc.appopsshizuku.shizuku.ShellBackend
     private lateinit var controller: AppOpsController
+    private lateinit var profileStore: PrivacyProfileStore
     private lateinit var packageName: String
     private lateinit var adapter: AppOpsAdapter
 
@@ -79,6 +83,7 @@ class AppOpsActivity : AppCompatActivity() {
         }.getOrDefault(false)
         backend = if (shizukuOn) de.minipc.appopsshizuku.shizuku.ShizukuBackend() else NoopBackend()
         controller = AppOpsController(backend)
+        profileStore = PrivacyProfileStore(this)
 
         loadAppInfo()
 
@@ -113,7 +118,107 @@ class AppOpsActivity : AppCompatActivity() {
                 )
                 true
             }
+            R.id.action_export_profiles -> {
+                exportProfiles()
+                true
+            }
+            R.id.action_import_profiles -> {
+                importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private val importPicker =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) importProfiles(uri)
+        }
+
+    private fun exportProfiles() {
+        executor.execute {
+            val profiles = profileStore.allProfiles()
+            handler.post {
+                if (profiles.isEmpty()) {
+                    Toast.makeText(this, R.string.profiles_export_empty, Toast.LENGTH_SHORT).show()
+                    return@post
+                }
+                try {
+                    profileStore.exportFile().writeText(PrivacyProfileStore.toJson(profiles))
+                    Toast.makeText(
+                        this,
+                        getString(R.string.profiles_export_ok, profiles.size),
+                        Toast.LENGTH_LONG
+                    ).show()
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.profiles_export_fail, e.message ?: "?"),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * JSON-Datei (SAF-Picker) einlesen: Profile in die Prefs mergen und die
+     * Modi der aktuell geoeffneten App direkt anwenden (Klon-Backup: gleiche
+     * Ops auf das Klon-Paket setzen).
+     */
+    private fun importProfiles(uri: Uri) {
+        findViewById<LinearProgressIndicator>(R.id.loadingBar).visibility = View.VISIBLE
+        executor.execute {
+            var importedApps = 0
+            var appliedOps = 0
+            var error: String? = null
+            try {
+                val json = contentResolver.openInputStream(uri)
+                    ?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+                    ?: throw IllegalArgumentException("Datei nicht lesbar")
+                val profiles = PrivacyProfileStore.fromJson(json)
+                profileStore.importProfiles(profiles)
+                importedApps = profiles.size
+
+                // Profil dieser App (falls enthalten) live anwenden
+                val ownProfile = profiles[packageName]
+                if (ownProfile != null) {
+                    for (op in ops) {
+                        val mode = ownProfile[op.opName] ?: continue
+                        val res = controller.setMode(packageName, op, mode)
+                        if (res.exitCode == 0) {
+                            opStates[op.opName] = mode
+                            appliedOps++
+                        } else {
+                            opStates[op.opName] = try {
+                                controller.getMode(packageName, op)
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                error = e.message ?: e.javaClass.simpleName
+            }
+            handler.post {
+                findViewById<LinearProgressIndicator>(R.id.loadingBar).visibility = View.GONE
+                adapter.submitList(buildItems())
+                updateStats()
+                if (error != null) {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.profiles_import_fail, error),
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.profiles_import_ok, importedApps, appliedOps),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
     }
 
@@ -170,6 +275,7 @@ class AppOpsActivity : AppCompatActivity() {
             handler.post {
                 if (res.exitCode == 0) {
                     opStates[op.opName] = mode
+                    profileStore.setOpMode(packageName, op.opName, mode)
                     adapter.submitList(buildItems())
                     updateStats()
                     Toast.makeText(
@@ -198,6 +304,8 @@ class AppOpsActivity : AppCompatActivity() {
                 if (res.exitCode != 0) failed++
                 opStates[op.opName] = "default"
             }
+            // Alles auf Standard -> kein explizites Profil mehr gespeichert
+            profileStore.removeProfile(packageName)
             handler.post {
                 findViewById<LinearProgressIndicator>(R.id.loadingBar).visibility = View.GONE
                 adapter.submitList(buildItems())

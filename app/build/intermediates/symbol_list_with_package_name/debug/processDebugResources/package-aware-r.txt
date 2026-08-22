@@ -3069,7 +3069,9 @@ id action_components
 id action_container
 id action_context_bar
 id action_divider
+id action_export_profiles
 id action_image
+id action_import_profiles
 id action_menu_divider
 id action_menu_presenter
 id action_mode_bar
@@ -3876,6 +3878,8 @@ string material_timepicker_pm
 string material_timepicker_select_time
 string material_timepicker_text_input_mode_description
 string menu_components
+string menu_export_profiles
+string menu_import_profiles
 string mtrl_badge_numberless_content_description
 string mtrl_checkbox_button_icon_path_checked
 string mtrl_checkbox_button_icon_path_group_name
@@ -3948,6 +3952,11 @@ string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
 string permissions_loaded
+string profiles_export_empty
+string profiles_export_fail
+string profiles_export_ok
+string profiles_import_fail
+string profiles_import_ok
 string restore_done
 string scanning_apps
 string search_hint

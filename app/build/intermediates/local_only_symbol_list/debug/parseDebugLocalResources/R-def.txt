@@ -6,6 +6,8 @@ drawable ic_chevron
 drawable ic_launcher
 drawable ic_refresh
 id action_components
+id action_export_profiles
+id action_import_profiles
 id appDisableSwitch
 id appFreezeSwitch
 id appIcon
@@ -130,11 +132,18 @@ string filter_all
 string filter_blocked
 string loading_permissions
 string menu_components
+string menu_export_profiles
+string menu_import_profiles
 string no_apps
 string op_mode_hint
 string op_set_fail
 string op_set_ok
 string permissions_loaded
+string profiles_export_empty
+string profiles_export_fail
+string profiles_export_ok
+string profiles_import_fail
+string profiles_import_ok
 string restore_done
 string scanning_apps
 string search_hint

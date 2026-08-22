@@ -1,37 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-08-11T06:52:31" hostname="Mini2" time="0.026">
+<testsuite name="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-08-22T07:44:38.268Z" hostname="Mini2" time="0.001">
   <properties/>
-  <testcase name="setExcludeFromRecents_patziertFossManifestKorrekt" classname="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" time="0.016"/>
-  <testcase name="removeCategoryLauncher_entferntLauncherKategorie" classname="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" time="0.005"/>
-  <testcase name="beidePatches_kombinierbar" classname="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" time="0.005"/>
-  <system-out><![CDATA[original=12140 patched=12504
---- aapt2 dump (activity/excludeFromRecents-Zeilen) ---
-          E: activity (line=52)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.BrowserActivity" (Raw: "de.baumann.browser.activity.BrowserActivity")
-            A: http://schemas.android.com/apk/res/android:excludeFromRecents(0x01010017)=true
-                    A: http://schemas.android.com/apk/res/android:name(0x01010003)="android.intent.action.MAIN" (Raw: "android.intent.action.MAIN")
-                    A: http://schemas.android.com/apk/res/android:name(0x01010003)="android.intent.category.LAUNCHER" (Raw: "android.intent.category.LAUNCHER")
-          E: activity (line=95)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.ActivityShare" (Raw: "de.baumann.browser.activity.ActivityShare")
-          E: activity (line=108)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.ActivityCustomSearches" (Raw: "de.baumann.browser.activity.ActivityCustomSearches")
-          E: activity (line=123)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Activity" (Raw: "de.baumann.browser.activity.Settings_Activity")
-          E: activity (line=126)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_ProfileList" (Raw: "de.baumann.browser.activity.Settings_ProfileList")
-          E: activity (line=129)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Delete" (Raw: "de.baumann.browser.activity.Settings_Delete")
-          E: activity (line=132)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Backup" (Raw: "de.baumann.browser.activity.Settings_Backup")
-          E: activity (line=135)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Gesture" (Raw: "de.baumann.browser.activity.Settings_Gesture")
-          E: activity (line=138)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Filter" (Raw: "de.baumann.browser.activity.Settings_Filter")
-          E: activity (line=141)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Profile" (Raw: "de.baumann.browser.activity.Settings_Profile")
-          E: activity (line=144)
-            A: http://schemas.android.com/apk/res/android:name(0x01010003)="de.baumann.browser.activity.Settings_Menu" (Raw: "de.baumann.browser.activity.Settings_Menu")
---- kombiniertes Manifest ok ---
+  <testcase name="setExcludeFromRecents_patziertFossManifestKorrekt" classname="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" time="0.0"/>
+  <testcase name="removeCategoryLauncher_entferntLauncherKategorie" classname="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" time="0.001"/>
+  <testcase name="beidePatches_kombinierbar" classname="de.minipc.appopsshizuku.stealth.BinaryXmlStealthTest" time="0.0"/>
+  <system-out><![CDATA[SKIP: /tmp/foss_original.apk fehlt
+SKIP: /tmp/foss_original.apk fehlt
+SKIP: /tmp/foss_original.apk fehlt
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
