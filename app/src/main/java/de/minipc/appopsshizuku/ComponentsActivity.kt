@@ -180,18 +180,29 @@ class ComponentsActivity : AppCompatActivity() {
         }
 
         // Ist-Zustand: App-Level enabled/disabled via PackageManager (kein Shell-Call)
+        // Listener erst NACH dem initialen isChecked setzen (Muster ComponentsAdapter)
         val appEnabled = packageManager.getApplicationEnabledSetting(packageName)
         sw.isChecked =
             appEnabled == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
                 appEnabled == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
 
+        bindAppDisableSwitchListener()
+    }
+
+    /** Switch-Listener anhaengen (nach programmatischen isChecked-Aenderungen neu binden). */
+    private fun bindAppDisableSwitchListener() {
+        val sw = findViewById<SwitchMaterial>(R.id.appDisableSwitch)
         sw.setOnCheckedChangeListener { _, checked ->
             if (checked) {
                 MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.components_disable_app)
                     .setMessage(R.string.components_disable_warning)
                     .setNegativeButton(R.string.btn_cancel) { _, _ ->
+                        // Programmatisches Zuruecksetzen OHNE Listener-Feuer:
+                        // sonst wuerde checked=false ein pm enable ausloesen
+                        sw.setOnCheckedChangeListener(null)
                         sw.isChecked = false
+                        bindAppDisableSwitchListener()
                     }
                     .setPositiveButton(R.string.btn_disable) { _, _ ->
                         toggleApp(false)
@@ -213,7 +224,9 @@ class ComponentsActivity : AppCompatActivity() {
             }
             handler.post {
                 if (isFailed(res)) {
+                    sw.setOnCheckedChangeListener(null)
                     sw.isChecked = enable
+                    bindAppDisableSwitchListener()
                     Toast.makeText(this, R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(
