@@ -1,7 +1,0 @@
-R_DEF: Internal format may change without notice
-local
-id calculatorGrid
-id display
-id rootLayout
-layout activity_main
-style Theme.VaultCalc

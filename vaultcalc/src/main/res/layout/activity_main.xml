@@ -5,19 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#101010"
+    android:background="#0D0D0F"
     android:padding="16dp">
+
+    <TextView
+        android:id="@+id/history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:maxLines="1"
+        android:text=""
+        android:textColor="#7A7A7A"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/display"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:gravity="end|center_vertical"
+        android:layout_height="120dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="end|bottom"
         android:maxLines="1"
         android:text="0"
-        android:textColor="#FFFFFF"
-        android:textSize="36sp" />
+        android:textColor="#EAEAEA"
+        android:textSize="56sp"
+        android:fontFamily="sans-serif-medium"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="28sp"
+        android:autoSizeMaxTextSize="56sp"
+        android:autoSizeStepGranularity="2sp" />
 
     <GridLayout
         android:id="@+id/calculatorGrid"

@@ -66,6 +66,9 @@ class StealthPatchService : Service() {
         const val EXTRA_SPOOF_ANDROID_ID_ON = "spoofAndroidIdOn"
         const val EXTRA_SPOOF_TELEPHONY = "spoofTelephony"
 
+        /** Begleit-App (VaultCalculator), die bei Vault-Patches auto-installiert wird. */
+        const val VAULT_CALC_PACKAGE = "de.minipc.vaultcalc"
+
         const val CHANNEL_ID = "stealth_patch"
         const val NOTIF_ID = 42
 
@@ -269,6 +272,12 @@ class StealthPatchService : Service() {
                         signed, targetPkg,
                         allowAutoUninstall = cloneNewPkg == null
                     )
+                    // Vault: Begleit-App (VaultCalculator) automatisch mitinstallieren,
+                    // wenn sie fehlt. NICHT blockierend: Ein Fehler hier aendert das
+                    // Patch-Ergebnis nicht (nur Log; Nutzer kann Rechner manuell holen).
+                    if (res.success && intent.getBooleanExtra(EXTRA_VAULT, false)) {
+                        ensureVaultCalculatorInstalled(backend, stealer)
+                    }
                     if (res.success) {
                         val msg = if (cloneNewPkg != null) {
                             getString(R.string.stealth_success_clone, cloneNewPkg)
@@ -310,6 +319,35 @@ class StealthPatchService : Service() {
             ?.sortedBy { it.name }
             ?: emptyList()
         return listOf(base) + splits
+    }
+
+    /**
+     * Installiert die VaultCalculator-Begleit-App (de.minipc.vaultcalc) automatisch,
+     * wenn sie noch nicht installiert ist. Die APK ist als Raw-Ressource gebuendelt
+     * (app/src/main/res/raw/vaultcalc.apk). Fehler sind NICHT blockierend: Der
+     * Haupt-Patch bleibt erfolgreich; ein fehlgeschlagener Begleit-Install wird nur
+     * geloggt (der Nutzer kann den Rechner dann manuell installieren).
+     */
+    private fun ensureVaultCalculatorInstalled(
+        backend: de.minipc.appopsshizuku.shizuku.ShellBackend,
+        stealer: StealthStealer
+    ) {
+        try {
+            val check = backend.exec("pm", "path", VAULT_CALC_PACKAGE)
+            if (check.exitCode == 0 && check.stdout.contains("package:")) return // bereits installiert
+            val apk = File(cacheDir, "vaultcalc.apk")
+            resources.openRawResource(R.raw.vaultcalc).use { input ->
+                apk.outputStream().use { out -> input.copyTo(out) }
+            }
+            val result = stealer.installApk(apk, VAULT_CALC_PACKAGE, allowAutoUninstall = false)
+            if (!result.success) {
+                Log.w(TAG, "VaultCalculator-Auto-Install fehlgeschlagen: ${result.message}")
+            } else {
+                Log.d(TAG, "VaultCalculator automatisch installiert")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "VaultCalculator-Auto-Install Fehler", e)
+        }
     }
 
     private fun finish(success: Boolean, message: String) {

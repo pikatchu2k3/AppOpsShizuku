@@ -484,6 +484,28 @@ sobald der User zu einer anderen App wechselte. CPU taktete auch im Vordergrund 
 - [ ] Auf OnePlus (Android 16/OxygenOS) testen — erwartet gleiches Verhalten, Shizuku via Wireless-Debugging; ⚠️ Emulator-verifiziert ≠ OnePlus-verifiziert (OxygenOS-Recents-Quirks, siehe v1.4.0-Hinweis)
 - [ ] Feature 3 (geplant): Lifecycle-Profile (RUN_ANY_IN_BACKGROUND, Standby-Bucket, Screen-Off-Exit)
 
+# v1.13.0 (08/2026) — VaultCalc v1.1: Auto-Install, neues Design, Icon
+
+- **Auto-Install des VaultCalculator:** Bei Stealth-Patches mit Vault-Option wird die Begleit-App
+  `de.minipc.vaultcalc` automatisch mitinstalliert, wenn sie fehlt. APK liegt als Raw-Ressource
+  (`app/src/main/res/raw/vaultcalc.apk`, aus vaultcalc-Build kopiert). Pre-Check via `pm path`,
+  Install über die bestehende `installApk()`-Session-Logik. **Nicht-blockierend:** Fehler ändern
+  das Patch-Ergebnis nicht (nur Logcat), der Nutzer kann den Rechner manuell nachinstallieren.
+- **VaultCalc v1.1 (Design-Refresh):** Runde Buttons (Drawables `bg_key`/`bg_key_op`/`bg_key_accent`,
+  68dp-Kreise, Ripple), dunkler Hintergrund `#0D0D0F`, Display 56sp rechtsbündig mit autoSize,
+  Labels **AC ⌫ % ÷ / 7 8 9 × / 4 5 6 − / 1 2 3 + / 0 . =** — Operator-Spalte + `=` in Akzent
+  (Amber `#FFB300`), AC rot getönt. Neue `%`-Funktion (aktueller Wert ÷ 100). Rechenlogik,
+  `isVaultSequence`/PIN-Verhalten unverändert.
+- **Launcher-Icon:** `de.minipc.vaultcalc` hatte keins → adaptive icon (`mipmap-anydpi-v26`,
+  Hintergrund Amber, Vector-Rechner-Glyph, Monochrome für Android 13).
+- **E2E verifiziert (Emulator):** VaultCalc v1.0 deinstalliert → Vault-Patch (Clone "fossy" + Vault)
+  → Log `VaultCalculator automatisch installiert`, `de.minipc.vaultcalc` v1.1 mit Icon installiert;
+  Rechner-UI (AC/⌫/%/÷, runde Buttons) sichtbar; PIN `12345` + `=` → startet `fossy.stealth`
+  BrowserActivity (Fokus + Prozess verifiziert). `fossy.stealth` weiterhin ohne Launcher-Icon
+  (Vault-Design, nur über Rechner erreichbar).
+- **Build:** `./gradlew :vaultcalc:assembleDebug` + `:app:assembleDebug` grün. APKs:
+  `app-ops-shizuku-v1.13.0.apk` (versionCode 24), `vaultcalculator-v1.1.apk` (versionCode 2).
+
 # Nutzung auf dem OnePlus
 
 1. Shizuku installieren (shizuku.rikka.app / APK von GitHub) und via Wireless-Debugging starten

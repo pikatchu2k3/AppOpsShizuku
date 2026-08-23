@@ -27,6 +27,13 @@ class MainActivity : AppCompatActivity() {
     private companion object {
         const val DEFAULT_SECRET_CODE = "12345"
 
+        // Key-Typen fuer Styling: Standard (Ziffern/Dezimalpunkt/Prozent),
+        // Operator-Spalte (dunkler), Akzent (=), AC (rot getoent).
+        const val KEY_DEFAULT = 0
+        const val KEY_OP = 1
+        const val KEY_ACCENT = 2
+        const val KEY_AC = 3
+
         const val PREFS_NAME = "vault"
         const val KEY_VAULT_PACKAGE = "vault_package"
         const val KEY_VAULT_CLASS = "vault_class"
@@ -81,28 +88,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun buildButtons() {
-        addButton(grid, "C", 0, 0) { clearAll() }
-        addButton(grid, "⌫", 0, 1) { backspace() }
-        addButton(grid, "/", 0, 2) { inputOperator("/") }
-        addButton(grid, "*", 0, 3) { inputOperator("*") }
+        // Layout (4x5): AC ⌫ % ÷ / 7 8 9 x / 4 5 6 - / 1 2 3 + / 0 . =
+        addButton(grid, "AC", 0, 0, keyType = KEY_AC) { clearAll() }
+        addButton(grid, "⌫", 0, 1, keyType = KEY_OP) { backspace() }
+        addButton(grid, "%", 0, 2) { percent() }
+        addButton(grid, "÷", 0, 3, keyType = KEY_OP) { inputOperator("/") }
 
         addButton(grid, "7", 1, 0) { inputDigit("7") }
         addButton(grid, "8", 1, 1) { inputDigit("8") }
         addButton(grid, "9", 1, 2) { inputDigit("9") }
-        addButton(grid, "-", 1, 3) { inputOperator("-") }
+        addButton(grid, "×", 1, 3, keyType = KEY_OP) { inputOperator("*") }
 
         addButton(grid, "4", 2, 0) { inputDigit("4") }
         addButton(grid, "5", 2, 1) { inputDigit("5") }
         addButton(grid, "6", 2, 2) { inputDigit("6") }
-        addButton(grid, "+", 2, 3) { inputOperator("+") }
+        addButton(grid, "−", 2, 3, keyType = KEY_OP) { inputOperator("-") }
 
         addButton(grid, "1", 3, 0) { inputDigit("1") }
         addButton(grid, "2", 3, 1) { inputDigit("2") }
         addButton(grid, "3", 3, 2) { inputDigit("3") }
-        addButton(grid, "=", 3, 3, rowSpan = 2) { equals() }
+        addButton(grid, "+", 3, 3, keyType = KEY_OP) { inputOperator("+") }
 
         addButton(grid, "0", 4, 0, colSpan = 2) { inputDigit("0") }
         addButton(grid, ".", 4, 2) { inputDigit(".") }
+        addButton(grid, "=", 3, 3, rowSpan = 2, keyType = KEY_ACCENT) { equals() }
     }
 
     private fun addButton(
@@ -112,14 +121,32 @@ class MainActivity : AppCompatActivity() {
         col: Int,
         rowSpan: Int = 1,
         colSpan: Int = 1,
+        keyType: Int = KEY_DEFAULT,
         onClick: (View) -> Unit
     ) {
         val button = Button(this).apply {
             text = label
             isAllCaps = false
-            textSize = 20f
-            setTextColor(Color.WHITE)
-            setBackgroundColor(Color.parseColor("#2E2E2E"))
+            textSize = if (keyType == KEY_DEFAULT) 24f else 26f
+            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            when (keyType) {
+                KEY_DEFAULT -> {
+                    setTextColor(Color.WHITE)
+                    setBackgroundResource(R.drawable.bg_key)
+                }
+                KEY_OP -> {
+                    setTextColor(Color.WHITE)
+                    setBackgroundResource(R.drawable.bg_key_op)
+                }
+                KEY_ACCENT -> {
+                    setTextColor(Color.parseColor("#1A1A1A"))
+                    setBackgroundResource(R.drawable.bg_key_accent)
+                }
+                KEY_AC -> {
+                    setTextColor(Color.parseColor("#FF5252"))
+                    setBackgroundResource(R.drawable.bg_key)
+                }
+            }
             setOnClickListener(onClick)
         }
 
@@ -127,9 +154,11 @@ class MainActivity : AppCompatActivity() {
             GridLayout.spec(row, rowSpan, GridLayout.FILL, 1f),
             GridLayout.spec(col, colSpan, GridLayout.FILL, 1f)
         )
-        params.width = 0
-        params.height = 0
-        params.setMargins(dp(4), dp(4), dp(4), dp(4))
+        // Runde Buttons: feste Groesse (Kreis), in der Zelle zentriert
+        params.width = dp(68)
+        params.height = dp(68)
+        params.setGravity(Gravity.CENTER)
+        params.setMargins(dp(6), dp(6), dp(6), dp(6))
 
         button.layoutParams = params
         grid.addView(button)
@@ -203,6 +232,20 @@ class MainActivity : AppCompatActivity() {
         lastResult = ""
         state = State.INPUT
         updateDisplay()
+    }
+
+    /** Prozent: aktuellen Ausdruck auswerten und durch 100 teilen (wie [x] %). */
+    private fun percent() {
+        if (expression.isEmpty() && lastResult.isEmpty()) return
+        val expr = if (expression.isNotEmpty()) expression.toString() else lastResult
+        val value = evaluate(expr)
+        if (value == "Fehler") return
+        val num = value.toDoubleOrNull() ?: return
+        val pct = num / 100.0
+        display.text = formatResult(pct)
+        state = State.RESULT
+        lastResult = formatResult(pct)
+        expression.clear()
     }
 
     private fun backspace() {
