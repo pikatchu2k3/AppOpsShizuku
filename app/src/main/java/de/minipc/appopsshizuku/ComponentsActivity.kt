@@ -38,7 +38,7 @@ import de.minipc.appopsshizuku.stealth.DeviceProfiles
 import de.minipc.appopsshizuku.stealth.DeviceSpoofOptions
 import de.minipc.appopsshizuku.stealth.StealthPhase
 import de.minipc.appopsshizuku.stealth.StealthStealer
-import de.minipc.appopsshizuku.stealth.VaultCalcIntegration
+import de.minipc.appopsshizuku.stealth.VaultIntegration
 import de.minipc.appopsshizuku.ui.ComponentListItem
 import de.minipc.appopsshizuku.ui.ComponentsAdapter
 import java.io.File
@@ -832,7 +832,7 @@ class ComponentsActivity : AppCompatActivity() {
                             if (oldPkg != null) launcher.replaceFirst(oldPkg, vaultPkg)
                             else launcher
                         } else launcher
-                        VaultCalcIntegration.configureVaultCalculator(
+                        VaultIntegration.configureVaultCalculator(
                             this@ComponentsActivity,
                             vaultPkg,
                             vaultLauncher,

@@ -484,6 +484,25 @@ sobald der User zu einer anderen App wechselte. CPU taktete auch im Vordergrund 
 - [ ] Auf OnePlus (Android 16/OxygenOS) testen — erwartet gleiches Verhalten, Shizuku via Wireless-Debugging; ⚠️ Emulator-verifiziert ≠ OnePlus-verifiziert (OxygenOS-Recents-Quirks, siehe v1.4.0-Hinweis)
 - [ ] Feature 3 (geplant): Lifecycle-Profile (RUN_ANY_IN_BACKGROUND, Standby-Bucket, Screen-Off-Exit)
 
+# v1.14.0 (08/2026) — CalcYou-Vault-Fork statt VaultCalc
+
+- **VaultCalc (eigenes Mini-Projekt) entfernt** — Begleit-App ist jetzt der **CalcYou-Vault-Fork**
+  (`de.minipc.calcyou`, GPL-3.0, privates Repo `pikatchu2k3/CalcYou-Vault`): vollwertiger
+  Taschenrechner (Klammern, Verlauf, Unit Converter, Graphing) mit Vault-PIN — perfekte Tarnung.
+- **VaultCalc-Integration → `VaultIntegration`**: konfiguriert `de.minipc.calcyou` über dessen
+  `VaultConfigProvider` (`content://de.minipc.calcyou.config`, gleiche Prefs-Struktur "vault").
+- **Auto-Install**: `app/src/main/res/raw/calcyou.apk` (CalcYou-Fork-Build, ~21 MB) wird bei
+  Vault-Patches via `pm path`-Check + bestehender installApk-Session-Logik installiert
+  (nicht-blockierend, Log `CalcYou (Vault) automatisch installiert`).
+- **E2E verifiziert (Emulator):** Vault-Patch (Clone "fossy" + Vault) → `de.minipc.calcyou`
+  auto-installiert + `fossy.stealth` Klon; PIN `12345` + `=` im CalcYou startet
+  `fossy.stealth/.activity.BrowserActivity` (Fokus verifiziert).
+- **CalcYou-Fork-Änderungen:** Paketname `de.minipc.calcyou` (Namespace + applicationId, debug-Suffix
+  entfernt), Label "Rechner" (alle Locales), PIN-Logik im `EventHandler` (Evaluate-Zweig:
+  `isVaultSequence` + `launchVault`), `VaultConfigProvider`, compileSdk 36 (SDK android-36 installiert),
+  Fix `EnergyConverter` (Int→Double-Literale). Original-Fehlverhalten: Main-Branch kompilierte nicht.
+- **Build:** `./gradlew :app:assembleDebug` grün. APK: `app-ops-shizuku-v1.14.0.apk` (versionCode 25).
+
 # v1.13.0 (08/2026) — VaultCalc v1.1: Auto-Install, neues Design, Icon
 
 - **Auto-Install des VaultCalculator:** Bei Stealth-Patches mit Vault-Option wird die Begleit-App

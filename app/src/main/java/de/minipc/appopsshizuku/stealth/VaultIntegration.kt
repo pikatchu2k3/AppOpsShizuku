@@ -7,17 +7,17 @@ import android.net.Uri
 import android.os.Bundle
 
 /**
- * Konfiguriert die VaultCalculator-App nach erfolgreichem Stealth-Patch.
+ * Konfiguriert die CalcYou-Vault-App nach erfolgreichem Stealth-Patch.
  *
  * Bevorzugt über den ContentProvider (App muss nicht sichtbar gestartet werden).
  * Fallback: MainActivity mit Extras starten. Übergibt Zielpaket, Zielklasse und
  * die benutzerdefinierte PIN.
  */
-object VaultCalcIntegration {
+object VaultIntegration {
 
-    private const val VAULT_PACKAGE = "de.minipc.vaultcalc"
-    private const val VAULT_ACTIVITY = "de.minipc.vaultcalc.MainActivity"
-    private const val CONFIG_AUTHORITY = "content://de.minipc.vaultcalc.config"
+    private const val VAULT_PACKAGE = "de.minipc.calcyou"
+    private const val VAULT_ACTIVITY = "de.minipc.calcyou.MainActivity"
+    private const val CONFIG_AUTHORITY = "content://de.minipc.calcyou.config"
     private const val METHOD_SET = "set"
     private const val KEY_PACKAGE = "package"
     private const val KEY_CLASS = "class"

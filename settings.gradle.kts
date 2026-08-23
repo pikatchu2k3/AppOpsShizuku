@@ -14,5 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "AppOpsShizuku"
 include(":app")
-include(":vaultcalc")
 include(":spooftest")
