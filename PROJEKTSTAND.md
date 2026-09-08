@@ -484,6 +484,32 @@ sobald der User zu einer anderen App wechselte. CPU taktete auch im Vordergrund 
 - [ ] Auf OnePlus (Android 16/OxygenOS) testen — erwartet gleiches Verhalten, Shizuku via Wireless-Debugging; ⚠️ Emulator-verifiziert ≠ OnePlus-verifiziert (OxygenOS-Recents-Quirks, siehe v1.4.0-Hinweis)
 - [ ] Feature 3 (geplant): Lifecycle-Profile (RUN_ANY_IN_BACKGROUND, Standby-Bucket, Screen-Off-Exit)
 
+# v1.14.1 (08/2026) — Cache-Fix: Originale nach filesDir, Cleanup nach Patch
+
+- **Problem:** Der Stealth-Patcher ließ pro gepatchter App 2–3 APK-Kopien im App-Cache liegen
+  (`original.apk` + `repacked.apk` + `signed.apk` + Splits) → realer User-Cache ~700 MB
+  nach großem Patch (Google Maps-Fall 08/2026). Zusätzlich ist der App-Cache per Android-
+  Definition wegwerfbar → Cache-Leeren zerstörte stillschweigend die Restore-Funktion.
+- **Fix (3 Stellen):**
+  - `StealthStealer.preservedDir()` = `filesDir/stealth_<pkg>` (dauerhaft). Nach erfolgreichem
+    Install verschiebt `relocateOriginals(workDir, pkg)` die Originale (base + Splits) dorthin
+    und löscht den Rest des Arbeitsordners (repacked/signed/Splits = Einweg-Artefakte).
+  - `StealthPatchService`: `resolveOriginals(pkg, workDir)` löst Originale bevorzugt aus
+    filesDir auf, sonst Legacy-Cache (Migration bei Bestand); `ACTION_RESTORE` liest ebenfalls
+    über den Resolver (Bug: las vorher NUR aus dem Cache → nach Cache-Leeren
+    "Fehler beim Wiederherstellen"; vom E2E-Test aufgedeckt). `workDir.mkdirs()` beim
+    Reuse aus filesDir. `calcyou.apk` wird nach dem Vault-Install wieder gelöscht.
+  - `ComponentsActivity`: `resolveOriginalApkFile()` prüft filesDir zuerst, sonst Cache
+    (Restore-Button-Zustand).
+- **E2E verifiziert (Emulator, API 35):** Patch mit Reuse aus Legacy-Cache → Cache von
+  64 MB auf 26 MB (nur Altlasten), Originale in filesDir. Cache geleert (`rm -rf cache/*`)
+  → Restore funktioniert weiterhin aus filesDir → Original-App zurück (Launcher-Icon da).
+- **Tests:** 42 Unit-Tests, 1 vorbestehender Fehler (`BinaryXmlStealthTest` hängt an
+  `/tmp/foss_original.apk`, dessen Manifest bereits excludeFromRecents enthält — unabhängig
+  von diesem Fix, per `git stash` bewiesen).
+- **Build:** `./gradlew :app:assembleDebug` grün. APK: `AppOpsShizuku-v1.14.1-cache-fix.apk`
+  (versionCode 26, MD5 `1f4cf2bd30d51d2df8942b32fb537b0d`).
+
 # v1.14.0 (08/2026) — CalcYou-Vault-Fork statt VaultCalc
 
 - **VaultCalc (eigenes Mini-Projekt) entfernt** — Begleit-App ist jetzt der **CalcYou-Vault-Fork**

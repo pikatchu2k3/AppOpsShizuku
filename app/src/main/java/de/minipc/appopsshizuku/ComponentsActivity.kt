@@ -13,6 +13,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -42,6 +43,7 @@ import de.minipc.appopsshizuku.stealth.VaultIntegration
 import de.minipc.appopsshizuku.ui.ComponentListItem
 import de.minipc.appopsshizuku.ui.ComponentsAdapter
 import java.io.File
+import java.security.MessageDigest
 import java.util.concurrent.Executors
 
 /**
@@ -103,6 +105,7 @@ class ComponentsActivity : AppCompatActivity() {
 
         setupDisableAppSwitch()
         setupFreezeAppSwitch()
+        setupClearDataButton()
         setupStealth()
 
         loadComponents()
@@ -161,10 +164,49 @@ class ComponentsActivity : AppCompatActivity() {
             findViewById<ImageView>(R.id.appIcon).setImageDrawable(pm.getApplicationIcon(info))
             findViewById<TextView>(R.id.appLabel).text = pm.getApplicationLabel(info)
             findViewById<TextView>(R.id.appPackage).text = packageName
+            // QW-10: Detail-Header (Version, targetSdk, Installer, Signatur-Fingerprint) —
+            // unterscheidet Klon (eigener Key) vs. Original sofort.
+            findViewById<TextView>(R.id.appPackage).text = buildString {
+                append(packageName)
+                append('\n')
+                append(buildDetail(pm, info))
+            }
         } catch (e: PackageManager.NameNotFoundException) {
             findViewById<TextView>(R.id.appLabel).text = packageName
         }
     }
+
+    /** QW-10: Info-Zeile je App. `installSourceInfo` wirft auf Android 14+ eine
+     * SecurityException, wenn der Anfragende nicht dem Installer entspricht -> runCatching. */
+    private fun buildDetail(pm: PackageManager, info: ApplicationInfo): String {
+        val version = runCatching {
+            val pi = pm.getPackageInfo(packageName, 0)
+            "${pi.versionName} (${pi.longVersionCode})"
+        }.getOrElse { "?" }
+        val installer = runCatching {
+            if (Build.VERSION.SDK_INT >= 30)
+                pm.getInstallSourceInfo(packageName).installingPackageName ?: "System"
+            else
+                @Suppress("DEPRECATION") pm.getInstallerPackageName(packageName) ?: "System"
+        }.getOrElse { "unbekannt" }
+        val sha = signerSha256(pm, packageName)
+        return "v$version · targetSdk ${info.targetSdkVersion}\nInstaller: $installer\nSHA-256: $sha"
+    }
+
+    private fun signerSha256(pm: PackageManager, pkg: String): String = runCatching {
+        val pi = if (Build.VERSION.SDK_INT >= 28)
+            pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES)
+        else
+            @Suppress("DEPRECATION") pm.getPackageInfo(pkg, PackageManager.GET_SIGNATURES)
+        val cert = if (Build.VERSION.SDK_INT >= 28)
+            pi.signingInfo?.apkContentsSigners?.firstOrNull()
+        else
+            @Suppress("DEPRECATION") pi.signatures?.firstOrNull()
+        if (cert == null) return@runCatching "unbekannt"
+        MessageDigest.getInstance("SHA-256").digest(cert.toByteArray())
+            .joinToString("") { "%02x".format(it) }.uppercase()
+            .chunked(4).joinToString(":").take(47) + "…"
+    }.getOrElse { "unbekannt" }
 
     private fun setupDisableAppSwitch() {
         val sw = findViewById<SwitchMaterial>(R.id.appDisableSwitch)
@@ -252,6 +294,50 @@ class ComponentsActivity : AppCompatActivity() {
             } else {
                 toggleFreeze(false)
             }
+        }
+    }
+
+    /** QW-3: App-Daten via `pm clear` zerstoeren. Destruktiv -> Paketnamen-Eingabe
+     *  zur Bestaetigung (wie im Plan gefordert), und NIE fuer die eigene App
+     *  (loescht unsere Profile/Keys!) oder System-Apps. */
+    private fun setupClearDataButton() {
+        val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.clearDataButton)
+        val subtitle = findViewById<TextView>(R.id.clearDataSubtitle)
+        val isSelf = packageName == applicationContext.packageName
+        val isSystem = runCatching {
+            (packageManager.getApplicationInfo(packageName, 0).flags and ApplicationInfo.FLAG_SYSTEM) != 0
+        }.getOrDefault(false)
+        if (isSelf || isSystem) {
+            button.isEnabled = false
+            subtitle.text = getString(R.string.components_own_app)
+        }
+        button.setOnClickListener {
+            val input = EditText(this)
+            input.inputType = android.text.InputType.TYPE_CLASS_TEXT
+            input.hint = packageName
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.components_clear_data_confirm_title)
+                .setMessage(R.string.components_clear_data_confirm_msg)
+                .setView(input)
+                .setNegativeButton(R.string.btn_cancel) { _, _ -> }
+                .setPositiveButton(R.string.components_clear_data_action) { _, _ ->
+                    val typed = input.text?.toString()?.trim()
+                    if (typed != packageName) {
+                        Toast.makeText(this, R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
+                    } else {
+                        executor.execute {
+                            val res = backend.exec("pm", "clear", packageName)
+                            handler.post {
+                                if (isFailed(res)) {
+                                    Toast.makeText(this, R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(this, R.string.components_clear_data_done, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                }
+                .show()
         }
     }
 
@@ -526,6 +612,17 @@ class ComponentsActivity : AppCompatActivity() {
 
     private fun stealthWorkDir(): File = File(cacheDir, "stealth_$packageName")
 
+    /** Dauerhafter Aufbewahrungsort für Original-APKs (überlebt Cache-Leeren). */
+    private fun stealthPreservedDir(): File = File(filesDir, "stealth_$packageName")
+
+    /** Original-APK auflösen: dauerhafter Ort zuerst, sonst Legacy-Cache. */
+    private fun resolveOriginalApkFile(): File? {
+        val preserved = File(stealthPreservedDir(), "original.apk")
+        if (preserved.exists() && preserved.length() > 0) return preserved
+        val cached = File(stealthWorkDir(), "original.apk")
+        return if (cached.exists() && cached.length() > 0) cached else null
+    }
+
     private fun setupStealth() {
         if (backend is NoopBackend) {
             // Ohne Shizuku keine APK-Manipulation
@@ -534,7 +631,7 @@ class ComponentsActivity : AppCompatActivity() {
             return
         }
         stealthStealer = StealthStealer(backend, applicationContext)
-        originalApkFile = File(stealthWorkDir(), "original.apk")
+        originalApkFile = resolveOriginalApkFile()
         val restoreBtn = findViewById<MaterialButton>(R.id.stealthRestoreButton)
         restoreBtn.isEnabled = originalApkFile?.exists() == true
 

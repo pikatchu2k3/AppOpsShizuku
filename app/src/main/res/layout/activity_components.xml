@@ -178,6 +178,41 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- App-Daten zurücksetzen (pm clear) — QW-3, destruktiv -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/components_clear_data"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnErrorContainer" />
+                    <TextView
+                        android:id="@+id/clearDataSubtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/components_clear_data_warning"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnErrorContainer" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/clearDataButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/components_clear_data_action"
+                        style="@style/Widget.Material3.Button.OutlinedButton" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Stealth-Modus: Launcher-Icon entfernen (AXML), App bleibt startbar -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/stealthCard"

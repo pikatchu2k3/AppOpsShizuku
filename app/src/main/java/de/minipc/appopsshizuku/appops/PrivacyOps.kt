@@ -1,10 +1,16 @@
 package de.minipc.appopsshizuku.appops
 
-data class AppOp(val opName: String, val label: String, val permissionName: String?)
+data class AppOp(
+    val opName: String,
+    val label: String,
+    val permissionName: String?,
+    val category: String = "Privacy"
+)
 
 /** Privacy-AppOps fuer das Profil. READ/WRITE_CLIPBOARD existieren erst ab Android 10 — Laufzeit-Probe. */
 object PrivacyOps {
     val PRIVACY_OPS: List<AppOp> = listOf(
+        // --- Privacy (Berechtigungen, pm grant/revoke-Hebel) ---
         AppOp("CAMERA", "Kamera", "android.permission.CAMERA"),
         AppOp("RECORD_AUDIO", "Mikrofon", "android.permission.RECORD_AUDIO"),
         AppOp("READ_CONTACTS", "Kontakte lesen", "android.permission.READ_CONTACTS"),
@@ -17,7 +23,20 @@ object PrivacyOps {
         AppOp("READ_CLIPBOARD", "Zwischenablage lesen", null),
         AppOp("WRITE_CLIPBOARD", "Zwischenablage schreiben", null),
         AppOp("BODY_SENSORS", "Koerper-Sensoren", "android.permission.BODY_SENSORS"),
-        AppOp("ACTIVITY_RECOGNITION", "Aktivitaetserkennung", "android.permission.ACTIVITY_RECOGNITION")
+        AppOp("ACTIVITY_RECOGNITION", "Aktivitaetserkennung", "android.permission.ACTIVITY_RECOGNITION"),
+        // --- Hintergrund (reine AppOps, cmd appops set-Hebel) ---
+        AppOp("RUN_IN_BACKGROUND", "Hintergrund-Ausfuehrung", null, "Hintergrund"),
+        AppOp("RUN_ANY_IN_BACKGROUND", "Hintergrund-Ausfuehrung (beliebig)", null, "Hintergrund"),
+        AppOp("START_FOREGROUND_SERVICES_FROM_BACKGROUND", "FGS aus Hintergrund starten", null, "Hintergrund"),
+        AppOp("GET_USAGE_STATS", "Nutzungsstatistik", null, "Hintergrund"),
+        // --- Identitaet ---
+        AppOp("READ_DEVICE_IDENTIFIERS", "Geraete-IDs lesen", null, "Identitaet"),
+        AppOp("MOCK_LOCATION", "Standort vortaeuschen", null, "Identitaet"),
+        // --- System-UI ---
+        AppOp("SYSTEM_ALERT_WINDOW", "Ueber anderen Apps anzeigen", null, "System-UI"),
+        AppOp("ACCESS_NOTIFICATIONS", "Benachrichtigungen", null, "System-UI"),
+        AppOp("TURN_SCREEN_ON", "Bildschirm einschalten", null, "System-UI"),
+        AppOp("PICTURE_IN_PICTURE", "Bild-in-Bild", null, "System-UI")
     )
 
     val MODES = listOf("default", "allow", "ignore", "deny")

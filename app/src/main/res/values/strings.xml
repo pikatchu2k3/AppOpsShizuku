@@ -74,6 +74,12 @@
     <!-- App-Freeze (pm suspend) -->
     <string name="components_freeze_app">App einfrieren (Suspend)</string>
     <string name="components_freeze_warning">Die App wird sofort beendet und kann nicht gestartet werden — installierte Daten bleiben erhalten. Zum Auftauen den Schalter wieder ausschalten.</string>
+    <string name="components_clear_data">App-Daten zurücksetzen</string>
+    <string name="components_clear_data_warning">Löscht Cache + Daten der App (Login, Einstellungen, Downloads) und setzt Berechtigungen zurück. Nicht umkehrbar — zum Testen, wenn eine App hängt.</string>
+    <string name="components_clear_data_action">Daten zurücksetzen</string>
+    <string name="components_clear_data_confirm_title">Daten wirklich löschen?</string>
+    <string name="components_clear_data_confirm_msg">Tippe den Paketnamen zum Bestätigen ein:</string>
+    <string name="components_clear_data_done">Daten gelöscht</string>
     <string name="btn_freeze">Einfrieren</string>
     <string name="components_frozen">App eingefroren</string>
     <string name="components_unfrozen">App aufgetaut</string>
