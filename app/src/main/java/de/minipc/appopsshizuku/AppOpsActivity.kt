@@ -287,14 +287,20 @@ class AppOpsActivity : AppCompatActivity() {
     private fun onModeSelected(op: AppOp, mode: String) {
         executor.execute {
             val res = controller.setMode(packageName, op, mode)
+            // NACH dem Setzen den echten Systemzustand lesen: manche Ops (z.B.
+            // TURN_SCREEN_ON, live 09/2026 auf LineageOS 14) werden vom System still
+            // ignoriert (exit 0, aber keine Aenderung) -> sonst zeigt die UI "deny",
+            // das System ist aber "default" (Irrefuehrung + falscher Blockiert-Zaehler).
+            val actual = if (res.exitCode == 0)
+                runCatching { controller.getMode(packageName, op) }.getOrNull()
+            else null
+            val effective = res.exitCode == 0 && isSetEffective(op, mode, actual)
             handler.post {
-                if (res.exitCode == 0) {
+                if (effective) {
                     opStates[op.opName] = mode
                     // Profil-Speicherung darf den UI-Thread NIE crashen
                     // (z.B. korruptes/leeres JSON in den Prefs -> JSONException).
                     runCatching { profileStore.setOpMode(packageName, op.opName, mode) }
-                    adapter.submitList(buildItems())
-                    updateStats()
                     Toast.makeText(
                         this,
                         getString(R.string.op_set_ok, op.label, mode),
@@ -305,16 +311,45 @@ class AppOpsActivity : AppCompatActivity() {
                     if (mode == "deny" && op.permissionName == null) {
                         Toast.makeText(this, R.string.op_deny_warning, Toast.LENGTH_LONG).show()
                     }
+                } else if (res.exitCode == 0) {
+                    // Op nicht aenderbar: echten Zustand anzeigen, NIE den Wunsch-Modus
+                    opStates[op.opName] = actual ?: "default"
+                    Toast.makeText(
+                        this,
+                        getString(R.string.op_not_settable, op.label),
+                        Toast.LENGTH_LONG
+                    ).show()
                 } else {
-                    adapter.submitList(buildItems())
                     Toast.makeText(
                         this,
                         getString(R.string.op_set_fail, op.label, res.exitCode),
                         Toast.LENGTH_LONG
                     ).show()
                 }
+                adapter.submitList(buildItems())
+                updateStats()
             }
         }
+    }
+
+    /**
+     * Prueft, ob das Setzen einer Op den gewuenschten Effekt hatte.
+     * - Ops MIT Runtime-Permission: deny/ignore (-> pm revoke -> System meldet "ignore")
+     *   und allow/default (-> pm grant -> System meldet "allow") sind semantisch gleich
+     *   (das System kennt nur blockiert/nicht-blockiert). -> effektiv.
+     * - Reine AppOps: der Modus muss exakt stimmen (deny bleibt deny, ignore bleibt ignore).
+     *   -> TURN_SCREEN_ON & Co, die das System still ignoriert, werden als NICHT effektiv erkannt.
+     */
+    private fun isSetEffective(op: AppOp, requested: String, actual: String?): Boolean {
+        if (actual == null) return false
+        if (op.permissionName != null) {
+            val requestedBlocked = requested == "deny" || requested == "ignore"
+            val actualBlocked = actual == "deny" || actual == "ignore"
+            val requestedAllowed = requested == "allow" || requested == "default"
+            val actualAllowed = actual == "allow" || actual == "default"
+            return (requestedBlocked && actualBlocked) || (requestedAllowed && actualAllowed)
+        }
+        return requested == actual
     }
 
     private fun restoreAll() {

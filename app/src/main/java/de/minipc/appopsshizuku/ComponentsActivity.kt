@@ -309,7 +309,12 @@ class ComponentsActivity : AppCompatActivity() {
         }.getOrDefault(false)
         if (isSelf || isSystem) {
             button.isEnabled = false
-            subtitle.text = getString(R.string.components_own_app)
+            // Klarer Hinweis je nach Fall: eigene App -> "zurückgesetzt", System-App -> "zurückgesetzt".
+            // Vorher wurde für Beides "Die eigene App kann nicht deaktiviert werden" gezeigt (Irreführung).
+            subtitle.text = getString(
+                if (isSystem) R.string.components_clear_data_system
+                else R.string.components_clear_data_own
+            )
         }
         button.setOnClickListener {
             val input = EditText(this)

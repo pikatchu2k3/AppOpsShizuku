@@ -38,6 +38,7 @@
     <string name="op_set_ok">%1$s → %2$s gesetzt</string>
     <string name="op_set_fail">Fehler bei %1$s: Exit %2$d</string>
     <string name="op_deny_warning">Achtung: deny kann die App beim Start crashen lassen (SecurityException). Für die Zwischenablage ist ignore die bessere Wahl (stille Blockade).</string>
+    <string name="op_not_settable">%1$s ist auf diesem Gerät nicht änderbar — wurde nicht übernommen.</string>
     <string name="restore_done">Alle Ops zurückgesetzt</string>
     <string name="no_apps">Keine Apps gefunden</string>
     <string name="scanning_apps">Berechtigungen werden geprüft…</string>
@@ -67,6 +68,8 @@
     <string name="components_start">Starten</string>
     <string name="components_system_app">System-Apps können nicht komplett deaktiviert werden</string>
     <string name="components_own_app">Die eigene App kann nicht deaktiviert werden</string>
+    <string name="components_clear_data_own">Die eigene App kann nicht zurückgesetzt werden</string>
+    <string name="components_clear_data_system">System-Apps können nicht zurückgesetzt werden</string>
     <string name="btn_disable">Deaktivieren</string>
     <string name="btn_cancel">Abbrechen</string>
     <string name="error_app_not_found">App nicht gefunden</string>

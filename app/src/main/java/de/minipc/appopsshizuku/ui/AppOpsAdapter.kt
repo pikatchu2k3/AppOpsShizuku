@@ -96,6 +96,16 @@ class AppOpsAdapter(
                 (oldItem is OpsListItem.CategoryHeader && newItem is OpsListItem.CategoryHeader && oldItem.title == newItem.title)
 
         override fun areContentsTheSame(oldItem: OpsListItem, newItem: OpsListItem): Boolean =
-            oldItem == newItem
+            when {
+                oldItem is OpsListItem.CategoryHeader && newItem is OpsListItem.CategoryHeader ->
+                    oldItem.title == newItem.title
+                // Op-Zeilen IMMER neu binden: der Spinner ist ein interaktives Widget —
+                // nach einer Auswahl (z.B. "deny") bleibt er sonst auf dem gewählten Text
+                // stehen, auch wenn die Op vom System NICHT übernommen wurde (live 09/2026:
+                // TURN_SCREEN_ON -> UI zeigte "deny", System war "default"). Durch das
+                // Rebind zeigt der Spinner immer den echten Modus aus opStates.
+                oldItem is OpsListItem.OpItem && newItem is OpsListItem.OpItem -> false
+                else -> false
+            }
     }
 }
