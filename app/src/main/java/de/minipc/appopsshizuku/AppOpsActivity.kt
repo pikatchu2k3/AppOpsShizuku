@@ -47,6 +47,14 @@ class AppOpsActivity : AppCompatActivity() {
             "READ_CALL_LOG", "WRITE_CALL_LOG", "READ_CLIPBOARD", "WRITE_CLIPBOARD"
         )
         private val CATEGORY_ACCOUNT = listOf("GET_ACCOUNTS")
+        private val CATEGORY_BACKGROUND = listOf(
+            "RUN_IN_BACKGROUND", "RUN_ANY_IN_BACKGROUND",
+            "START_FOREGROUND_SERVICES_FROM_BACKGROUND", "GET_USAGE_STATS"
+        )
+        private val CATEGORY_IDENTITY = listOf("READ_DEVICE_IDENTIFIERS", "MOCK_LOCATION")
+        private val CATEGORY_SYSTEM_UI = listOf(
+            "SYSTEM_ALERT_WINDOW", "ACCESS_NOTIFICATIONS", "TURN_SCREEN_ON", "PICTURE_IN_PICTURE"
+        )
     }
 
     private val executor = Executors.newSingleThreadExecutor()
@@ -262,7 +270,10 @@ class AppOpsActivity : AppCompatActivity() {
         val categories = listOf(
             Pair(getString(R.string.category_sensors), CATEGORY_SENSORS),
             Pair(getString(R.string.category_data), CATEGORY_DATA),
-            Pair(getString(R.string.category_account_activity), CATEGORY_ACCOUNT)
+            Pair(getString(R.string.category_account_activity), CATEGORY_ACCOUNT),
+            Pair(getString(R.string.category_background), CATEGORY_BACKGROUND),
+            Pair(getString(R.string.category_identity), CATEGORY_IDENTITY),
+            Pair(getString(R.string.category_system_ui), CATEGORY_SYSTEM_UI)
         )
         for ((title, names) in categories) {
             val catOps = names.mapNotNull { byName[it] }

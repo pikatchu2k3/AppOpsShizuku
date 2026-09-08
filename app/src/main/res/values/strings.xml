@@ -27,6 +27,9 @@
     <string name="category_sensors">Sensoren</string>
     <string name="category_data">Daten</string>
     <string name="category_account_activity">Konto &amp; Aktivität</string>
+    <string name="category_background">Hintergrund</string>
+    <string name="category_identity">Identität</string>
+    <string name="category_system_ui">System-UI</string>
     <string name="loading_permissions">Berechtigungen werden geladen…</string>
     <string name="permissions_loaded">Berechtigungen geladen</string>
     <string name="error_loading">Fehler beim Laden</string>
