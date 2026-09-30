@@ -215,7 +215,10 @@ class StealthPatchService : Service() {
             when (intent.action) {
                 ACTION_RESTORE -> {
                     val workDir = StealthStealer.workDir(this, pkg)
-                    val originals = originalApks(workDir)
+                    // Originale auflösen: dauerhafter Ort (filesDir) zuerst, sonst
+                    // Legacy-Cache. Nach einem Cache-Leeren (Android/Einstellungen)
+                    // sind die Originale NUR noch in filesDir vorhanden.
+                    val originals = stealer.resolveOriginals(pkg, workDir)
                     if (originals == null) {
                         finish(false, getString(R.string.stealth_error_restore))
                         return
@@ -232,10 +235,12 @@ class StealthPatchService : Service() {
                     // wenn die Anzahl zur aktuellen pm-path-Anzahl passt — sonst ist die
                     // Extraktion veraltet (z.B. vorher ohne Splits extrahiert, App ist
                     // jetzt ein Bundle; realer Fall 08/2026: Klon kam ohne Splits an).
-                    val existing = originalApks(workDir)
+                    // Auflösung: dauerhafter Ort (filesDir) zuerst, sonst Legacy-Cache.
                     val expectedCount = pmPathCount(pkg, backend)
-                    val ok = if (existing != null && existing.size == expectedCount) {
+                    var originals = stealer.resolveOriginals(pkg, workDir)
+                    val ok = if (originals != null && originals.size == expectedCount) {
                         stealer.progressListener?.invoke(StealthPhase.EXTRACT, 100)
+                        workDir.mkdirs() // fehlt, wenn Originale aus filesDir kommen
                         true
                     } else {
                         stealer.extractApk(pkg, workDir) != null
@@ -244,7 +249,9 @@ class StealthPatchService : Service() {
                         finish(false, getString(R.string.stealth_error_extract))
                         return
                     }
-                    val originals = originalApks(workDir)
+                    if (originals == null || originals.size != expectedCount) {
+                        originals = originalApks(workDir)
+                    }
                     if (originals == null) {
                         finish(false, getString(R.string.stealth_error_extract))
                         return
@@ -279,6 +286,13 @@ class StealthPatchService : Service() {
                         ensureVaultAppInstalled(backend, stealer)
                     }
                     if (res.success) {
+                        // Originale dauerhaft sichern (filesDir) + Arbeitsordner
+                        // aufräumen: repacked/signed-Kopien sind nach dem Install
+                        // Einweg-Artefakte — nur die Originale braucht der Restore.
+                        // Ergebnis nicht blockierend (Originale bleiben sonst im Cache).
+                        if (!stealer.relocateOriginals(workDir, pkg)) {
+                            Log.w(TAG, "relocateOriginals fehlgeschlagen für $pkg (Originale bleiben im Cache)")
+                        }
                         val msg = if (cloneNewPkg != null) {
                             getString(R.string.stealth_success_clone, cloneNewPkg)
                         } else {
@@ -336,14 +350,19 @@ class StealthPatchService : Service() {
             val check = backend.exec("pm", "path", VAULT_CALC_PACKAGE)
             if (check.exitCode == 0 && check.stdout.contains("package:")) return // bereits installiert
             val apk = File(cacheDir, "calcyou.apk")
-            resources.openRawResource(R.raw.calcyou).use { input ->
-                apk.outputStream().use { out -> input.copyTo(out) }
-            }
-            val result = stealer.installApk(apk, VAULT_CALC_PACKAGE, allowAutoUninstall = false)
-            if (!result.success) {
-                Log.w(TAG, "CalcYou-Auto-Install fehlgeschlagen: ${result.message}")
-            } else {
-                Log.d(TAG, "CalcYou (Vault) automatisch installiert")
+            try {
+                resources.openRawResource(R.raw.calcyou).use { input ->
+                    apk.outputStream().use { out -> input.copyTo(out) }
+                }
+                val result = stealer.installApk(apk, VAULT_CALC_PACKAGE, allowAutoUninstall = false)
+                if (!result.success) {
+                    Log.w(TAG, "CalcYou-Auto-Install fehlgeschlagen: ${result.message}")
+                } else {
+                    Log.d(TAG, "CalcYou (Vault) automatisch installiert")
+                }
+            } finally {
+                // Temp-Datei entfernen — wird bei Bedarf aus der Raw-Ressource neu geschrieben
+                apk.delete()
             }
         } catch (e: Exception) {
             Log.w(TAG, "CalcYou-Auto-Install Fehler", e)
@@ -434,11 +453,14 @@ class StealthPatchService : Service() {
         phase: StealthPhase?,
         percent: Int?
     ): Notification {
+        // Tippen auf die Fortschritts-Notification oeffnet die App-Detailseite direkt
+        // auf dem Reiter "Tarnung" (dort haengt jetzt die Fortschrittsanzeige).
         val contentIntent = PendingIntent.getActivity(
             this, 0,
-            Intent(this, ComponentsActivity::class.java).apply {
+            Intent(this, AppDetailActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                if (currentPkg.isNotEmpty()) putExtra(ComponentsActivity.EXTRA_PACKAGE, currentPkg)
+                if (currentPkg.isNotEmpty()) putExtra(AppDetailActivity.EXTRA_PACKAGE, currentPkg)
+                putExtra(AppDetailActivity.EXTRA_TAB, AppDetailActivity.TAB_STEALTH)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

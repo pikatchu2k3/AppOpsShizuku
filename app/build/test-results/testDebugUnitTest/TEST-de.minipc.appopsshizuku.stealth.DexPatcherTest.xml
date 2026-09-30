@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.minipc.appopsshizuku.stealth.DexPatcherTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-22T07:44:38.422Z" hostname="Mini2" time="0.0">
-  <properties/>
-  <testcase name="patchFossDex_erzeugtNeuesDex" classname="de.minipc.appopsshizuku.stealth.DexPatcherTest" time="0.0"/>
-  <system-out><![CDATA[SKIP: /tmp/foss_original.apk fehlt
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

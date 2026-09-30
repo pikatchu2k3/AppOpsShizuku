@@ -4,6 +4,7 @@
     <string name="btn_connect">Verbinden</string>
     <string name="btn_disconnect">Trennen</string>
     <string name="btn_retry">Erneut prüfen</string>
+    <string name="btn_check">Prüfen</string>
     <string name="btn_restore_all">Alle auf Standard</string>
     <string name="btn_refresh">Aktualisieren</string>
     <string name="search_hint">App suchen…</string>
@@ -15,6 +16,12 @@
     <string name="status_disconnected">Nicht verbunden</string>
     <string name="status_connected">Verbunden</string>
     <string name="status_permission_denied">Keine Berechtigung</string>
+    <string name="status_shizuku_connected">Shizuku verbunden</string>
+    <string name="status_shizuku_disconnected">Shizuku nicht verbunden</string>
+    <string name="status_permission_missing">Berechtigung fehlt</string>
+    <string name="status_detail_connected">App Ops können jetzt verwaltet werden.</string>
+    <string name="status_detail_disconnected">Starte die Shizuku-App und tippe auf „Verbinden".</string>
+    <string name="status_detail_permission">Erteile App Ops Shizuku in der Shizuku-App die Berechtigung.</string>
     <string name="filter_all">Alle</string>
     <string name="filter_blocked">Blockiert</string>
     <string name="empty_no_apps">Keine Apps gefunden</string>
@@ -26,6 +33,7 @@
     <string name="stat_default">Standard</string>
     <string name="category_sensors">Sensoren</string>
     <string name="category_data">Daten</string>
+    <string name="category_media">Medien</string>
     <string name="category_account_activity">Konto &amp; Aktivität</string>
     <string name="category_background">Hintergrund</string>
     <string name="category_identity">Identität</string>
@@ -94,9 +102,10 @@
     <string name="menu_export_profiles">Profile exportieren</string>
     <string name="menu_import_profiles">Profile importieren</string>
     <string name="profiles_export_empty">Keine gespeicherten Profile vorhanden</string>
-    <string name="profiles_export_ok">%1$d Profile exportiert: privacy_profiles.json (App-Ordner)</string>
+    <string name="profiles_export_ok">%1$d Profile und %2$d App-Einstellungen exportiert: privacy_profiles.json (App-Ordner)</string>
     <string name="profiles_export_fail">Export fehlgeschlagen: %1$s</string>
     <string name="profiles_import_ok">%1$d Apps importiert, %2$d Ops auf diese App angewendet</string>
+    <string name="profiles_import_ok_global">%1$d Profile importiert</string>
     <string name="profiles_import_fail">Import fehlgeschlagen: %1$s</string>
 
     <!-- Stealth-Modus (Feature 2b) -->
@@ -158,4 +167,104 @@
     <string name="stealth_notif_channel_desc">Fortschritt und Ergebnis des Stealth-Patchs</string>
     <string name="stealth_dialog_success_title">✓ Erfolg</string>
     <string name="stealth_dialog_error_title">Fehler</string>
+
+    <!-- App-Detail mit Reitern -->
+    <string name="tab_permissions">Berechtigungen</string>
+    <string name="tab_behavior">Verhalten</string>
+    <string name="tab_stealth">Tarnung</string>
+    <string name="btn_open_components">Komponenten &amp; Tarnung öffnen</string>
+    <string name="tab_stealth_title">Tarnung</string>
+    <string name="tab_stealth_text">Versteckt die App: aus dem Verlauf ausblenden, Launcher-Icon entfernen, als Taschenrechner tarnen (Vault), Geräte-Spoofing oder als parallele App klonen. Diese Funktionen liegen vorerst noch im Komponenten-Bildschirm.</string>
+    <!-- Reiter "Verhalten": Deaktivieren / Einfrieren / Deaktivieren-Rueckmeldungen -->
+    <string name="components_disable_own">Die eigene App kann sich nicht selbst deaktivieren.</string>
+    <string name="components_disable_system">System-App – Deaktivieren kann andere Funktionen des Geräts beeinträchtigen.</string>
+    <string name="components_disable_action">Deaktivieren</string>
+    <string name="components_enabled">App aktiviert</string>
+    <string name="components_disabled">App deaktiviert</string>
+
+    <string name="behavior_shizuku_note">Ohne Shizuku-Berechtigung stehen Standby-Stufe, Akku-Ausnahme und Optimierung nicht zur Verfügung. Oben im Reiter \"Berechtigungen\" verbinden.</string>
+
+    <!-- QW-6: Standby-Stufe -->
+    <string name="behavior_standby_title">Standby-Stufe</string>
+    <string name="behavior_standby_text">Bestimmt, wie oft Android die App im Hintergrund aufweckt. Niedrigere Stufen sparen Akku, Benachrichtigungen können dann aber später ankommen.</string>
+    <string name="behavior_standby_current">Aktuell: %1$s</string>
+    <string name="behavior_standby_done">Standby-Stufe gesetzt: %1$s</string>
+    <string name="behavior_standby_failed">Das Gerät hat den Wert nicht übernommen – es bleibt bei: %1$s</string>
+    <string name="behavior_bucket_active">Aktiv</string>
+    <string name="behavior_bucket_working_set">Häufig genutzt</string>
+    <string name="behavior_bucket_frequent">Häufig</string>
+    <string name="behavior_bucket_rare">Selten</string>
+    <string name="behavior_bucket_restricted">Eingeschränkt</string>
+    <string name="behavior_bucket_never">Nie</string>
+    <string name="behavior_bucket_exempted">Vom System ausgenommen</string>
+    <string name="behavior_value_unknown">unbekannt</string>
+    <string name="behavior_device_says">Gerät meldet: %1$s</string>
+
+    <!-- QW-6: Akku-Ausnahme (Doze) -->
+    <string name="behavior_battery_title">Akku-Ausnahme (Doze)</string>
+    <string name="behavior_battery_text">Eine Ausnahme erlaubt der App, auch im Tiefschlaf weiterzuarbeiten (z. B. für Wecker, Überwachung, Sync). Das kostet meist spürbar mehr Akku.</string>
+    <string name="behavior_battery_switch">Von der Akku-Optimierung ausnehmen</string>
+    <string name="behavior_battery_current_on">Ausgenommen – die App darf auch im Tiefschlaf arbeiten.</string>
+    <string name="behavior_battery_current_off">Nicht ausgenommen – Android darf die App im Tiefschlaf anhalten.</string>
+    <string name="behavior_battery_added">Ausnahme gesetzt</string>
+    <string name="behavior_battery_removed">Ausnahme entfernt</string>
+    <string name="behavior_battery_failed">Das Gerät hat die Änderung nicht übernommen.</string>
+
+    <!-- QW-7: App optimieren (Force-AOT) -->
+    <string name="behavior_aot_title">App optimieren</string>
+    <string name="behavior_aot_text">Kompiliert die App neu für dieses Gerät. Sie startet danach schneller. Es wird nichts gelöscht, der Vorgang kann einige Sekunden dauern.</string>
+    <string name="behavior_aot_button">Jetzt optimieren</string>
+    <string name="behavior_aot_running">Optimiert …</string>
+    <string name="behavior_aot_done">Neu kompiliert – die App startet jetzt schneller</string>
+    <string name="behavior_aot_failed">Optimierung nicht möglich (Gerät hat den Befehl abgelehnt)</string>
+    <string name="profiles_import_ok_full">%1$d Profile und %2$d App-Einstellungen übernommen</string>
+    <string name="profiles_import_behavior_need_shizuku">App-Einstellungen übersprungen (Shizuku nicht verbunden) – nur Profile übernommen</string>
+    <string name="profiles_import_ok_with_errors">%1$d Profile übernommen – %2$d App-Einstellungen hat das Gerät nicht übernommen</string>
+    <string name="block_all_button">Alles blockieren</string>
+    <string name="block_all_own_app">Eigene App wird nicht blockiert</string>
+    <string name="block_all_confirm_title">Alle Berechtigungen entziehen?</string>
+    <string name="block_all_confirm_msg">Setzt jede Berechtigung dieser App auf „Blockieren" (Kamera, Mikrofon, Standort, Kontakte, Dateien …). Rückgängig mit „Alle auf Standard".</string>
+    <string name="block_all_action">Blockieren</string>
+    <string name="block_all_done">Alle Berechtigungen blockiert</string>
+    <string name="block_all_partial">%1$d Berechtigungen konnte das Gerät nicht ändern</string>
+    <string name="backup_status_export_ok">Export: %1$d Profile, %2$d App-Einstellungen gesichert</string>
+    <string name="backup_status_export_fail">Export fehlgeschlagen: %1$s</string>
+    <string name="backup_status_import_ok">Import: %1$d Profile, %2$d App-Einstellungen übernommen</string>
+    <string name="backup_status_import_warn">Import: %1$d Profile übernommen, %2$d App-Einstellungen NICHT übernommen – %3$s</string>
+    <string name="backup_status_import_fail">Import fehlgeschlagen: %1$s</string>
+
+    <!-- Feature 3: Lifecycle-Profil -->
+    <string name="lifecycle_title">Lifecycle-Profil (Hintergrund)</string>
+    <string name="lifecycle_text">Setzt in einem Schritt: Akku-Ausnahme, Standby-Stufe und Hintergrund-Ausführung (RUN_IN_BACKGROUND, RUN_ANY_IN_BACKGROUND). Vorher wird der Ist-Zustand gemerkt, „Zurücknehmen“ stellt ihn wieder her. Jeder Wert wird danach neu vom Gerät gelesen.</string>
+    <string name="lifecycle_bucket_label">Standby-Stufe</string>
+    <string name="lifecycle_battery_check">Akku-Ausnahme erteilen</string>
+    <string name="lifecycle_battery_hint">Mit Akku-Ausnahme hält Android die Stufe auf „vom System ausgenommen“ (5) – die gewählte Stufe greift dann nicht und wird als nicht übernommen gemeldet.</string>
+    <string name="lifecycle_compile_check">App danach optimieren (dauert einige Sekunden)</string>
+    <string name="lifecycle_apply">Profil anwenden</string>
+    <string name="lifecycle_revert">Zurücknehmen</string>
+    <string name="lifecycle_running">Wird angewendet …</string>
+    <string name="lifecycle_saved_before">Gemerkter Ursprungszustand: %1$s</string>
+    <string name="lifecycle_no_snapshot">Kein gemerkter Ursprungszustand – Profil noch nicht angewendet.</string>
+    <string name="lifecycle_result_ok">Alle %1$d Werte vom Gerät bestätigt.</string>
+    <string name="lifecycle_result_failed">%1$d von %2$d Werten NICHT übernommen:</string>
+    <string name="lifecycle_revert_kept">Ursprungszustand bleibt gemerkt, damit du es erneut versuchen kannst.</string>
+
+    <!-- Feature 3: Screen-Off-Exit -->
+    <string name="screen_off_title">Beim Bildschirm-Aus anhalten</string>
+    <string name="screen_off_text">Hält die App an, sobald der Bildschirm ausgeht. Preis: Android meldet Bildschirm an/aus nur an eine laufende App. Solange mindestens eine App diesen Haken hat, läuft deshalb ein Dienst mit dauerhafter Benachrichtigung. Standard: aus.</string>
+    <string name="screen_off_switch">Beim Bildschirm-Aus anhalten</string>
+    <string name="screen_off_effect_suspend">Einfrieren (pm suspend) – wird zurückgenommen</string>
+    <string name="screen_off_effect_force_stop">Hart beenden (am force-stop)</string>
+    <string name="screen_off_release">Beim Einschalten wieder freigeben</string>
+    <string name="screen_off_excluded_own">Nicht für die eigene App.</string>
+    <string name="screen_off_excluded_system">Nicht für System-Apps.</string>
+    <string name="screen_off_no_shizuku">Nicht möglich: Shizuku ist nicht verbunden oder nicht erlaubt.</string>
+    <string name="screen_off_service_running">Dienst läuft (Benachrichtigung sichtbar).</string>
+    <string name="screen_off_service_failed">Dienst konnte nicht starten: %1$s</string>
+    <string name="screen_off_last">Zuletzt: %1$s</string>
+    <string name="screen_off_notif_denied">Benachrichtigungen sind nicht erlaubt – der Dienst läuft trotzdem, die Benachrichtigung ist aber versteckt.</string>
+    <string name="lifecycle_notif_channel">Bildschirm-Aus-Wächter</string>
+    <string name="lifecycle_notif_channel_desc">Dauerhafte Benachrichtigung, solange Apps beim Bildschirm-Aus angehalten werden</string>
+    <string name="lifecycle_notif_title">Bildschirm-Aus-Wächter: %1$d App(s)</string>
+    <string name="lifecycle_notif_text">Wartet auf Bildschirm aus/an</string>
 </resources>

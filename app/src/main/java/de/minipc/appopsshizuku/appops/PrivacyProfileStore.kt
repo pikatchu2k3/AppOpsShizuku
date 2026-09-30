@@ -26,18 +26,14 @@ class PrivacyProfileStore(context: Context) {
         // getString() null -> orEmpty() -> "" -> JSONObject("") wuerde mit
         // JSONException crashen (live reproduziert: App stuerzte beim Setzen
         // der ersten Op einer App auf den Main-Thread ab, "springt zurueck").
-        val json = getProfileJson(packageName)
-        val profile = if (json.isBlank()) JSONObject()
-        else runCatching { JSONObject(json) }.getOrElse { JSONObject() }
+        val profile = ProfileJson.parse(getProfileJson(packageName))
         profile.put(opName, mode)
         prefs.edit().putString(packageName, profile.toString()).apply()
     }
 
     /** Gespeichertes Profil einer App (leer wenn keins existiert). */
     fun getProfile(packageName: String): Map<String, String> {
-        val json = getProfileJson(packageName)
-        if (json.isEmpty()) return emptyMap()
-        return jsonObjectToMap(JSONObject(json))
+        return jsonObjectToMap(ProfileJson.parse(getProfileJson(packageName)))
     }
 
     /** Profil einer App loeschen (z.B. nach "Alle auf Standard"). */

@@ -2,7 +2,6 @@ package de.minipc.appopsshizuku
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,7 +11,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,6 +43,10 @@ class AppOpsActivity : AppCompatActivity() {
         private val CATEGORY_DATA = listOf(
             "READ_CONTACTS", "WRITE_CONTACTS", "READ_CALENDAR", "WRITE_CALENDAR",
             "READ_CALL_LOG", "WRITE_CALL_LOG", "READ_CLIPBOARD", "WRITE_CLIPBOARD"
+        )
+        private val CATEGORY_MEDIA = listOf(
+            "READ_MEDIA_IMAGES", "READ_MEDIA_VIDEO", "READ_MEDIA_AUDIO",
+            "READ_MEDIA_VISUAL_USER_SELECTED"
         )
         private val CATEGORY_ACCOUNT = listOf("GET_ACCOUNTS")
         private val CATEGORY_BACKGROUND = listOf(
@@ -130,107 +132,7 @@ class AppOpsActivity : AppCompatActivity() {
                 )
                 true
             }
-            R.id.action_export_profiles -> {
-                exportProfiles()
-                true
-            }
-            R.id.action_import_profiles -> {
-                importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
-                true
-            }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private val importPicker =
-        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            if (uri != null) importProfiles(uri)
-        }
-
-    private fun exportProfiles() {
-        executor.execute {
-            val profiles = profileStore.allProfiles()
-            handler.post {
-                if (profiles.isEmpty()) {
-                    Toast.makeText(this, R.string.profiles_export_empty, Toast.LENGTH_SHORT).show()
-                    return@post
-                }
-                try {
-                    profileStore.exportFile().writeText(PrivacyProfileStore.toJson(profiles))
-                    Toast.makeText(
-                        this,
-                        getString(R.string.profiles_export_ok, profiles.size),
-                        Toast.LENGTH_LONG
-                    ).show()
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.profiles_export_fail, e.message ?: "?"),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
-    }
-
-    /**
-     * JSON-Datei (SAF-Picker) einlesen: Profile in die Prefs mergen und die
-     * Modi der aktuell geoeffneten App direkt anwenden (Klon-Backup: gleiche
-     * Ops auf das Klon-Paket setzen).
-     */
-    private fun importProfiles(uri: Uri) {
-        findViewById<LinearProgressIndicator>(R.id.loadingBar).visibility = View.VISIBLE
-        executor.execute {
-            var importedApps = 0
-            var appliedOps = 0
-            var error: String? = null
-            try {
-                val json = contentResolver.openInputStream(uri)
-                    ?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
-                    ?: throw IllegalArgumentException("Datei nicht lesbar")
-                val profiles = PrivacyProfileStore.fromJson(json)
-                profileStore.importProfiles(profiles)
-                importedApps = profiles.size
-
-                // Profil dieser App (falls enthalten) live anwenden
-                val ownProfile = profiles[packageName]
-                if (ownProfile != null) {
-                    for (op in ops) {
-                        val mode = ownProfile[op.opName] ?: continue
-                        val res = controller.setMode(packageName, op, mode)
-                        if (res.exitCode == 0) {
-                            opStates[op.opName] = mode
-                            appliedOps++
-                        } else {
-                            opStates[op.opName] = try {
-                                controller.getMode(packageName, op)
-                            } catch (e: Exception) {
-                                null
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                error = e.message ?: e.javaClass.simpleName
-            }
-            handler.post {
-                findViewById<LinearProgressIndicator>(R.id.loadingBar).visibility = View.GONE
-                adapter.submitList(buildItems())
-                updateStats()
-                if (error != null) {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.profiles_import_fail, error),
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.profiles_import_ok, importedApps, appliedOps),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
         }
     }
 
@@ -270,6 +172,7 @@ class AppOpsActivity : AppCompatActivity() {
         val categories = listOf(
             Pair(getString(R.string.category_sensors), CATEGORY_SENSORS),
             Pair(getString(R.string.category_data), CATEGORY_DATA),
+            Pair(getString(R.string.category_media), CATEGORY_MEDIA),
             Pair(getString(R.string.category_account_activity), CATEGORY_ACCOUNT),
             Pair(getString(R.string.category_background), CATEGORY_BACKGROUND),
             Pair(getString(R.string.category_identity), CATEGORY_IDENTITY),
@@ -294,7 +197,8 @@ class AppOpsActivity : AppCompatActivity() {
             val actual = if (res.exitCode == 0)
                 runCatching { controller.getMode(packageName, op) }.getOrNull()
             else null
-            val effective = res.exitCode == 0 && isSetEffective(op, mode, actual)
+            val effective = res.exitCode == 0 &&
+                de.minipc.appopsshizuku.appops.OpEffect.isSetEffective(op.permissionName, mode, actual)
             handler.post {
                 if (effective) {
                     opStates[op.opName] = mode
@@ -330,26 +234,6 @@ class AppOpsActivity : AppCompatActivity() {
                 updateStats()
             }
         }
-    }
-
-    /**
-     * Prueft, ob das Setzen einer Op den gewuenschten Effekt hatte.
-     * - Ops MIT Runtime-Permission: deny/ignore (-> pm revoke -> System meldet "ignore")
-     *   und allow/default (-> pm grant -> System meldet "allow") sind semantisch gleich
-     *   (das System kennt nur blockiert/nicht-blockiert). -> effektiv.
-     * - Reine AppOps: der Modus muss exakt stimmen (deny bleibt deny, ignore bleibt ignore).
-     *   -> TURN_SCREEN_ON & Co, die das System still ignoriert, werden als NICHT effektiv erkannt.
-     */
-    private fun isSetEffective(op: AppOp, requested: String, actual: String?): Boolean {
-        if (actual == null) return false
-        if (op.permissionName != null) {
-            val requestedBlocked = requested == "deny" || requested == "ignore"
-            val actualBlocked = actual == "deny" || actual == "ignore"
-            val requestedAllowed = requested == "allow" || requested == "default"
-            val actualAllowed = actual == "allow" || actual == "default"
-            return (requestedBlocked && actualBlocked) || (requestedAllowed && actualAllowed)
-        }
-        return requested == actual
     }
 
     private fun restoreAll() {

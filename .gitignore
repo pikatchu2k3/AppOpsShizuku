@@ -6,3 +6,13 @@ local.properties
 *.aab
 vaultcalc/build/
 spooftest/build/
+app/build/
+spooftest/build/
+build/
+.gradle/
+.kotlin/
+local.properties
+*.apk
+*.aab
+*.idsig
+captures/

@@ -12,8 +12,13 @@
          ist der Schalter in den App-Einstellungen ausgegraut/nicht vorhanden
          (realer User-Fall 08/2026: "Benachrichtigungen kann ich nicht erlauben") -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Feature 3 Screen-Off-Exit: Android 14+ verlangt fuer jeden Vordergrunddienst einen Typ.
+         dataSync ist ab Android 15 auf 6 h/Tag begrenzt und passt inhaltlich nicht;
+         "specialUse" ist der einzige passende Typ ohne Zeitlimit und braucht genau dieses Recht. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
+        android:name=".AppOpsApp"
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher"
         android:theme="@style/Theme.AppOpsShizuku"
@@ -38,6 +43,9 @@
         </activity>
 
         <activity
+            android:name=".AppDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".AppOpsActivity"
             android:exported="false" />
         <activity
@@ -49,5 +57,17 @@
             android:name=".StealthPatchService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <!-- Feature 3 Screen-Off-Exit: SCREEN_ON/OFF sind ab Android 8 nicht per Manifest-Empfaenger
+             empfangbar -> Empfaenger zur Laufzeit in diesem Dienst. Laeuft nur, solange
+             mindestens eine App den Haken hat. -->
+        <service
+            android:name=".LifecycleScreenService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Beobachtet Bildschirm an/aus, um vom Nutzer gewaehlte Apps beim Ausschalten anzuhalten (pm suspend / am force-stop)." />
+        </service>
     </application>
 </manifest>

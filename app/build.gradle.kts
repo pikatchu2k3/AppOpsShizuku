@@ -54,6 +54,8 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    // App-Detail mit Reitern (TabLayout aus material, Pager aus viewpager2)
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
 
     // On-Device-APK-Signierung (v1+v2+v3) + selbstsigniertes Zertifikat (Stealth-Modus)
     implementation("com.android.tools.build:apksig:8.2.2")
@@ -65,4 +67,6 @@ dependencies {
     implementation("org.smali:dexlib2:2.5.2")
 
     testImplementation("junit:junit:4.13.2")
+    // Android-Unit-Tests haben kein echtes org.json (nur Stubs) -> echte Impl fuer JVM-Tests
+    testImplementation("org.json:json:20240303")
 }

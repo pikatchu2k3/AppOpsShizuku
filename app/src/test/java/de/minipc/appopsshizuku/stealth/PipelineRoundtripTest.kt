@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.stealth
 
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import java.io.File
 
@@ -13,6 +14,8 @@ class PipelineRoundtripTest {
     @Test
     fun roundtrip() {
         val apk = File("/tmp/foss_original.apk")
+        // Ohne die feste Host-APK sauber ueberspringen statt fehlschlagen.
+        assumeTrue("SKIP: /tmp/foss_original.apk fehlt", apk.exists())
         val work = File.createTempFile("pipe", "").apply { delete(); mkdirs() }
         try {
             // 1. Dex extrahieren

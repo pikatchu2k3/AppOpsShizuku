@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="de.minipc.appopsshizuku.stealth.PatchMiniApkTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-22T07:44:38.423Z" hostname="Mini2" time="0.0">
-  <properties/>
-  <testcase name="patchMiniApk" classname="de.minipc.appopsshizuku.stealth.PatchMiniApkTest" time="0.0"/>
-  <system-out><![CDATA[SKIP: mini5 fehlt
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

@@ -24,6 +24,14 @@ object PrivacyOps {
         AppOp("WRITE_CLIPBOARD", "Zwischenablage schreiben", null),
         AppOp("BODY_SENSORS", "Koerper-Sensoren", "android.permission.BODY_SENSORS"),
         AppOp("ACTIVITY_RECOGNITION", "Aktivitaetserkennung", "android.permission.ACTIVITY_RECOGNITION"),
+        // --- Medien (Android 13+, pm grant/revoke; auf aelteren Geraeten per Probe nicht setzbar) ---
+        AppOp("READ_MEDIA_IMAGES", "Fotos lesen", "android.permission.READ_MEDIA_IMAGES", "Medien"),
+        AppOp("READ_MEDIA_VIDEO", "Videos lesen", "android.permission.READ_MEDIA_VIDEO", "Medien"),
+        AppOp("READ_MEDIA_AUDIO", "Audio lesen", "android.permission.READ_MEDIA_AUDIO", "Medien"),
+        AppOp(
+            "READ_MEDIA_VISUAL_USER_SELECTED", "Ausgewaehlte Fotos/Videos",
+            "android.permission.READ_MEDIA_VISUAL_USER_SELECTED", "Medien"
+        ),
         // --- Hintergrund (reine AppOps, cmd appops set-Hebel) ---
         AppOp("RUN_IN_BACKGROUND", "Hintergrund-Ausfuehrung", null, "Hintergrund"),
         AppOp("RUN_ANY_IN_BACKGROUND", "Hintergrund-Ausfuehrung (beliebig)", null, "Hintergrund"),

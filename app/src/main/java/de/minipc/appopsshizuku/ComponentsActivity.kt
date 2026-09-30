@@ -30,6 +30,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.switchmaterial.SwitchMaterial
+import de.minipc.appopsshizuku.shizuku.isFailure
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
@@ -408,13 +409,7 @@ class ComponentsActivity : AppCompatActivity() {
      * stderr/stdout — nur exitCode reicht nicht (Android 15/16: Shell darf
      * Komponenten-Zustand nur mit CHANGE_COMPONENT_ENABLED_STATE aendern).
      */
-    private fun isFailed(res: de.minipc.appopsshizuku.shizuku.ShellResult): Boolean {
-        if (res.exitCode != 0) return true
-        val out = res.stderr + "\n" + res.stdout
-        return out.contains("Exception", ignoreCase = true) ||
-            out.contains("cannot change", ignoreCase = true) ||
-            out.contains("Error", ignoreCase = true)
-    }
+    private fun isFailed(res: de.minipc.appopsshizuku.shizuku.ShellResult): Boolean = res.isFailure()
 
     private fun loadComponents() {
         findViewById<ProgressBar>(R.id.loadingProgress).visibility = View.VISIBLE

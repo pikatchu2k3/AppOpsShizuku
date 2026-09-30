@@ -65,6 +65,15 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         /** Gemeinsamer Arbeitsordner (Activity + Service nutzen denselben Cache-Pfad). */
         fun workDir(context: android.content.Context, packageName: String): File =
             File(context.cacheDir, "stealth_$packageName")
+
+        /**
+         * Dauerhafter Aufbewahrungsort für die Original-APKs (filesDir statt Cache):
+         * überlebt ein Cache-Leeren durch Android/die Einstellungen, ohne dass die
+         * "Original wiederherstellen"-Funktion stirbt. Cache war der falsche Ort —
+         * Android behandelt ihn als wegwerfbar (real: 700 MB Cache nach großem Patch).
+         */
+        fun preservedDir(context: android.content.Context, packageName: String): File =
+            File(context.filesDir, "stealth_$packageName")
     }
 
     /**
@@ -193,6 +202,72 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         report(StealthPhase.EXTRACT, 100)
         if (outFiles.isEmpty() || outFiles.any { it.length() <= 0 }) return null
         return outFiles
+    }
+
+    /** Original-APKs (base + Splits) aus einem Ordner sammeln, null wenn keine gültige Extraktion. */
+    private fun collectOriginals(dir: File): List<File>? {
+        val base = File(dir, "original.apk")
+        if (!base.exists() || base.length() <= 0) return null
+        val splits = dir.listFiles { f -> f.name.startsWith("original_split_") }
+            ?.sortedBy { it.name }
+            ?: emptyList()
+        return listOf(base) + splits
+    }
+
+    /**
+     * Original-APKs am dauerhaften Ort (filesDir) — überleben ein Cache-Leeren.
+     * Wird nach erfolgreichem Patch per [relocateOriginals] dorthin verschoben.
+     */
+    fun preservedOriginals(pkg: String): List<File>? =
+        collectOriginals(preservedDir(appContext, pkg))
+
+    /**
+     * Originale auflösen: bevorzugt dauerhafter Ort (filesDir, neuer Speicherort),
+     * sonst Legacy-Cache (Bestandsinstallationen vor dem filesDir-Umzug). Der Cache
+     * wird beim nächsten erfolgreichen Patch automatisch via relocateOriginals migriert.
+     */
+    fun resolveOriginals(pkg: String, workDir: File): List<File>? =
+        preservedOriginals(pkg) ?: collectOriginals(workDir)
+
+    /**
+     * Nach erfolgreichem Patch: Originale in den dauerhaften Ordner (filesDir)
+     * verschieben und den Arbeitsordner aufräumen. Verhindert, dass der App-Cache
+     * durch 2–3 APK-Kopien pro Patch explodiert (real: ~700 MB nach großem Patch:
+     * original + repacked + signed blieben liegen). Im Arbeitsordner verbleiben
+     * sonst nur Einweg-Artefakte (repacked/signed/Splits) — die werden gelöscht.
+     * @return true wenn die Originale sicher im dauerhaften Ordner liegen.
+     */
+    fun relocateOriginals(workDir: File, pkg: String): Boolean {
+        val originals = collectOriginals(workDir) ?: return false
+        return try {
+            val targetDir = preservedDir(appContext, pkg)
+            targetDir.mkdirs()
+            // Veraltete Ziel-Dateien (z.B. ältere Splits) ersetzen
+            targetDir.listFiles()?.forEach { it.delete() }
+            var moved = true
+            for (f in originals) {
+                val dest = File(targetDir, f.name)
+                if (!f.renameTo(dest)) {
+                    moved = try {
+                        f.copyTo(dest, overwrite = true)
+                        f.delete()
+                        true
+                    } catch (e: Exception) {
+                        Log.e(TAG, "relocateOriginals: Kopie von ${f.name} fehlgeschlagen", e)
+                        false
+                    }
+                }
+                if (!moved) break
+            }
+            if (!moved) return false
+            // Rest im Arbeitsordner sind Einweg-Artefakte (repacked/signed/Splits)
+            workDir.listFiles()?.forEach { it.delete() }
+            workDir.delete()
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "relocateOriginals fehlgeschlagen", e)
+            false
+        }
     }
 
     /**

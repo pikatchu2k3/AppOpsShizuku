@@ -3,29 +3,45 @@ package de.minipc.appopsshizuku
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.LruCache
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import de.minipc.appopsshizuku.appops.BehaviorBackup
+import de.minipc.appopsshizuku.appops.ProfileBackup
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuManager
 import de.minipc.appopsshizuku.ui.AppItem
 import de.minipc.appopsshizuku.ui.AppListAdapter
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.Executors
 
 /**
@@ -38,6 +54,13 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        /** Import ohne Dateidialog: beim Start mit "--es import_file <pfad>" aufrufbar (auch per Tasker). */
+        const val EXTRA_IMPORT_FILE = "import_file"
+
+        private const val PREFS_BACKUP = "backup_status"
+        private const val KEY_BACKUP_TEXT = "text"
+        private const val KEY_BACKUP_ERROR = "error"
+
         const val SORT_NAME = 0
         const val SORT_INSTALL = 1
         const val SORT_UPDATE = 2
@@ -46,8 +69,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var manager: ShizukuManager
+    private lateinit var profileBackup: ProfileBackup
     private val handler = Handler(Looper.getMainLooper())
     private val executor = Executors.newFixedThreadPool(4)
+
+    /** SAF-Picker fuer den Profil-Import (JSON), global von der Toolbar aus. */
+    private val importPicker =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) importProfiles(uri)
+        }
 
     /** Alle Apps (ungefiltert, Basis fuer Filter+Sortierung). Nur per Referenz-Tausch aendern. */
     private var allApps: List<AppItem> = emptyList()
@@ -72,9 +102,48 @@ class MainActivity : AppCompatActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
+        supportActionBar?.title = getString(R.string.app_name)
+
+        // Edge-to-Edge: Systemleisten-Abstaende auf das Wurzel-Layout legen,
+        // damit die Toolbar unter der Statusleiste und die Liste ueber der
+        // Navigationsleiste bleiben (kein Inhalt/Tap geht verloren).
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
+            insets
+        }
+
+        profileBackup = ProfileBackup(this)
+
+        // Feature 3: Bildschirm-Aus-Waechter wieder starten, falls Apps den Haken haben
+        // (nach Neustart/Prozess-Ende). Hier ist die App sicher im Vordergrund.
+        LifecycleScreenService.sync(this)
+
+        // Direkt-Import ohne Dateidialog: am start ... --es import_file <pfad>
+        // (praktisch fuer Skripte/Tasker und fuer Tests; der System-Dialog ist headless unzuverlaessig)
+        intent?.getStringExtra(EXTRA_IMPORT_FILE)?.takeIf { it.isNotBlank() }?.let { path ->
+            val file = File(path)
+            if (file.isFile) {
+                importProfiles(Uri.fromFile(file))
+            } else {
+                setBackupStatus(
+                    getString(R.string.backup_status_import_fail, "Datei nicht lesbar: $path"), true
+                )
+            }
+        }
+
+        // Letzte Backup-Meldung wieder anzeigen (bleibt auch nach App-Neustart lesbar)
+        getSharedPreferences(PREFS_BACKUP, MODE_PRIVATE).let { prefs ->
+            val last = prefs.getString(KEY_BACKUP_TEXT, null)
+            if (!last.isNullOrBlank()) {
+                showBackupStatus(last, prefs.getBoolean(KEY_BACKUP_ERROR, false))
+            }
+        }
         manager = ShizukuManager(onStateChanged = { runOnUiThread { updateStatus() } })
         manager.refresh()
 
@@ -93,8 +162,8 @@ class MainActivity : AppCompatActivity() {
 
         adapter = AppListAdapter { app ->
             startActivity(
-                Intent(this, AppOpsActivity::class.java)
-                    .putExtra(AppOpsActivity.EXTRA_PACKAGE, app.packageName)
+                Intent(this, AppDetailActivity::class.java)
+                    .putExtra(AppDetailActivity.EXTRA_PACKAGE, app.packageName)
             )
         }
         findViewById<RecyclerView>(R.id.appList).apply {
@@ -328,13 +397,209 @@ class MainActivity : AppCompatActivity() {
         loadApps()
     }
 
-    private fun updateStatus() {
-        val chip = findViewById<Chip>(R.id.statusChip)
-        when {
-            !manager.isConnected -> chip.text = getString(R.string.status_disconnected)
-            !manager.hasPermission -> chip.text = getString(R.string.status_permission_denied)
-            else -> chip.text = getString(R.string.status_connected)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_export_profiles -> {
+                exportProfiles()
+                true
+            }
+            R.id.action_import_profiles -> {
+                importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    /** Alle gespeicherten Profile als JSON in den App-Ordner schreiben. */
+    private fun exportProfiles() {
+        executor.execute {
+            val result = runCatching {
+                // Einheitliches Backup: Berechtigungsprofile + Verhaltens-Einstellungen
+                // (Standby-Stufe, Akku-Ausnahme, eingefroren, deaktiviert) in EINER Datei.
+                val behavior = if (manager.isConnected && manager.hasPermission && allApps.isNotEmpty()) {
+                    runCatching {
+                        BehaviorBackup(ShizukuBackend()).collect(allApps.map { it.packageName })
+                    }.getOrDefault(emptyMap())
+                } else {
+                    emptyMap()
+                }
+                profileBackup.export(behavior)
+            }
+            handler.post {
+                result.onSuccess { r ->
+                    if (r.count == 0 && r.behaviorCount == 0 && r.lifecycleCount == 0) {
+                        setBackupStatus(getString(R.string.profiles_export_empty), false)
+                        Toast.makeText(this, R.string.profiles_export_empty, Toast.LENGTH_SHORT).show()
+                    } else {
+                        setBackupStatus(
+                            getString(R.string.backup_status_export_ok, r.count, r.behaviorCount), false
+                        )
+                        Toast.makeText(
+                            this,
+                            getString(R.string.profiles_export_ok, r.count, r.behaviorCount),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }.onFailure { e ->
+                    val reason = e.message ?: e.javaClass.simpleName
+                    setBackupStatus(getString(R.string.backup_status_export_fail, reason), true)
+                    Toast.makeText(
+                        this,
+                        getString(R.string.profiles_export_fail, reason),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /** JSON-Datei (SAF) einlesen und in die Prefs mergen (global, alle Apps). */
+    private fun importProfiles(uri: Uri) {
+        executor.execute {
+            val result = runCatching { profileBackup.import(uri) }
+            handler.post {
+                result.onSuccess { imported ->
+                    val shizukuOk = manager.isConnected && manager.hasPermission
+                    val message = when {
+                        imported.behavior.isEmpty() ->
+                            getString(R.string.profiles_import_ok_global, imported.profiles.size)
+
+                        !shizukuOk ->
+                            getString(R.string.profiles_import_ok_global, imported.profiles.size) + " – " +
+                                getString(R.string.profiles_import_behavior_need_shizuku)
+
+                        else -> {
+                            // Ehrlich: die Zahl der Einstellungen, die das Geraet NICHT uebernommen hat
+                            val errors = runCatching {
+                                val backup = BehaviorBackup(ShizukuBackend())
+                                imported.behavior.flatMap { (pkg, state) ->
+                                    backup.restoreToDevice(pkg, state, applicationContext.packageName)
+                                }
+                            }.getOrElse { listOf(it.message ?: it.javaClass.simpleName) }
+
+                            if (errors.isEmpty()) {
+                                setBackupStatus(
+                                    getString(
+                                        R.string.backup_status_import_ok,
+                                        imported.profiles.size, imported.behavior.size
+                                    ), false
+                                )
+                                getString(
+                                    R.string.profiles_import_ok_full,
+                                    imported.profiles.size, imported.behavior.size
+                                )
+                            } else {
+                                // Klartext-Grund mitschreiben: so ist der Fehler auch spaeter lesbar
+                                setBackupStatus(
+                                    getString(
+                                        R.string.backup_status_import_warn,
+                                        imported.profiles.size, errors.size,
+                                        errors.take(3).joinToString("; ")
+                                    ), true
+                                )
+                                getString(
+                                    R.string.profiles_import_ok_with_errors,
+                                    imported.profiles.size, errors.size
+                                )
+                            }
+                        }
+                    }
+                    // Importierte Screen-Off-Haken wirken erst mit laufendem Dienst
+                    if (imported.lifecycle.isNotEmpty()) LifecycleScreenService.sync(this)
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                }.onFailure { e ->
+                    val reason = e.message ?: e.javaClass.simpleName
+                    setBackupStatus(getString(R.string.backup_status_import_fail, reason), true)
+                    Toast.makeText(
+                        this,
+                        getString(R.string.profiles_import_fail, reason),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Bleibende Rueckmeldung fuer Export/Import: sichtbar oben im Hauptbildschirm UND im
+     * App-Speicher abgelegt - so ist auch ein Fehlergrund noch lesbar, wenn der Toast weg ist.
+     */
+    private fun setBackupStatus(message: String, isError: Boolean) {
+        val stamp = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMANY).format(Date())
+        val text = "$message\n$stamp"
+        getSharedPreferences(PREFS_BACKUP, MODE_PRIVATE).edit()
+            .putString(KEY_BACKUP_TEXT, text)
+            .putBoolean(KEY_BACKUP_ERROR, isError)
+            .apply()
+        showBackupStatus(text, isError)
+    }
+
+    private fun showBackupStatus(text: String, isError: Boolean) {
+        val view = findViewById<TextView>(R.id.backupStatus) ?: return
+        view.text = text
+        view.visibility = View.VISIBLE
+        view.setBackgroundColor(
+            themeColor(
+                if (isError) com.google.android.material.R.attr.colorErrorContainer
+                else com.google.android.material.R.attr.colorSurfaceVariant
+            )
+        )
+        view.setTextColor(
+            themeColor(
+                if (isError) com.google.android.material.R.attr.colorOnErrorContainer
+                else com.google.android.material.R.attr.colorOnSurfaceVariant
+            )
+        )
+    }
+
+    /** Theme-Farbe (Attribut) aufloesen — respektiert Material-You/Dark-Mode. */
+    private fun themeColor(attr: Int): Int {
+        val tv = android.util.TypedValue()
+        theme.resolveAttribute(attr, tv, true)
+        return tv.data
+    }
+
+    private fun updateStatus() {
+        val card = findViewById<MaterialCardView>(R.id.statusCard)
+        val title = findViewById<TextView>(R.id.statusTitle)
+        val detail = findViewById<TextView>(R.id.statusDetail)
+        val button = findViewById<Button>(R.id.connectButton)
+
+        val bgAttr: Int
+        val fgAttr: Int
+        when {
+            !manager.isConnected -> {
+                title.setText(R.string.status_shizuku_disconnected)
+                detail.setText(R.string.status_detail_disconnected)
+                button.setText(R.string.btn_connect)
+                bgAttr = com.google.android.material.R.attr.colorSecondaryContainer
+                fgAttr = com.google.android.material.R.attr.colorOnSecondaryContainer
+            }
+            !manager.hasPermission -> {
+                title.setText(R.string.status_permission_missing)
+                detail.setText(R.string.status_detail_permission)
+                button.setText(R.string.btn_connect)
+                bgAttr = com.google.android.material.R.attr.colorErrorContainer
+                fgAttr = com.google.android.material.R.attr.colorOnErrorContainer
+            }
+            else -> {
+                title.setText(R.string.status_shizuku_connected)
+                detail.setText(R.string.status_detail_connected)
+                button.setText(R.string.btn_check)
+                bgAttr = com.google.android.material.R.attr.colorPrimaryContainer
+                fgAttr = com.google.android.material.R.attr.colorOnPrimaryContainer
+            }
+        }
+        val fg = themeColor(fgAttr)
+        card.setCardBackgroundColor(themeColor(bgAttr))
+        title.setTextColor(fg)
+        detail.setTextColor(fg)
     }
 
     override fun onRequestPermissionsResult(
