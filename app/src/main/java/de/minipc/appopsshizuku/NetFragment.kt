@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,10 +21,12 @@ import de.minipc.appopsshizuku.appops.NetControl
 import de.minipc.appopsshizuku.appops.NetStore
 import de.minipc.appopsshizuku.appops.NetSwitch
 import de.minipc.appopsshizuku.appops.TrackerCatalog
+import de.minipc.appopsshizuku.appops.TrackerCodeScan
 import de.minipc.appopsshizuku.appops.TrackerGroup
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
+import java.io.File
 import java.util.concurrent.Executors
 
 /**
@@ -35,6 +39,7 @@ class NetFragment : Fragment() {
     companion object {
         private const val ARG_PACKAGE = "pkg"
         private const val REGISTRAR_PREFIX = "com.google.firebase.components:"
+        private const val LOG_TAG = "TrackerCodeScan"
 
         fun newInstance(packageName: String) = NetFragment().apply {
             arguments = Bundle().apply { putString(ARG_PACKAGE, packageName) }
@@ -61,6 +66,10 @@ class NetFragment : Fragment() {
 
     /** Klassennamen der App (null = nicht lesbar), einmal pro Fragment geladen. */
     private var foundClasses: Set<String>? = null
+
+    /** Code-Scan: [codeResult] = Ergebnis (null = noch keins), [codeRunningMb] = APK-Groesse waehrend des Laufs. */
+    private var codeResult: TrackerCodeScan.Result? = null
+    private var codeRunningMb: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -232,6 +241,41 @@ class NetFragment : Fragment() {
                 if (!isAdded) return@post
                 foundClasses = found
                 renderTrackers()
+                if (found != null) startCodeScan()
+            }
+        }
+    }
+
+    /**
+     * Zweite Erkennung: Marker in den Dex-Dateien der APK(s). Laeuft im selben Einzel-Executor, also
+     * nach dem Manifest-Scan. Die APK-Pfade kommen vom PackageManager (Basis + Splits).
+     */
+    private fun startCodeScan() {
+        if (codeResult != null || codeRunningMb != null) return
+        codeRunningMb = 0
+        executor.execute {
+            val files = runCatching {
+                val ai = appContext.packageManager.getApplicationInfo(packageName, 0)
+                listOfNotNull(ai.sourceDir) + ai.splitSourceDirs.orEmpty()
+            }.getOrDefault(emptyList()).map { File(it) }
+            val mb = files.sumOf { it.length() } / (1024 * 1024)
+            handler.post {
+                codeRunningMb = mb
+                if (isAdded) renderTrackers()
+            }
+            val t0 = SystemClock.elapsedRealtime()
+            val result = TrackerCodeScan.scanWithInfo(files, TrackerCatalog.probes) { Log.w(LOG_TAG, it) }
+            Log.i(
+                LOG_TAG,
+                "$packageName: ${SystemClock.elapsedRealtime() - t0} ms, ${files.size} APK ($mb MB), " +
+                    "${result.bytesRead / (1024 * 1024)} MB Dex gelesen, gefunden=${result.found}, " +
+                    "vollstaendig=${result.complete}"
+            )
+            // Ergebnis immer merken (auch ohne Ansicht): kein zweiter Scan beim Zurueckkehren.
+            handler.post {
+                codeResult = result
+                codeRunningMb = null
+                if (isAdded) renderTrackers()
             }
         }
     }
@@ -244,7 +288,25 @@ class NetFragment : Fragment() {
             list.addView(TextView(requireContext()).apply { setText(R.string.net_diag_unreadable) })
             return
         }
-        val scan = TrackerCatalog.scan(found)
+        val manifest = TrackerCatalog.scan(found)
+        val code = codeResult
+        val running = codeRunningMb != null
+        val codeFound = code?.found.orEmpty()
+        val status = layoutInflater.inflate(R.layout.item_net_tracker, list, false)
+        status.findViewById<TextView>(R.id.trackerName).text = when {
+            running -> getString(R.string.net_code_running, codeRunningMb)
+            code == null -> ""
+            else -> getString(
+                R.string.net_code_summary,
+                manifest.count { (sdk, hit) -> hit || sdk.name in codeFound },
+                manifest.count { (sdk, hit) -> !hit && sdk.name in codeFound }
+            ) + when {
+                code.truncated -> " " + getString(R.string.net_code_truncated)
+                !code.complete -> " " + getString(R.string.net_code_unreadable)
+                else -> ""
+            }
+        }
+        list.addView(status)
         val groups = listOf(
             TrackerGroup.ANALYTICS to R.string.net_group_analytics,
             TrackerGroup.ADS to R.string.net_group_ads,
@@ -254,11 +316,19 @@ class NetFragment : Fragment() {
             val header = layoutInflater.inflate(R.layout.item_category_header, list, false) as TextView
             header.setText(title)
             list.addView(header)
-            for ((sdk, hit) in scan.filter { it.first.group == group }) {
+            for ((sdk, hit) in manifest.filter { it.first.group == group }) {
                 val row = layoutInflater.inflate(R.layout.item_net_tracker, list, false)
                 row.findViewById<TextView>(R.id.trackerName).text = sdk.name
+                val inCode = sdk.name in codeFound
                 row.findViewById<TextView>(R.id.trackerState).setText(
-                    if (hit) R.string.net_found else R.string.net_not_found
+                    when {
+                        hit && inCode -> R.string.net_found_both
+                        hit -> R.string.net_found_manifest
+                        inCode -> R.string.net_found_code
+                        running -> R.string.net_code_pending
+                        code?.complete == false -> R.string.net_not_found_partial
+                        else -> R.string.net_not_found
+                    }
                 )
                 list.addView(row)
             }

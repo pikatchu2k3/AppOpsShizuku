@@ -1,49 +1,45 @@
 ### English
 
-**App Ops Shizuku 1.15.0** — new tab *Network & Trackers*.
+**App Ops Shizuku 1.15.1** — the tracker overview now also reads the app's code, and it says out loud that it cannot switch anything off.
 
 **New**
-- Fourth tab in the app detail screen: three network switches that really work through Shizuku (shell UID, no root) — block background data, take an app completely offline, and push it onto Android's restrict-background list. Every switch is read back from the device; the device state is the truth, not the tap.
-- The firewall chain is checked as well: while it is off, Android stores the deny bit and still reports "deny" but blocks nothing. The switch now enables the chain itself and turns it back off when you reset (only if the app enabled it).
-- "Completely offline" is disabled for system apps instead of always failing.
-- Tracker overview (read-only): reads the app's manifest and lists known building blocks — Firebase Analytics, Firebase DataTransport, Crashlytics, Facebook SDK (app events), AdMob, Facebook Audience Network, Sentry, Mixpanel, Braze, AppsFlyer, Adjust, Kochava.
-- "Reset all" only undoes what this app changed.
+- The tracker overview no longer looks at the manifest alone: it also searches the app's DEX files (base APK plus every split of an app bundle) for the class names of known building blocks. Those files are readable by a normal app — no root, no Shizuku needed.
+- Every entry now shows where it was found: *manifest + code*, *code only*, *manifest only*, or not found. Building blocks without manifest components were invisible before and are caught now: Segment, Amplitude, the old Google Analytics, Facebook SDK (app events) and the Google advertising ID library.
+- Real measurements on a test device: 37 MB app → 4.6 s, 196 MB app bundle → 21.8 s, on a background thread, with a progress line, measured runtime in the log and a result cache per app.
+- The tab states clearly why per-tracker switches are missing: Android refuses component changes to the shell without root. Blocking is done by the three switches above; only the APK patch (Stealth tab) removes code.
 
 **Fixed**
-- Component lists no longer lose already disabled components (`MATCH_DISABLED_COMPONENTS`).
-- `ShellResult.isFailure()` no longer reports component names like `…ErrorReportingService` as errors.
+- False alarm: Google's advertising ID library (`AdvertisingIdClient`) is present in many apps that show no ads at all — it made the AdMob entry light up. AdMob now uses precise class names, and the advertising ID has its own honest entry. Verified on two real apps: an app without ads now correctly reports "AdMob: not found" instead of a wrong hit.
 
 **Honest limits**
+- The code search works on names. An obfuscated app can rename library classes, and SDKs loaded only by reflection or remote config leave no name behind — "not found" stays a probability, not a promise.
 - Disabling single *components* of other apps is not offered: Android 15/16 refuses it to the shell (`SecurityException: Shell cannot change component state`).
-- The switches stop network traffic, not the tracking code inside the app. Only the APK patch (Stealth tab) removes code.
-- The tracker list only knows building blocks with manifest components — "not found" does not mean "not present".
+- The switches stop network traffic, not the tracking code inside the app.
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 Automatic updates: add this repository to [Obtainium](https://github.com/ImranR98/Obtainium) (source: GitHub Releases).
 
-Build: `:app:assembleDebug` · package `de.minipc.appopsshizuku` · versionCode 28 · debug signature (certificate SHA-256 `652394f7…7226e`).
+Build: `:app:assembleDebug` · package `de.minipc.appopsshizuku` · versionCode 29 · debug signature (certificate SHA-256 `652394f7…7226e`).
 
 ### Deutsch
 
-**App Ops Shizuku 1.15.0** — neuer Reiter *Netz & Tracker*.
+**App Ops Shizuku 1.15.1** — die Tracker-Übersicht liest jetzt auch den Code der App und sagt deutlich, dass sie nichts abschalten kann.
 
 **Neu**
-- Vierter Reiter in der App-Detailansicht: drei Netzschalter, die über Shizuku (Shell-Rechte, kein Root) wirklich wirken — Hintergrund-Datenverkehr sperren, App komplett offline schalten und auf die Hintergrund-Sperrliste setzen. Jeder Schalter wird vom Gerät zurückgelesen; der Gerätezustand zählt, nicht der Tipp.
-- Die Firewall-Kette wird mitgeprüft: Ist sie aus, merkt sich Android das Sperr-Bit und meldet trotzdem „deny", sperrt aber nichts. Der Schalter aktiviert sie jetzt selbst und schaltet sie beim Zurücksetzen wieder ab (nur wenn die App sie eingeschaltet hat).
-- „Komplett offline" ist bei System-Apps gesperrt, statt immer zu scheitern.
-- Tracker-Übersicht (nur lesen): liest das Manifest der App und zeigt bekannte Bausteine — Firebase Analytics, Firebase Datentransport, Crashlytics, Facebook SDK (App-Events), AdMob, Facebook Audience Network, Sentry, Mixpanel, Braze, AppsFlyer, Adjust, Kochava.
-- „Alles zurücksetzen" nimmt nur zurück, was diese App geändert hat.
+- Die Tracker-Übersicht schaut nicht mehr nur ins Manifest: Sie durchsucht zusätzlich die DEX-Dateien der App (Basis-APK und alle Splits eines App-Bundles) nach den Klassennamen bekannter Bausteine. Diese Dateien darf eine normale App lesen — ohne Root, ohne Shizuku.
+- Jeder Eintrag zeigt jetzt die Herkunft: *Manifest + Code*, *nur Code*, *nur Manifest* oder nicht gefunden. Bausteine ohne Manifest-Komponenten waren vorher unsichtbar und werden nun erfasst: Segment, Amplitude, das alte Google Analytics, Facebook SDK (App-Events) und die Google-Werbe-ID-Bibliothek.
+- Echte Messwerte am Testgerät: 37-MB-App → 4,6 s, 196-MB-App-Bundle → 21,8 s, im Hintergrund-Thread, mit Fortschrittszeile, gemessener Laufzeit im Log und Ergebnis-Cache je App.
+- Der Reiter sagt jetzt klar, warum Schalter pro Tracker fehlen: Android verweigert der Shell ohne Root das Ändern von Komponenten. Blockiert wird über die drei Schalter oben; Code entfernt nur der APK-Patch (Reiter Tarnung).
 
 **Behoben**
-- Komponenten-Listen verlieren keine bereits deaktivierten Komponenten mehr (`MATCH_DISABLED_COMPONENTS`).
-- `ShellResult.isFailure()` meldet Namen wie `…ErrorReportingService` nicht mehr fälschlich als Fehler.
+- Fehlalarm: Die Google-Werbe-ID-Bibliothek (`AdvertisingIdClient`) steckt in vielen Apps, die gar keine Werbung zeigen — sie ließ den AdMob-Eintrag aufleuchten. AdMob prüft jetzt genaue Klassennamen, die Werbe-ID hat einen eigenen, ehrlichen Eintrag. An zwei echten Apps belegt: Eine App ohne Werbung meldet nun korrekt „AdMob: nicht gefunden" statt eines falschen Treffers.
 
 **Ehrliche Grenzen**
+- Die Code-Suche arbeitet über Namen. Eine verschleierte App kann Bibliotheksnamen umbenennen, und SDKs, die nur per Reflection oder Remote-Konfiguration geladen werden, hinterlassen keinen Namen — „nicht gefunden" bleibt eine Wahrscheinlichkeit, keine Zusage.
 - Das Abschalten einzelner *Komponenten* fremder Apps wird bewusst nicht angeboten: Android 15/16 verweigert es der Shell (`SecurityException: Shell cannot change component state`).
-- Die Schalter stoppen Netzverkehr, nicht den Tracker-Code in der App. Code entfernt nur der APK-Patch (Reiter Tarnung).
-- Die Tracker-Liste kennt nur Bausteine mit Manifest-Komponenten — „nicht gefunden" heißt nicht „nicht enthalten".
+- Die Schalter stoppen Netzverkehr, nicht den Tracker-Code in der App.
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 Automatische Updates: dieses Repository in [Obtainium](https://github.com/ImranR98/Obtainium) hinzufügen (Quelle: GitHub Releases).
 
-Build: `:app:assembleDebug` · Paket `de.minipc.appopsshizuku` · versionCode 28 · Debug-Signatur (Zertifikat SHA-256 `652394f7…7226e`).
+Build: `:app:assembleDebug` · Paket `de.minipc.appopsshizuku` · versionCode 29 · Debug-Signatur (Zertifikat SHA-256 `652394f7…7226e`).
