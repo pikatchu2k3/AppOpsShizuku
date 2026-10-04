@@ -168,13 +168,36 @@ print("OK %s %s" % (a["size"], a["browser_download_url"]))
 ASSET_SIZE=$(cut -d' ' -f2 <<<"$CHECK"); ASSET_URL=$(cut -d' ' -f3 <<<"$CHECK")
 [ "$ASSET_SIZE" = "$SIZE" ] || fail "Asset-Groesse auf GitHub ($ASSET_SIZE) != lokal ($SIZE)."
 
-# Herunterladen wie der Update-Kanal (oeffentlich, ohne Token); CDN kann kurz hinterherhinken
+# Herunterladen wie der Update-Kanal. Achtung: bei einem PRIVATEN Repo liefert die
+# oeffentliche Download-URL einem Fremden 404 (9 Bytes "Not Found") - dann ueber die
+# API mit Token pruefen und klar sagen, dass der Update-Kanal einen Token braucht.
+api GET "https://api.github.com/repos/$REPO"
+IS_PRIVATE=$(printf '%s' "$HTTP_BODY" | jget 'd["private"]')
 DL="$TMP/$APK_NAME"
-for i in 1 2 3 4 5; do
-    curl -sSL -o "$DL" "$ASSET_URL" 2>/dev/null && [ "$(md5sum "$DL" | awk '{print $1}')" = "$MD5" ] && break
-    [ "$i" -lt 5 ] || fail "Download-Pruefung fehlgeschlagen: MD5 des heruntergeladenen Assets != $MD5 ($ASSET_URL)."
-    log "Download-Versuch $i ohne passende MD5, warte ..."; sleep 5
-done
+DL_OK=0
+if [ "$IS_PRIVATE" = "False" ]; then
+    for i in 1 2 3 4 5 6; do
+        CODE=$(curl -sSL -o "$DL" -w '%{http_code}' "$ASSET_URL" 2>/dev/null || true)
+        if [ "$CODE" = "200" ] && [ "$(stat -c %s "$DL" 2>/dev/null || echo 0)" = "$SIZE" ] \
+            && [ "$(md5sum "$DL" | awk '{print $1}')" = "$MD5" ]; then
+            DL_OK=1; break
+        fi
+        log "Download-Versuch $i: HTTP ${CODE:-?} (GitHub braucht nach dem Oeffentlichstellen kurz Zeit)"
+        sleep 10
+    done
+    [ "$DL_OK" = "1" ] || fail "Download-Pruefung fehlgeschlagen ($ASSET_URL). Release $REL_ID ($REL_URL) steht, aber das Asset ist anonym nicht sauber abrufbar."
+    log "Anonymer Download ok (wie Obtainium)"
+else
+    ASSET_ID=$(api GET "https://api.github.com/repos/$REPO/releases/tags/$TAG"; printf '%s' "$HTTP_BODY" \
+        | python3 -c 'import sys,json; d=json.load(sys.stdin); print(d["assets"][0]["id"])')
+    curl -sSL -H "@$TMP/auth" -H 'Accept: application/octet-stream' -o "$DL" \
+        "https://api.github.com/repos/$REPO/releases/assets/$ASSET_ID" \
+        || fail "Download ueber die API fehlgeschlagen ($ASSET_URL)."
+    [ "$(md5sum "$DL" | awk '{print $1}')" = "$MD5" ] \
+        || fail "Download-Pruefung (mit Token) fehlgeschlagen: MD5 != $MD5."
+    log "Download mit Token ok - HINWEIS: das Repo ist privat, der Update-Kanal braucht dort einen Token."
+fi
+[ "$(stat -c %s "$DL")" = "$SIZE" ] || fail "Groesse des heruntergeladenen Assets != $SIZE."
 [ "$(badging_field "$DL" versionName)" = "$VERSION_NAME" ] \
     || fail "versionName des heruntergeladenen Assets != $VERSION_NAME - Update-Kanal wuerde es nicht anbieten."
 log "Gegenpruefung ok: heruntergeladenes Asset hat MD5 $MD5 und versionName $VERSION_NAME"
