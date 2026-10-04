@@ -25,11 +25,14 @@ object BinaryXmlTestData {
     """.trimIndent()
 
     /** Baut die Mini-APK mit aapt2 und liest das AXML-Manifest heraus. */
-    fun miniManifest(): ByteArray {
+    fun miniManifest(): ByteArray = compile(MANIFEST_XML)
+
+    /** Kompiliert beliebigen Manifest-Quelltext mit aapt2 zu binaerem AXML. */
+    fun compile(xml: String): ByteArray {
         val dir = createTempDir()
         try {
             val manifestFile = File(dir, "AndroidManifest.xml")
-            manifestFile.writeText(MANIFEST_XML)
+            manifestFile.writeText(xml)
             val apk = File(dir, "mini.apk")
             val aapt2 = "/opt/android-sdk/build-tools/35.0.0/aapt2"
             val proc = ProcessBuilder(
@@ -50,6 +53,22 @@ object BinaryXmlTestData {
             return result
         } finally {
             dir.deleteRecursively()
+        }
+    }
+
+    /** `aapt2 dump xmltree` - der echte Android-Parser muss das Manifest akzeptieren (sonst Exit != 0). */
+    fun xmltree(manifest: ByteArray): String {
+        val apk = manifestToApk(manifest)
+        try {
+            val proc = ProcessBuilder(
+                "/opt/android-sdk/build-tools/35.0.0/aapt2", "dump", "xmltree", apk.absolutePath,
+                "--file", "AndroidManifest.xml"
+            ).redirectErrorStream(true).start()
+            val out = proc.inputStream.bufferedReader().readText()
+            check(proc.waitFor() == 0) { "aapt2 dump lehnt das Manifest ab:\n$out" }
+            return out
+        } finally {
+            apk.delete()
         }
     }
 

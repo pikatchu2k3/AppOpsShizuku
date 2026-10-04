@@ -3,6 +3,8 @@ package de.minipc.appopsshizuku.stealth
 import android.content.Context
 import android.util.Base64
 import android.util.Log
+import de.minipc.appopsshizuku.appops.TrackerDisable
+import de.minipc.appopsshizuku.appops.TrackerGroup
 import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShellResult
 import java.io.File
@@ -27,6 +29,10 @@ enum class StealthPhase {
     TRANSFER,
     /** pm install. */
     INSTALL,
+    /** Gepatchte APK mit dem Tracker-Katalog scannen (Vorher/Nachher). */
+    PROOF,
+    /** Startprobe: App starten, Logcat auf Absturzmerkmale pruefen. */
+    PROBE,
     /** Original wiederherstellen (Rollback). */
     RESTORE
 }
@@ -82,6 +88,9 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
      * (Extraktion/Transfer chunked mit echten Prozenten, sonst Phasen-Marker).
      */
     var progressListener: ((StealthPhase, Int?) -> Unit)? = null
+
+    /** Konkreter Grund, wenn [buildStealthApkWithSplits] aus einem erklaerbaren Grund null liefert. */
+    var lastError: String? = null
 
     private fun report(phase: StealthPhase, percent: Int?) {
         try {
@@ -286,7 +295,8 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         vaultCalc: Boolean = false,
         spoofOptions: DeviceSpoofOptions = DeviceSpoofOptions(),
         cloneNewPkg: String? = null,
-        cloneLabel: String? = null
+        cloneLabel: String? = null,
+        trackerGroups: Set<TrackerGroup> = emptySet()
     ): File? {
         return try {
             val manifest = ApkModifier.extractManifest(originalApk)
@@ -314,6 +324,10 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
                 patchedManifest = BinaryXml.addPermission(
                     patchedManifest, "android.permission.ACCESS_NETWORK_STATE"
                 )
+            }
+            // Tracker abschalten: VOR dem Klon-Rename (Katalognamen sind absolut, Paketnamen ohne Belang)
+            if (trackerGroups.isNotEmpty()) {
+                patchedManifest = TrackerDisable.apply(patchedManifest, trackerGroups)
             }
             // App-Cloning: Paketnamen im Manifest tauschen (package + Komponenten)
             if (cloneNewPkg != null) {
@@ -390,12 +404,23 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         vaultCalc: Boolean = false,
         spoofOptions: DeviceSpoofOptions = DeviceSpoofOptions(),
         cloneNewPkg: String? = null,
-        cloneLabel: String? = null
+        cloneLabel: String? = null,
+        trackerGroups: Set<TrackerGroup> = emptySet()
     ): List<File>? {
+        lastError = null
+        // Klon + Split mit eigenem Code (Dynamic Feature): der Dex-Rename laeuft nur ueber die base-APK,
+        // der Split wuerde auf nicht mehr vorhandene Klassen des Originals zeigen -> lieber ablehnen.
+        if (cloneNewPkg != null) {
+            splits.firstOrNull { CloneRewriter.apkHasDex(it) }?.let {
+                lastError = "Klon nicht moeglich: Split ${it.name.removePrefix("original_split_")} enthaelt eigenen Code " +
+                    "(Dynamic Feature), der nicht umbenannt werden kann."
+                return null
+            }
+        }
         val signedBase = buildStealthApk(
             originalApk, workDir,
             excludeFromRecents, removeLauncherIcon, secureSnapshot, requireVpn,
-            vaultCalc, spoofOptions, cloneNewPkg, cloneLabel
+            vaultCalc, spoofOptions, cloneNewPkg, cloneLabel, trackerGroups
         ) ?: return null
         val result = ArrayList<File>()
         result.add(signedBase)
@@ -403,12 +428,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
             val split = splits[i]
             try {
                 var m = ApkModifier.extractManifest(split)
-                if (cloneNewPkg != null) {
-                    val oldPkg = BinaryXml.packageName(m)
-                    if (oldPkg != null && oldPkg != cloneNewPkg) {
-                        m = BinaryXml.renamePackage(m, oldPkg, cloneNewPkg)
-                    }
-                }
+                if (cloneNewPkg != null) m = CloneRewriter.renameSplitManifest(m, cloneNewPkg)
                 val repackedSplit = File(workDir, "repacked_split_$i.apk")
                 report(StealthPhase.REPACK, 0)
                 ApkModifier.repackWithReplacements(

@@ -11,18 +11,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.switchmaterial.SwitchMaterial
 import android.content.Intent
+import de.minipc.appopsshizuku.appops.TrackerCatalog
+import de.minipc.appopsshizuku.appops.TrackerCodeScan
+import de.minipc.appopsshizuku.appops.TrackerDisable
+import de.minipc.appopsshizuku.appops.TrackerGroup
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
@@ -197,10 +203,90 @@ class StealthFragment : Fragment() {
         // Clone-Switch: Paketname-Feld nur zeigen, wenn Clone aktiv (Default: an)
         val cloneSwitch = root.findViewById<SwitchMaterial>(R.id.stealthCloneSwitch)
         val clonePkgLayout = root.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.stealthClonePkgLayout)
-        clonePkgLayout.visibility = if (cloneSwitch.isChecked) View.VISIBLE else View.GONE
-        cloneSwitch.setOnCheckedChangeListener { _, checked ->
-            clonePkgLayout.visibility = if (checked) View.VISIBLE else View.GONE
+        val cloneLabelLayout = root.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.stealthCloneLabelLayout)
+        fun syncCloneViews() {
+            val on = cloneSwitch.isChecked
+            clonePkgLayout.visibility = if (on) View.VISIBLE else View.GONE
+            cloneLabelLayout.visibility = if (on) View.VISIBLE else View.GONE
+            updateCollisionHint()
         }
+        syncCloneViews()
+        cloneSwitch.setOnCheckedChangeListener { _, _ -> syncCloneViews() }
+        root.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.stealthClonePkgInput)
+            .doAfterTextChanged { updateCollisionHint() }
+
+        detectTrackers()
+    }
+
+    /** Ziel-Paketname des Klons (null = kein Klon). Ohne Punkt wird `.stealth` angehaengt (Installer braucht 2 Segmente). */
+    private fun cloneTargetPkg(): String? {
+        if (!root.findViewById<SwitchMaterial>(R.id.stealthCloneSwitch).isChecked) return null
+        val rawInput = root.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.stealthClonePkgInput)
+            .text?.toString()?.trim().orEmpty().lowercase().replace(Regex("[^a-z0-9._]"), "")
+        val base = rawInput.ifEmpty { "$packageName.stealth" }
+        return if (base.contains('.')) base else "$base.stealth"
+    }
+
+    private fun isInstalled(pkg: String): Boolean = runCatching {
+        requireContext().packageManager.getPackageInfo(pkg, 0); true
+    }.getOrDefault(false)
+
+    private fun isOurClone(pkg: String): Boolean =
+        requireContext().getSharedPreferences("clones", android.content.Context.MODE_PRIVATE).getBoolean(pkg, false)
+
+    /**
+     * Kollision des Ziel-Paketnamens: belegt von einer anderen App (Original oder fremd) -> Fehlertext
+     * (Installation wuerde mit Signaturkonflikt scheitern, Auto-Deinstallation gibt es beim Klon nie);
+     * frueherer Klon von uns -> Hinweis auf Aktualisierung; sonst null.
+     * @return (Text, blockiert)
+     */
+    private fun cloneCollision(): Pair<String, Boolean>? {
+        val target = cloneTargetPkg() ?: return null
+        if (!isInstalled(target)) return null
+        return if (target != packageName && isOurClone(target)) {
+            getString(R.string.stealth_clone_replace, target) to false
+        } else {
+            getString(R.string.stealth_clone_taken, target) to true
+        }
+    }
+
+    private fun updateCollisionHint() {
+        if (!::root.isInitialized) return
+        val tv = root.findViewById<TextView>(R.id.stealthCloneCollision)
+        val c = cloneCollision()
+        tv.text = c?.first.orEmpty()
+        tv.visibility = if (c != null) View.VISIBLE else View.GONE
+    }
+
+    /** Welche Tracker-Gruppen sind angekreuzt? */
+    private fun selectedTrackerGroups(): Set<TrackerGroup> = buildSet {
+        if (root.findViewById<CheckBox>(R.id.stealthTrackerAds).isChecked) add(TrackerGroup.ADS)
+        if (root.findViewById<CheckBox>(R.id.stealthTrackerAnalytics).isChecked) add(TrackerGroup.ANALYTICS)
+        if (root.findViewById<CheckBox>(R.id.stealthTrackerAttribution).isChecked) add(TrackerGroup.ATTRIBUTION)
+    }
+
+    /** "Erkannte Bausteine dieser App": Manifest + Code-Scan der installierten APK(s), im Hintergrund. */
+    private fun detectTrackers() {
+        val appContext = requireContext().applicationContext
+        val pkg = packageName
+        val view = root.findViewById<TextView>(R.id.stealthTrackerDetected)
+        Thread {
+            val names = runCatching {
+                val ai = appContext.packageManager.getApplicationInfo(pkg, 0)
+                val files = (listOfNotNull(ai.sourceDir) + ai.splitSourceDirs.orEmpty()).map(::File)
+                val found = TrackerDisable.detectInManifest(ApkModifier.extractManifest(files.first())) +
+                    TrackerCodeScan.scan(files, TrackerCatalog.probes)
+                TrackerCatalog.sdks.map { it.name }.filter { it in found }
+            }.getOrNull()
+            handler.post {
+                if (!isAdded) return@post
+                view.text = when {
+                    names == null -> getString(R.string.stealth_tracker_detected_unreadable)
+                    names.isEmpty() -> getString(R.string.stealth_tracker_detected_none)
+                    else -> getString(R.string.stealth_tracker_detected, names.joinToString(", "))
+                }
+            }
+        }.start()
     }
 
     private fun readSpoofOptions(): DeviceSpoofOptions {
@@ -253,8 +339,18 @@ class StealthFragment : Fragment() {
         val spoofOptions = readSpoofOptions()
         val cloneSwitch = root.findViewById<SwitchMaterial>(R.id.stealthCloneSwitch).isChecked
         val clonePkgInput = root.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.stealthClonePkgInput)
-        if (!excludeRecents && !removeLauncherIcon && !secureSnapshot && !requireVpn && !vaultCalc && !spoofOptions.anyEnabled && !cloneSwitch) {
+        val trackerGroups = selectedTrackerGroups()
+        if (!excludeRecents && !removeLauncherIcon && !secureSnapshot && !requireVpn && !vaultCalc && !spoofOptions.anyEnabled && !cloneSwitch &&
+            trackerGroups.isEmpty()
+        ) {
             Toast.makeText(requireContext(), R.string.stealth_need_launcher, Toast.LENGTH_SHORT).show()
+            return
+        }
+        // Paketname schon belegt? Vor dem langen Patch melden, nicht erst bei der Installation.
+        val collision = cloneCollision()
+        if (collision?.second == true) {
+            updateCollisionHint()
+            Toast.makeText(requireContext(), collision.first, Toast.LENGTH_LONG).show()
             return
         }
         // Vault-PIN validieren (falls aktiv): nur Ziffern, 4-10 Stellen
@@ -278,24 +374,22 @@ class StealthFragment : Fragment() {
         // WICHTIG: Android-Paketnamen brauchen mindestens einen Punkt (2 Segmente).
         // Eingabe ohne Punkt ("test") -> "test.stealth" anhängen, sonst schlägt der
         // Installer mit "Installation fehlgeschlagen" fehl (realer User-Fall 08/2026).
-        val cloneNewPkg: String? = if (cloneSwitch) {
-            val rawInput = clonePkgInput.text?.toString()?.trim().orEmpty()
-                .lowercase().replace(Regex("[^a-z0-9._]"), "")
-            val base = rawInput.ifEmpty { "$packageName.stealth" }
-            if (base.contains('.')) base else "$base.stealth"
-        } else null
-        // Clone-Label: eigener Name -> sprechender Teil (test.stealth -> "test",
-        // "test" ohne Punkt -> "test"); Default -> Original-Label + " (Stealth)"
-        // (unterscheidbar, kein doppeltes "FOSS Browser")
+        val cloneNewPkg: String? = cloneTargetPkg()
+        // Clone-Label: eigener Name (Feld) > sprechender Teil des Paketnamens (test.stealth -> "test")
+        // > Standard "<Original> (Kopie)" (unterscheidbar, kein doppeltes "FOSS Browser")
         val cloneLabel: String? = if (cloneSwitch) {
+            val labelInput = root.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.stealthCloneLabelInput)
+                .text?.toString()?.trim().orEmpty()
             val rawInput = clonePkgInput.text?.toString()?.trim().orEmpty()
-            if (rawInput.isNotEmpty()) {
-                rawInput.substringBeforeLast('.', rawInput).ifBlank { rawInput }
-            } else {
-                val origLabel = try {
-                    requireContext().packageManager.getApplicationInfo(packageName, 0).loadLabel(requireContext().packageManager).toString()
-                } catch (e: Exception) { null }
-                if (origLabel.isNullOrBlank()) null else "${origLabel} (Stealth)"
+            when {
+                labelInput.isNotEmpty() -> labelInput
+                rawInput.isNotEmpty() -> rawInput.substringBeforeLast('.', rawInput).ifBlank { rawInput }
+                else -> {
+                    val origLabel = try {
+                        requireContext().packageManager.getApplicationInfo(packageName, 0).loadLabel(requireContext().packageManager).toString()
+                    } catch (e: Exception) { null }
+                    if (origLabel.isNullOrBlank()) null else getString(R.string.stealth_clone_label, origLabel)
+                }
             }
         } else null
         // Bestaetigung: Neu-Signierung + ggf. automatische Deinstallation des Originals.
@@ -305,13 +399,17 @@ class StealthFragment : Fragment() {
         val message = buildString {
             append(getString(if (cloneNewPkg != null) R.string.stealth_confirm_message_clone else R.string.stealth_confirm_message))
             if (splitWarning != null) append("\n\n").append(splitWarning)
+            if (cloneNewPkg != null) append("\n\n").append(getString(R.string.stealth_clone_limits))
+            if (collision != null) append("\n\n").append(collision.first)
+            if (trackerGroups.isNotEmpty()) append("\n\n").append(getString(R.string.stealth_confirm_tracker))
+            append("\n\n").append(getString(R.string.stealth_beta_notice))
         }
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.stealth_confirm_title)
             .setMessage(message)
             .setNegativeButton(R.string.btn_cancel, null)
             .setPositiveButton(R.string.stealth_confirm_ok) { _, _ ->
-                runStealth(excludeRecents, removeLauncherIcon, secureSnapshot, requireVpn, vaultCalc, vaultPin, spoofOptions, cloneNewPkg, cloneLabel)
+                runStealth(excludeRecents, removeLauncherIcon, secureSnapshot, requireVpn, vaultCalc, vaultPin, spoofOptions, cloneNewPkg, cloneLabel, trackerGroups)
             }
             .show()
     }
@@ -330,7 +428,8 @@ class StealthFragment : Fragment() {
         vaultPin: String?,
         spoofOptions: DeviceSpoofOptions = DeviceSpoofOptions(),
         cloneNewPkg: String? = null,
-        cloneLabel: String? = null
+        cloneLabel: String? = null,
+        trackerGroups: Set<TrackerGroup> = emptySet()
     ) {
         if (backend is NoopBackend) {
             Toast.makeText(requireContext(), R.string.status_no_permission, Toast.LENGTH_LONG).show()
@@ -369,6 +468,9 @@ class StealthFragment : Fragment() {
             vaultPin?.let { putExtra(StealthPatchService.EXTRA_VAULT_PIN, it) }
             cloneNewPkg?.let { putExtra(StealthPatchService.EXTRA_CLONE_PKG, it) }
             cloneLabel?.let { putExtra(StealthPatchService.EXTRA_CLONE_LABEL, it) }
+            if (trackerGroups.isNotEmpty()) {
+                putExtra(StealthPatchService.EXTRA_TRACKER_GROUPS, trackerGroups.map { it.name }.toTypedArray())
+            }
             spoofOptions.putInto(this)
         }
         ContextCompat.startForegroundService(requireContext(), intent)
@@ -431,9 +533,11 @@ class StealthFragment : Fragment() {
     private fun showResultDialog(success: Boolean, message: String) {
         val title =
             if (success) R.string.stealth_dialog_success_title else R.string.stealth_dialog_error_title
+        // Beta-/Signatur-Hinweis auch im Ergebnis (nicht beim Wiederherstellen)
+        val text = if (pendingRestore) message else message + "\n\n" + getString(R.string.stealth_beta_notice)
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
-            .setMessage(message)
+            .setMessage(text)
             .setPositiveButton(R.string.btn_ok, null)
             .show()
     }
@@ -442,6 +546,19 @@ class StealthFragment : Fragment() {
         // Progress-Dialog zuerst schliessen, sonst haengt er unter dem
         // Ergebnisdialog sichtbar im Baum (realer Bug 08/2026, E2E).
         dismissProgressDialog()
+        // Klon merken (auch bei Startprobe-Absturz: er IST installiert). Die Kollisionspruefung liess nur
+        // "nicht installiert" oder "frueherer Klon von uns" durch, also gehoert er jetzt uns.
+        pendingClonePkg?.let { clone ->
+            if (!pendingRestore && isInstalled(clone)) {
+                requireContext().getSharedPreferences("clones", android.content.Context.MODE_PRIVATE)
+                    .edit().putBoolean(clone, true).apply()
+            }
+        }
+        if (!res.success) {
+            // Nach einem Fehler (auch Startprobe-Absturz) muss der Rueckweg offen bleiben
+            originalApkFile = resolveOriginalApkFile()
+            root.findViewById<MaterialButton>(R.id.stealthRestoreButton).isEnabled = originalApkFile != null
+        }
         if (res.success) {
             markStealth(!pendingRestore)
             root.findViewById<MaterialButton>(R.id.stealthRestoreButton).isEnabled = !pendingRestore

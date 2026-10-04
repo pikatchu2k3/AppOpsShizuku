@@ -97,6 +97,22 @@ object CloneRewriter {
         return changed
     }
 
+    /**
+     * Manifest eines Split-APKs: `package` (und Pool-Strings mit `oldPkg.`-Praefix) auf den Klon
+     * umstellen. Ohne das gehoert der Split nicht zur umbenannten base und die Installation scheitert.
+     */
+    fun renameSplitManifest(manifest: ByteArray, newPkg: String): ByteArray {
+        val oldPkg = BinaryXml.packageName(manifest) ?: return manifest
+        return if (oldPkg == newPkg) manifest else BinaryXml.renamePackage(manifest, oldPkg, newPkg)
+    }
+
+    private val DEX_NAME = Regex("classes\\d*\\.dex")
+
+    /** Hat die APK eigenen Code (`classes*.dex` im Wurzelverzeichnis)? Config-Splits haben keinen. */
+    fun apkHasDex(apk: File): Boolean = java.util.zip.ZipFile(apk).use { zf ->
+        zf.entries().asSequence().any { DEX_NAME.matches(it.name) }
+    }
+
     /** Manifest-Binär-XML: Paketnamen tauschen (delegiert an BinaryXml). */
     fun renamePackageInManifest(xmlBytes: ByteArray, oldPkg: String, newPkg: String): ByteArray =
         BinaryXml.renamePackage(xmlBytes, oldPkg, newPkg)

@@ -455,7 +455,11 @@ object BinaryXml {
 
     /** Fuegt das excludeFromRecents-Attribut zum Start-Element hinzu bzw. setzt data=true.
      *  [resIds] ist die ResourceMap (String-Index -> resId) fuer die sortierte Einfuegeposition. */
-    private fun addExcludeAttr(chunk: ByteArray, nsIndex: Int, nameIndex: Int, resIds: IntArray? = null): ByteArray {
+    private fun addExcludeAttr(
+        chunk: ByteArray, nsIndex: Int, nameIndex: Int, resIds: IntArray? = null,
+        attrResId: Int = EXCLUDE_FROM_RECENTS_ID, value: Boolean = true, clearRaw: Boolean = false
+    ): ByteArray {
+        val bool = if (value) (-1).toByte() else 0.toByte() // true = 0xFFFFFFFF (wie aapt2)
         val buf = ByteBuffer.wrap(chunk).order(ByteOrder.LITTLE_ENDIAN)
         val chunkSize = buf.getInt(4)
         val attrStart = buf.getShort(24).toInt() and 0xFFFF
@@ -476,10 +480,11 @@ object BinaryXml {
                 copy[base + 13] = 0
                 copy[base + 14] = 0
                 copy[base + 15] = TYPE_INT_BOOLEAN.toByte()
-                copy[base + 16] = -1  // Boolean true = 0xFFFFFFFF (wie aapt2!)
-                copy[base + 17] = -1
-                copy[base + 18] = -1
-                copy[base + 19] = -1
+                copy[base + 16] = bool // Boolean true = 0xFFFFFFFF (wie aapt2!)
+                copy[base + 17] = bool
+                copy[base + 18] = bool
+                copy[base + 19] = bool
+                if (clearRaw) writeInt(copy, base + 8, NO_INDEX)
                 return copy
             }
         }
@@ -507,8 +512,9 @@ object BinaryXml {
                 val b = attrsBase + i * attrSize
                 if (b + 20 > chunk.size) break
                 val n = buf.getInt(b + 4)
-                val resId = if (n in resIds.indices) resIds[n] else Int.MAX_VALUE
-                if (resId < EXCLUDE_FROM_RECENTS_ID) insertPos = i + 1 else break
+                // 0 = kein Framework-Attribut (aapt2 sortiert die hinter alle Framework-Attribute)
+                val resId = if (n in resIds.indices && resIds[n] != 0) resIds[n] else Int.MAX_VALUE
+                if (resId < attrResId) insertPos = i + 1 else break
             }
         } else {
             // Ohne Map: direkt hinter android:name einfuegen (Position 1),
@@ -533,10 +539,10 @@ object BinaryXml {
         result[base + 13] = 0
         result[base + 14] = 0
         result[base + 15] = TYPE_INT_BOOLEAN.toByte()
-        result[base + 16] = -1
-        result[base + 17] = -1
-        result[base + 18] = -1
-        result[base + 19] = -1
+        result[base + 16] = bool
+        result[base + 17] = bool
+        result[base + 18] = bool
+        result[base + 19] = bool
         return result
     }
 
@@ -701,16 +707,19 @@ object BinaryXml {
             // keine Teilstrings ("de.baumann.browserx" bleibt unangetastet).
             // Idempotenz: Strings, die bereits mit newPkg beginnen, NICHT anfassen.
             val replacements = HashMap<Int, String>()
+            // Autoritaeten-Listen "a.x;a.y" (android:authorities): jedes Element einzeln, sonst bleibt
+            // die zweite Autoritaet des Originals stehen (INSTALL_FAILED_CONFLICTING_PROVIDER).
+            fun rename(part: String): String = when {
+                part == oldPkg -> newPkg
+                part.startsWith(newPkg) || part.startsWith(newPkg.replace('.', '/') + "/") -> part // schon umbenannt
+                part.startsWith("$oldPkg.") -> part.replaceFirst(oldPkg, newPkg)
+                else -> part
+            }
             for (i in 0 until pool.count) {
                 val s = pool.get(i)
                 if (s.isEmpty()) continue
-                if (s == oldPkg) {
-                    replacements[i] = newPkg
-                } else if (s.startsWith(newPkg) || s.startsWith(newPkg.replace('.', '/') + "/")) {
-                    // bereits umbenannt — nichts tun
-                } else if (s.startsWith("$oldPkg.")) {
-                    replacements[i] = s.replaceFirst(oldPkg, newPkg)
-                }
+                val renamed = if (';' in s) s.split(';').joinToString(";") { rename(it) } else rename(s)
+                if (renamed != s) replacements[i] = renamed
             }
             if (replacements.isEmpty()) return data
 
@@ -821,6 +830,310 @@ object BinaryXml {
             return pool.get(raw)
         }
         return null
+    }
+
+    // ------------------------------------------------------------------
+    // Komponenten lesen / abschalten (Tracker-Abschaltung beim Patchen)
+    // ------------------------------------------------------------------
+
+    private val COMPONENT_ELEMENTS = setOf("activity", "activity-alias", "service", "receiver", "provider")
+    private const val ENABLED_ID = 0x0101000e // android.R.attr.enabled
+    private const val NAME_ID = 0x01010003 // android.R.attr.name
+    private const val VALUE_ID = 0x01010024 // android.R.attr.value
+    private const val TYPE_STRING_VALUE = 0x03
+    private const val DISCOVERY_PREFIX = "com.google.firebase.components:"
+
+    /** [name] ist voll qualifiziert (relative `.Foo`-Namen sind gegen das Paket aufgeloest). */
+    data class Component(val kind: String, val name: String, val enabled: Boolean)
+
+    /** `.Foo` und `Foo` sind relativ zum Paket (wie im PackageParser); alles mit Punkt ist absolut. */
+    fun resolveClassName(raw: String, pkg: String?): String = when {
+        pkg == null -> raw
+        raw.startsWith(".") -> pkg + raw
+        '.' !in raw -> "$pkg.$raw"
+        else -> raw
+    }
+
+    /** Alle Komponenten (activity, activity-alias, service, receiver, provider) direkt unter `<application>`. */
+    fun components(data: ByteArray): List<Component> {
+        val parsed = parse(data) ?: return emptyList()
+        val pool = parsed.pool
+        if (pool.isEmpty) return emptyList()
+        val pkg = packageName(data)
+        val out = ArrayList<Component>()
+        var depth = 0 // manifest = 0, application = 1, Komponenten = 2
+        for (c in parsed.chunks) {
+            when (c.type) {
+                TYPE_START_ELEMENT -> {
+                    val el = elementName(pool, c)
+                    if (depth == 2 && el in COMPONENT_ELEMENTS) {
+                        attributeString(c.bytes, pool, "name")?.let {
+                            out += Component(el, resolveClassName(it, pkg), componentEnabled(c.bytes, pool))
+                        }
+                    }
+                    depth++
+                }
+                TYPE_END_ELEMENT -> depth--
+            }
+        }
+        return out
+    }
+
+    /**
+     * Firebase-Registrare: stehen als `<meta-data android:name="com.google.firebase.components:<Klasse>">`
+     * im ComponentDiscoveryService (keine Komponenten, nur Hinweis auf das SDK).
+     */
+    fun firebaseRegistrars(data: ByteArray): Set<String> {
+        val parsed = parse(data) ?: return emptySet()
+        val pool = parsed.pool
+        if (pool.isEmpty) return emptySet()
+        val out = LinkedHashSet<String>()
+        var depth = 0
+        for (c in parsed.chunks) {
+            when (c.type) {
+                TYPE_START_ELEMENT -> {
+                    if (depth == 3 && elementName(pool, c) == "meta-data") {
+                        attributeString(c.bytes, pool, "name")
+                            ?.takeIf { it.startsWith(DISCOVERY_PREFIX) }
+                            ?.let { out += it.removePrefix(DISCOVERY_PREFIX) }
+                    }
+                    depth++
+                }
+                TYPE_END_ELEMENT -> depth--
+            }
+        }
+        return out
+    }
+
+    /**
+     * Setzt `android:enabled=[enabled]` (0x0101000e) an allen Komponenten, deren aufgeloester Name in
+     * [componentNames] liegt. Eintraege bleiben im Manifest (nichts wird geloescht) - das Framework
+     * instanziiert eine abgeschaltete Komponente nur nicht mehr. Idempotent: Komponenten, die schon
+     * den Zielzustand haben, bleiben unveraendert; gibt es nichts zu tun, kommt [data] selbst zurueck.
+     */
+    fun setComponentEnabled(data: ByteArray, componentNames: Set<String>, enabled: Boolean): ByteArray {
+        if (componentNames.isEmpty()) return data
+        val parsed = parse(data) ?: return data
+        val pool = parsed.pool
+        if (pool.isEmpty) return data
+        val nsIndex = pool.indexOf(ANDROID_NS)
+        if (nsIndex < 0) return data
+        val pkg = packageName(data)
+
+        val hits = ArrayList<Int>()
+        var depth = 0
+        for ((i, c) in parsed.chunks.withIndex()) {
+            when (c.type) {
+                TYPE_START_ELEMENT -> {
+                    if (depth == 2 && elementName(pool, c) in COMPONENT_ELEMENTS) {
+                        val name = attributeString(c.bytes, pool, "name")?.let { resolveClassName(it, pkg) }
+                        if (name != null && name in componentNames && componentEnabled(c.bytes, pool) != enabled) hits += i
+                    }
+                    depth++
+                }
+                TYPE_END_ELEMENT -> depth--
+            }
+        }
+        if (hits.isEmpty()) return data
+
+        val edit = Edit(parsed)
+        val newNameIdx = edit.attr("enabled", ENABLED_ID) ?: return data
+        val resIds = edit.resIds()
+        val replaced = HashMap<Int, ByteArray>()
+        for (i in hits) {
+            val bytes = parsed.chunks[i].bytes
+            val existing = attrBase(bytes, pool, "enabled")
+            val nameIdx = if (existing >= 0) ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt(existing + 4) else newNameIdx
+            replaced[i] = addExcludeAttr(bytes, nsIndex, nameIdx, resIds, ENABLED_ID, enabled, clearRaw = true)
+        }
+        return edit.build(replaced)
+    }
+
+    /**
+     * Haengt `<meta-data android:name=[name] android:value=[value]/>` als LETZTES Kind an `<application>`
+     * (bei doppelten Namen gewinnt der spaetere Eintrag, also unserer). Idempotent: steht der Wert
+     * schon als letzter Eintrag dieses Namens so da, bleibt [data] unveraendert.
+     * Ist das Anhaengen mit der vorhandenen Struktur nicht sicher moeglich (kein Ressourcen-Map-Chunk,
+     * Pool mit Styles), kommt [data] unveraendert zurueck.
+     */
+    fun setApplicationMetaBoolean(data: ByteArray, name: String, value: Boolean): ByteArray {
+        val parsed = parse(data) ?: return data
+        val pool = parsed.pool
+        if (pool.isEmpty) return data
+        val nsIndex = pool.indexOf(ANDROID_NS)
+        if (nsIndex < 0) return data
+
+        var depth = 0
+        var appEnd = -1
+        for ((i, c) in parsed.chunks.withIndex()) {
+            when (c.type) {
+                TYPE_START_ELEMENT -> depth++
+                TYPE_END_ELEMENT -> {
+                    depth--
+                    if (depth == 1 && elementName(pool, c) == "application") appEnd = i
+                }
+            }
+        }
+        if (appEnd < 0 || applicationMetaBoolean(data, name) == value) return data
+
+        val edit = Edit(parsed)
+        val nameAttr = edit.attr("name", NAME_ID) ?: return data
+        val valueAttr = edit.attr("value", VALUE_ID) ?: return data
+        val elem = edit.str("meta-data") ?: return data
+        val nameStr = edit.str(name) ?: return data
+        val bool = if (value) -1 else 0
+
+        val start = ByteArray(16 + 20 + 2 * 20)
+        writeU16(start, 0, TYPE_START_ELEMENT)
+        writeU16(start, 2, 16)
+        writeInt(start, 4, start.size)
+        writeInt(start, 12, NO_INDEX) // comment
+        writeInt(start, 16, NO_INDEX) // Element im Default-Namespace
+        writeInt(start, 20, elem)
+        writeU16(start, 24, 20) // attrStart
+        writeU16(start, 26, 20) // attrSize
+        writeU16(start, 28, 2) // attrCount; id/class/style-Index bleiben 0 (= keiner, wie aapt2)
+        // Attribute aufsteigend nach Ressourcen-ID: name (0x01010003), value (0x01010024)
+        writeInt(start, 36, nsIndex)
+        writeInt(start, 40, nameAttr)
+        writeInt(start, 44, nameStr)
+        writeU16(start, 48, 8)
+        start[51] = TYPE_STRING_VALUE.toByte()
+        writeInt(start, 52, nameStr)
+        writeInt(start, 56, nsIndex)
+        writeInt(start, 60, valueAttr)
+        writeInt(start, 64, NO_INDEX)
+        writeU16(start, 68, 8)
+        start[71] = TYPE_INT_BOOLEAN.toByte()
+        writeInt(start, 72, bool)
+
+        val end = ByteArray(24)
+        writeU16(end, 0, TYPE_END_ELEMENT)
+        writeU16(end, 2, 16)
+        writeInt(end, 4, end.size)
+        writeInt(end, 12, NO_INDEX)
+        writeInt(end, 16, NO_INDEX)
+        writeInt(end, 20, elem)
+
+        return edit.build(emptyMap(), mapOf(appEnd to (start + end)))
+    }
+
+    /** Boolean-Wert des (letzten) `<meta-data>` [name] direkt unter `<application>`; null = fehlt/kein Boolean. */
+    fun applicationMetaBoolean(data: ByteArray, name: String): Boolean? {
+        val parsed = parse(data) ?: return null
+        val pool = parsed.pool
+        if (pool.isEmpty) return null
+        var depth = 0
+        var current: Boolean? = null
+        for (c in parsed.chunks) {
+            when (c.type) {
+                TYPE_START_ELEMENT -> {
+                    if (depth == 2 && elementName(pool, c) == "meta-data" &&
+                        attributeString(c.bytes, pool, "name") == name
+                    ) current = metaBoolean(c.bytes, pool)
+                    depth++
+                }
+                TYPE_END_ELEMENT -> depth--
+            }
+        }
+        return current
+    }
+
+    /** Wert des `android:value` eines meta-data als Boolean (typisiert oder String "true"/"false"), sonst null. */
+    private fun metaBoolean(chunk: ByteArray, pool: StringPool): Boolean? {
+        val base = attrBase(chunk, pool, "value")
+        if (base < 0) return null
+        val buf = ByteBuffer.wrap(chunk).order(ByteOrder.LITTLE_ENDIAN)
+        return when (chunk[base + 15].toInt() and 0xFF) {
+            TYPE_INT_BOOLEAN -> buf.getInt(base + 16) != 0
+            TYPE_STRING_VALUE -> pool.get(buf.getInt(base + 8)).toBooleanStrictOrNull()
+            else -> null
+        }
+    }
+
+    /** Ein android:enabled, das kein Boolean ist (z.B. @bool-Verweis), zaehlt als aktiv (nicht aufloesbar). */
+    private fun componentEnabled(chunk: ByteArray, pool: StringPool): Boolean {
+        val base = attrBase(chunk, pool, "enabled")
+        if (base < 0 || (chunk[base + 15].toInt() and 0xFF) != TYPE_INT_BOOLEAN) return true
+        return ByteBuffer.wrap(chunk).order(ByteOrder.LITTLE_ENDIAN).getInt(base + 16) != 0
+    }
+
+    /** Offset des Attributs [attrName] (android-Namespace oder ohne) im Start-Chunk, -1 wenn es fehlt. */
+    private fun attrBase(chunk: ByteArray, pool: StringPool, attrName: String): Int {
+        if (chunk.size < 36) return -1
+        val buf = ByteBuffer.wrap(chunk).order(ByteOrder.LITTLE_ENDIAN)
+        val attrStart = buf.getShort(24).toInt() and 0xFFFF
+        val attrSize = buf.getShort(26).toInt() and 0xFFFF
+        val attrCount = buf.getShort(28).toInt() and 0xFFFF
+        if (attrSize < 20) return -1
+        for (i in 0 until attrCount) {
+            val base = 16 + attrStart + i * attrSize
+            if (base + 20 > chunk.size) break
+            if (pool.get(buf.getInt(base + 4)) != attrName) continue
+            val nsRef = buf.getInt(base)
+            if (nsRef != NO_INDEX && pool.get(nsRef) != ANDROID_NS) continue
+            return base
+        }
+        return -1
+    }
+
+    /**
+     * Sammelt Pool-/ResourceMap-Erweiterungen und setzt die Datei wieder zusammen.
+     * Jede Operation parst neu und baut neu (Manifeste sind klein); Strings und Map-Eintraege
+     * werden nur angehaengt, bestehende Indizes bleiben gueltig.
+     */
+    private class Edit(private val parsed: Parsed) {
+        private var pool: ByteArray = parsed.pool.raw
+        private val resMapIdx = parsed.chunks.indexOfFirst { it.type == TYPE_RESOURCE_MAP }
+        private var resMap: ByteArray? = parsed.chunks.getOrNull(resMapIdx)?.bytes
+        private val added = HashMap<String, Int>()
+
+        /** Pool-Index von [s]; haengt den String an, falls er fehlt. */
+        fun str(s: String): Int? {
+            parsed.pool.indexOf(s).takeIf { it >= 0 }?.let { return it }
+            added[s]?.let { return it }
+            val a = BinaryXml.appendPoolString(pool, s) ?: return null
+            pool = a.first
+            added[s] = a.second
+            return a.second
+        }
+
+        /** Pool-Index des Framework-Attributs [resId] (laut ResourceMap); legt Name + Map-Eintrag an, falls er fehlt. */
+        fun attr(name: String, resId: Int): Int? {
+            val rm = resMap ?: return null
+            val n = (rm.size - 8) / 4
+            val buf = ByteBuffer.wrap(rm).order(ByteOrder.LITTLE_ENDIAN)
+            for (i in 0 until n) if (buf.getInt(8 + i * 4) == resId) return i
+            val a = BinaryXml.appendPoolString(pool, name) ?: return null
+            resMap = BinaryXml.appendResourceMapEntry(rm, a.second, resId) ?: return null
+            pool = a.first
+            return a.second
+        }
+
+        fun resIds(): IntArray? = resMap?.let { rm ->
+            val buf = ByteBuffer.wrap(rm).order(ByteOrder.LITTLE_ENDIAN)
+            IntArray((rm.size - 8) / 4) { buf.getInt(8 + it * 4) }
+        }
+
+        /** [replaced] = Chunk-Index -> neue Bytes, [before] = Chunk-Index -> Bytes, die davor eingefuegt werden. */
+        fun build(replaced: Map<Int, ByteArray>, before: Map<Int, ByteArray> = emptyMap()): ByteArray {
+            val out = ByteArrayOutputStream()
+            var poolDone = false
+            for ((i, c) in parsed.chunks.withIndex()) {
+                before[i]?.let { out.write(it) }
+                when {
+                    c.type == TYPE_STRING_POOL && !poolDone -> { out.write(pool); poolDone = true }
+                    i == resMapIdx -> out.write(resMap ?: c.bytes)
+                    else -> out.write(replaced[i] ?: c.bytes)
+                }
+            }
+            val result = ByteArray(8 + out.size())
+            BinaryXml.writeU16(result, 0, 0x0003)
+            BinaryXml.writeU16(result, 2, 0x0008)
+            BinaryXml.writeInt(result, 4, result.size)
+            System.arraycopy(out.toByteArray(), 0, result, 8, out.size())
+            return result
+        }
     }
 
     // ------------------------------------------------------------------

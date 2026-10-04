@@ -13,9 +13,14 @@ import android.os.PowerManager
 import android.os.Process
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import de.minipc.appopsshizuku.appops.TrackerDisable
+import de.minipc.appopsshizuku.appops.TrackerGroup
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
+import de.minipc.appopsshizuku.stealth.ApkModifier
+import de.minipc.appopsshizuku.stealth.BinaryXml
 import de.minipc.appopsshizuku.stealth.DeviceSpoofOptions
+import de.minipc.appopsshizuku.stealth.StartProbe
 import de.minipc.appopsshizuku.stealth.StealthPhase
 import de.minipc.appopsshizuku.stealth.StealthStealer
 import java.io.File
@@ -48,6 +53,13 @@ class StealthPatchService : Service() {
         const val EXTRA_PACKAGE = "pkg"
         const val EXTRA_CLONE_PKG = "clonePkg"
         const val EXTRA_CLONE_LABEL = "cloneLabel"
+        /** String-Array mit [TrackerGroup]-Namen; leer/fehlend = Tracker nicht anfassen. */
+        const val EXTRA_TRACKER_GROUPS = "trackerGroups"
+
+        /** Wartezeit der Startprobe, bevor das Logcat gelesen wird. */
+        private const val PROBE_MILLIS = 15_000L
+        /** Harte Obergrenze fuer die gesamte Startprobe (sie darf den Lauf nie blockieren). */
+        private const val PROBE_TOTAL_SECONDS = 90L
         const val EXTRA_EXCLUDE_RECENTS = "excludeRecents"
         const val EXTRA_REMOVE_ICON = "removeIcon"
         const val EXTRA_SECURE_SNAPSHOT = "secureSnapshot"
@@ -71,6 +83,8 @@ class StealthPatchService : Service() {
 
         const val CHANNEL_ID = "stealth_patch"
         const val NOTIF_ID = 42
+        /** Eigene ID fuer das Ergebnis - darf NICHT der Fortschritts-ID entsprechen (s. finish()). */
+        const val NOTIF_ID_RESULT = 43
 
         // --- Kommunikation Activity <-> Service (gleicher Prozess) ---
         @Volatile var running = false
@@ -88,6 +102,8 @@ class StealthPatchService : Service() {
             StealthPhase.TRANSFER -> ctx.getString(R.string.stealth_phase_transfer)
             StealthPhase.INSTALL -> ctx.getString(R.string.stealth_phase_install)
             StealthPhase.RESTORE -> ctx.getString(R.string.stealth_phase_restore)
+            StealthPhase.PROOF -> ctx.getString(R.string.stealth_phase_proof)
+            StealthPhase.PROBE -> ctx.getString(R.string.stealth_phase_probe)
         }
 
         /**
@@ -105,6 +121,7 @@ class StealthPatchService : Service() {
                 StealthPhase.TRANSFER -> 88 + pct * 8 / 100
                 StealthPhase.INSTALL -> 96 + pct * 4 / 100
                 StealthPhase.RESTORE -> pct
+                StealthPhase.PROOF, StealthPhase.PROBE -> 100
             }.coerceIn(0, 100)
         }
     }
@@ -114,6 +131,9 @@ class StealthPatchService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var hintSession: Any? = null // PerformanceHintManager.HintSession (API 31+)
     private var lastHintReportNanos = 0L
+    /** Letzter gemeldeter Fortschritt (Spam-Bremse im progressListener). */
+    private var lastLoggedPhase: StealthPhase? = null
+    private var lastLoggedPercent: Int? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -204,12 +224,21 @@ class StealthPatchService : Service() {
             backend.exec("cmd", "activity", "set-inactive", ownPkg, "false")
         }
         stealer.progressListener = { phase, pct ->
-            currentPhase = phase
-            currentPercent = pct
-            updateNotification(phase, pct)
-            reportHint()
-            Log.d(TAG, "stealer.progress: $phase pct=$pct -> UI-Listener=${progressListener != null}")
-            progressListener?.invoke(phase, pct)
+            // Spam-Bremse: der Dex-/Repack-Schritt meldet pro Eintrag; ohne Filter
+            // fluten tausende identische Zeilen Logcat und Notification (am Geraet
+            // gemessen 10/2026: "REPACK pct=0" hundertfach pro Sekunde - dadurch
+            // wurde auch der Logpuffer fuer die Startprobe unbrauchbar).
+            val changed = phase != lastLoggedPhase || pct != lastLoggedPercent
+            if (changed) {
+                lastLoggedPhase = phase
+                lastLoggedPercent = pct
+                currentPhase = phase
+                currentPercent = pct
+                updateNotification(phase, pct)
+                reportHint()
+                Log.d(TAG, "stealer.progress: $phase pct=$pct -> UI-Listener=${progressListener != null}")
+                progressListener?.invoke(phase, pct)
+            }
         }
         try {
             when (intent.action) {
@@ -259,6 +288,35 @@ class StealthPatchService : Service() {
                     val base = originals.first()
                     val splits = originals.drop(1)
                     val cloneNewPkg = intent.getStringExtra(EXTRA_CLONE_PKG)
+                    val trackerGroups = intent.getStringArrayExtra(EXTRA_TRACKER_GROUPS).orEmpty()
+                        .mapNotNull { runCatching { TrackerGroup.valueOf(it) }.getOrNull() }.toSet()
+                    val spoof = intent.spoofOptions()
+                    var launcherForProbe: String? = null
+                    var trackerNote = ""
+                    if (trackerGroups.isNotEmpty()) {
+                        val m = ApkModifier.extractManifest(base)
+                        val oldPkg = BinaryXml.packageName(m)
+                        // Klon: die Launcher-Klasse liegt nach dem Rename unter dem neuen Paket
+                        launcherForProbe = BinaryXml.launcherActivityClass(m)
+                            ?.let { BinaryXml.resolveClassName(it, oldPkg) }
+                            ?.let { cls ->
+                                if (cloneNewPkg != null && oldPkg != null && cls.startsWith("$oldPkg."))
+                                    cloneNewPkg + cls.removePrefix(oldPkg) else cls
+                            }
+                        if (TrackerDisable.apply(m, trackerGroups).contentEquals(m)) {
+                            val otherOptions = intent.getBooleanExtra(EXTRA_EXCLUDE_RECENTS, false) ||
+                                intent.getBooleanExtra(EXTRA_REMOVE_ICON, false) ||
+                                intent.getBooleanExtra(EXTRA_SECURE_SNAPSHOT, false) ||
+                                intent.getBooleanExtra(EXTRA_REQUIRE_VPN, false) ||
+                                intent.getBooleanExtra(EXTRA_VAULT, false) ||
+                                spoof.anyEnabled || cloneNewPkg != null
+                            if (!otherOptions) {
+                                finish(false, getString(R.string.tracker_nothing_to_disable))
+                                return
+                            }
+                            trackerNote = "\n\n" + getString(R.string.tracker_nothing_to_disable)
+                        }
+                    }
                     val signed = stealer.buildStealthApkWithSplits(
                         base, workDir, splits,
                         intent.getBooleanExtra(EXTRA_EXCLUDE_RECENTS, false),
@@ -266,13 +324,20 @@ class StealthPatchService : Service() {
                         intent.getBooleanExtra(EXTRA_SECURE_SNAPSHOT, false),
                         intent.getBooleanExtra(EXTRA_REQUIRE_VPN, false),
                         intent.getBooleanExtra(EXTRA_VAULT, false),
-                        intent.spoofOptions(),
+                        spoof,
                         cloneNewPkg,
-                        intent.getStringExtra(EXTRA_CLONE_LABEL)
+                        intent.getStringExtra(EXTRA_CLONE_LABEL),
+                        trackerGroups
                     )
                     if (signed == null) {
-                        finish(false, getString(R.string.stealth_error_patch))
+                        finish(false, (stealer.lastError ?: getString(R.string.stealth_error_patch)) + backupNote(stealer, pkg, workDir))
                         return
+                    }
+                    // Beweis vorher/nachher: das GEPATCHTE APK (Manifest + Code-Scan) gegen das Original
+                    if (trackerGroups.isNotEmpty()) {
+                        stealer.progressListener?.invoke(StealthPhase.PROOF, null)
+                        trackerNote += "\n\n" + runCatching { TrackerDisable.proof(originals, signed).text() }
+                            .getOrElse { getString(R.string.tracker_proof_failed, it.message ?: it.javaClass.simpleName) }
                     }
                     val targetPkg = cloneNewPkg ?: pkg
                     val res = stealer.installApk(
@@ -293,20 +358,100 @@ class StealthPatchService : Service() {
                         if (!stealer.relocateOriginals(workDir, pkg)) {
                             Log.w(TAG, "relocateOriginals fehlgeschlagen für $pkg (Originale bleiben im Cache)")
                         }
-                        val msg = if (cloneNewPkg != null) {
+                        var msg = if (cloneNewPkg != null) {
                             getString(R.string.stealth_success_clone, cloneNewPkg)
                         } else {
                             getString(R.string.stealth_success)
                         }
-                        finish(true, msg)
+                        msg += trackerNote
+                        var ok = true
+                        if (trackerGroups.isNotEmpty()) {
+                            val probe = startProbe(backend, stealer, targetPkg, launcherForProbe)
+                            ok = probe.first
+                            msg += "\n\n" + probe.second
+                        }
+                        finish(ok, msg + backupNote(stealer, pkg, workDir))
                     } else {
-                        finish(false, res.message)
+                        finish(false, res.message + backupNote(stealer, pkg, workDir))
                     }
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Patch fehlgeschlagen", e)
             finish(false, e.message ?: "Unbekannter Fehler")
+        }
+    }
+
+    /** Wo die Original-APKs liegen (dauerhafter Ort, sonst Arbeitsordner) - fuer den Rueckweg. */
+    private fun backupNote(stealer: StealthStealer, pkg: String, workDir: File): String {
+        val dir = stealer.resolveOriginals(pkg, workDir)?.firstOrNull()?.parentFile ?: return ""
+        return "\n\n" + getString(R.string.stealth_original_backup, dir.absolutePath)
+    }
+
+    /**
+     * Startprobe: App einmal starten, [PROBE_MILLIS] warten, Logcat ab Startzeit auf Absturzmerkmale
+     * pruefen ([StartProbe]). @return (kein Absturz, Text). Ohne Launcher-Activity oder bei einem
+     * Startfehler wird NICHT behauptet, die App laufe - der Text sagt, dass nicht geprueft wurde.
+     */
+    private fun startProbe(
+        backend: de.minipc.appopsshizuku.shizuku.ShellBackend,
+        stealer: StealthStealer,
+        pkg: String,
+        launcher: String?
+    ): Pair<Boolean, String> {
+        if (launcher == null) return true to getString(R.string.probe_no_launcher)
+        stealer.progressListener?.invoke(StealthPhase.PROBE, null)
+        // Hart begrenzt: die Probe darf den Gesamtlauf nie blockieren. Am Geraet gemessen
+        // (10/2026) blieb sie nach "am start -W" haengen - die gestartete App erbt den
+        // Ausgabe-Kanal des Shell-Prozesses, dadurch endet das Lesen nie. Nach 90 s wird
+        // abgebrochen und ehrlich gemeldet, dass NICHT geprueft wurde.
+        val probeExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+        val future = probeExecutor.submit<Pair<Boolean, String>> {
+            probeOnce(backend, stealer, pkg, launcher)
+        }
+        return try {
+            future.get(PROBE_TOTAL_SECONDS, java.util.concurrent.TimeUnit.SECONDS)
+        } catch (e: Exception) {
+            future.cancel(true)
+            runCatching { backend.exec("am", "force-stop", pkg) }
+            true to getString(R.string.probe_timeout, PROBE_TOTAL_SECONDS)
+        } finally {
+            probeExecutor.shutdownNow()
+        }
+    }
+
+    /** Ein Probelauf: starten, warten, Logcat ab Startzeit auswerten. */
+    private fun probeOnce(
+        backend: de.minipc.appopsshizuku.shizuku.ShellBackend,
+        stealer: StealthStealer,
+        pkg: String,
+        launcher: String
+    ): Pair<Boolean, String> {
+        stealer.progressListener?.invoke(StealthPhase.PROBE, null)
+        val since = backend.exec("date", "+%m-%d %H:%M:%S.000").takeIf { it.exitCode == 0 }?.stdout?.trim()
+        backend.exec("am", "force-stop", pkg)
+        // OHNE "-W": "-W" wartet auf die Anzeige der Activity und haengt, wenn die App
+        // einen Splash/Weiterleitung startet. Der Startnachweis kommt aus dem Logcat.
+        val start = backend.execTimeout(30L, "am", "start", "-n", "$pkg/$launcher")
+        if (start.exitCode != 0 || start.stdout.contains("Error:") || start.stderr.contains("Error:")) {
+            return true to getString(R.string.probe_start_failed, (start.stdout + start.stderr).trim().take(120))
+        }
+        try {
+            Thread.sleep(PROBE_MILLIS)
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
+        }
+        val args = mutableListOf("logcat", "-d", "-v", "threadtime", "-b", "main", "-b", "system", "-b", "crash")
+        if (!since.isNullOrEmpty()) args += listOf("-T", since)
+        val log = backend.execTimeout(30L, *args.toTypedArray()).stdout
+        backend.exec("am", "force-stop", pkg)
+        val r = StartProbe.analyze(log, pkg)
+        return when {
+            r.crashed -> false to (getString(R.string.probe_crashed) + "\n" + r.hits.values.joinToString("\n"))
+            r.hits.isNotEmpty() ->
+                true to (getString(R.string.probe_markers, r.hits.keys.joinToString(", ")) + "\n" + r.hits.values.joinToString("\n"))
+            !r.started -> true to getString(R.string.probe_no_process)
+            else -> true to getString(R.string.probe_ok, PROBE_MILLIS / 1000)
         }
     }
 
@@ -385,8 +530,13 @@ class StealthPatchService : Service() {
             else getString(R.string.stealth_notif_done_error),
             message, null, null
         )
-        getSystemService(NotificationManager::class.java).notify(NOTIF_ID, notif)
+        // Reihenfolge ist wichtig: stopForeground(STOP_FOREGROUND_REMOVE) entfernt die
+        // Benachrichtigung mit NOTIF_ID. Wurde das Ergebnis vorher unter derselben ID
+        // gepostet, loeschte Android es sofort wieder - der Lauf endete ohne sichtbares
+        // Ergebnis (am Geraet gemessen 10/2026). Deshalb: erst die Fortschritts-Notification
+        // weg, dann das Ergebnis unter eigener ID posten.
         stopForeground(STOP_FOREGROUND_REMOVE)
+        getSystemService(NotificationManager::class.java).notify(NOTIF_ID_RESULT, notif)
         stopSelf()
     }
 
