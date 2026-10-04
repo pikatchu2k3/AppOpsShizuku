@@ -21,6 +21,21 @@ class ShellResultTest {
     @Test fun exit0_error_imStdout_istFehler() =
         assertTrue(ShellResult(0, "Error", "").isFailure())
 
+    @Test fun komponentenNameMitError_imStdout_keinFalschalarm() =
+        assertFalse(
+            ShellResult(0, "com.example.app/.ErrorReportingService\nSuccess: no change", "").isFailure()
+        )
+
+    @Test fun javaException_amZeilenanfang_istFehler() =
+        assertTrue(
+            ShellResult(
+                0, "", "Exception occurred while executing 'disable-user':\njava.lang.SecurityException: x"
+            ).isFailure()
+        )
+
+    @Test fun javaException_nurAlsLeerzeichenEingerueckt_istFehler() =
+        assertTrue(ShellResult(0, "  java.lang.IllegalStateException: sUidOwnerMap", "").isFailure())
+
     @Test fun exitUngleich0_istFehler() =
         assertTrue(ShellResult(1, "", "Unknown op").isFailure())
 

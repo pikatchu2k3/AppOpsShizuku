@@ -21,14 +21,14 @@ class AppDetailActivity : AppCompatActivity() {
         /** Gleicher Schluessel wie AppOpsActivity/ComponentsActivity ("pkg"). */
         const val EXTRA_PACKAGE = AppOpsActivity.EXTRA_PACKAGE
 
-        /** Optionaler Start-Reiter (0=Berechtigungen, 1=Verhalten, 2=Tarnung). */
+        /** Optionaler Start-Reiter (0=Berechtigungen, 1=Verhalten, 2=Tarnung, 3=Netz & Tracker). */
         const val EXTRA_TAB = "tab"
 
         /** Reiter-Index "Tarnung" (fuer die Fortschritts-Notification des StealthPatchService). */
         const val TAB_STEALTH = 2
 
         private val TAB_TITLES = intArrayOf(
-            R.string.tab_permissions, R.string.tab_behavior, R.string.tab_stealth
+            R.string.tab_permissions, R.string.tab_behavior, R.string.tab_stealth, R.string.tab_net
         )
     }
 
@@ -87,7 +87,8 @@ class AppDetailActivity : AppCompatActivity() {
         override fun createFragment(position: Int): Fragment = when (position) {
             0 -> PermissionsFragment.newInstance(packageName)
             1 -> BehaviorFragment.newInstance(packageName)
-            else -> StealthFragment.newInstance(packageName)
+            2 -> StealthFragment.newInstance(packageName)
+            else -> NetFragment.newInstance(packageName)
         }
     }
 }

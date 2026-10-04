@@ -425,9 +425,11 @@ class ComponentsActivity : AppCompatActivity() {
     private fun buildComponentItems(): List<ComponentListItem> {
         val pm = packageManager
         val info = try {
-            pm.getPackageInfo(
+            // MATCH_DISABLED_COMPONENTS: bereits deaktivierte Komponenten muessen in der Liste bleiben
+            pm.getPackageInfoCompat(
                 packageName,
-                PackageManager.GET_ACTIVITIES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+                PackageManager.GET_ACTIVITIES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or
+                    PackageManager.MATCH_DISABLED_COMPONENTS
             )
         } catch (e: PackageManager.NameNotFoundException) {
             return emptyList()

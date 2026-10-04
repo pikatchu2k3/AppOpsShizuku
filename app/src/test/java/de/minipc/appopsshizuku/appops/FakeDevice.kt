@@ -20,7 +20,19 @@ class FakeDevice(
     /** Ops, deren Aenderung das Geraet stillschweigend ignoriert. */
     val ignoredOps: Set<String> = emptySet(),
     /** Geraet ignoriert pm suspend (z. B. Geraeteverwaltung). */
-    var ignoreSuspend: Boolean = false
+    var ignoreSuspend: Boolean = false,
+    /** Netz: UIDs mit gesperrten Hintergrunddaten / Pakete ohne Netz / UIDs auf der netpolicy-Sperrliste. */
+    val bgDenied: MutableSet<Int> = mutableSetOf(),
+    val offline: MutableSet<String> = mutableSetOf(),
+    val blacklist: MutableSet<Int> = mutableSetOf(),
+    /** Am OnePlus gemessen: der erste Hintergrund-Set wirft sUidOwnerMap-Fehler und setzt den Wert trotzdem. */
+    var bgSetThrowsOnce: Boolean = false,
+    /** Geraet uebernimmt Netz-Aenderungen nicht (Befehl laeuft fehlerfrei durch). */
+    var ignoreNetSets: Boolean = false,
+    /** Firewall-Kette: am Redmi im Ausgangszustand AUS - Deny-Bit liest sich dann trotzdem als `deny`. */
+    var chainEnabled: Boolean = true,
+    /** Geraet laesst die Kette nicht einschalten. */
+    var ignoreChainSet: Boolean = false
 ) : ShellBackend {
 
     val commands = mutableListOf<List<String>>()
@@ -55,6 +67,32 @@ class FakeDevice(
                 val m = modes[a[4]]
                 ok(if (m == null || m == "default") "No operations." else "${a[4]}: $m; time=+1h2m3s")
             }
+            a.take(3) == listOf("cmd", "connectivity", "set-background-networking-enabled-for-uid") -> {
+                val uid = a[3].toInt()
+                if (!ignoreNetSets) if (a[4] == "true") bgDenied.remove(uid) else bgDenied.add(uid)
+                if (bgSetThrowsOnce) {
+                    bgSetThrowsOnce = false
+                    ShellResult(0, "", "java.lang.IllegalStateException: sUidOwnerMap does not have entry for uid: $uid (code 2)")
+                } else ok("")
+            }
+            a.take(3) == listOf("cmd", "connectivity", "get-background-networking-enabled-for-uid") ->
+                ok("${a[3]}: ${if (a[3].toInt() in bgDenied) "deny" else "allow"}")
+            a.take(3) == listOf("cmd", "connectivity", "set-package-networking-enabled") -> {
+                if (!ignoreNetSets) if (a[3] == "true") offline.remove(a[4]) else offline.add(a[4])
+                ok("Disabled networking for ${a[4]}, appId 10641")
+            }
+            a.take(3) == listOf("cmd", "connectivity", "get-package-networking-enabled") ->
+                ok("${a[3]}:${if (a[3] in offline) "deny" else "allow"}")
+            a.take(3) == listOf("cmd", "connectivity", "get-chain3-enabled") ->
+                ok("chain:${if (chainEnabled) "enabled" else "disabled"}")
+            a.take(3) == listOf("cmd", "connectivity", "set-chain3-enabled") -> {
+                if (!ignoreChainSet) chainEnabled = (a[3] == "true")
+                ok("")
+            }
+            a.take(2) == listOf("cmd", "netpolicy") && a[2] == "add" -> { if (!ignoreNetSets) blacklist.add(a[4].toInt()); ok("") }
+            a.take(2) == listOf("cmd", "netpolicy") && a[2] == "remove" -> { blacklist.remove(a[4].toInt()); ok("") }
+            a == listOf("cmd", "netpolicy", "list", "restrict-background-blacklist") ->
+                ok("Restrict background blacklisted UIDs: " + (blacklist.joinToString(" ").ifEmpty { "none" }))
             a.take(3) == listOf("cmd", "package", "compile") -> ok("Success")
             a.take(2) == listOf("am", "force-stop") -> { stopped = true; ok("") }
             a.take(2) == listOf("dumpsys", "package") ->
