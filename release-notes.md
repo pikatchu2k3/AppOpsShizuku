@@ -27,6 +27,7 @@ Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 Automatic updates: add this repository to [Obtainium](https://github.com/ImranR98/Obtainium) (source: GitHub Releases).
 
 Build: `:app:assembleDebug` · package `de.minipc.appopsshizuku` · versionCode 30 · debug signature (certificate SHA-256 `652394f7…7226e`).
+License: **GNU General Public License v3.0** — see [LICENSE](https://github.com/pikatchu2k3/AppOpsShizuku/blob/master/LICENSE).
 
 ### Deutsch
 
@@ -57,3 +58,4 @@ Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 Automatische Updates: dieses Repository in [Obtainium](https://github.com/ImranR98/Obtainium) hinzufügen (Quelle: GitHub Releases).
 
 Build: `:app:assembleDebug` · Paket `de.minipc.appopsshizuku` · versionCode 30 · Debug-Signatur (Zertifikat SHA-256 `652394f7…7226e`).
+Lizenz: **GNU General Public License v3.0** — siehe [LICENSE](https://github.com/pikatchu2k3/AppOpsShizuku/blob/master/LICENSE).

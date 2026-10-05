@@ -93,7 +93,11 @@ Releases are signed with the debug certificate, SHA-256 `652394f7…7226e` (full
 
 ### License
 
-No license file exists in this repository yet — **this is an open point**, so no license is granted for now. Note: the app bundles a build of a CalcYou fork (`app/src/main/res/raw/calcyou.apk`, described in `PROJEKTSTAND.md` as GPL-3.0) for the calculator vault; that has to be settled when a license is chosen.
+This project is under the **GNU General Public License, version 3.0** — full text in [LICENSE](LICENSE).
+
+Reason: the app bundles a build of a CalcYou fork (`app/src/main/res/raw/calcyou.apk`) as a raw resource for the calculator vault, and that is GPL-3.0 itself. Since the app is distributed publicly anyway, the whole project uses the same license — consistent and legally clean.
+
+Because the repository is public, the source that belongs to every released package is available in the same place (repository + releases). There is **no warranty**: patching other apps can damage them, and the Stealth tab is used at your own risk.
 
 ---
 
@@ -190,4 +194,8 @@ Releases sind mit dem Debug-Zertifikat signiert, SHA-256 `652394f7…7226e` (vol
 
 ### Lizenz
 
-Im Repository gibt es noch keine Lizenzdatei — **das ist ein offener Punkt**, daher wird vorerst keine Lizenz eingeräumt. Hinweis: Die App bündelt einen Build eines CalcYou-Forks (`app/src/main/res/raw/calcyou.apk`, laut `PROJEKTSTAND.md` GPL-3.0) für den Taschenrechner-Vault; das muss bei der Lizenzwahl geklärt werden.
+Dieses Projekt steht unter der **GNU General Public License, Version 3.0** — vollständiger Text in [LICENSE](LICENSE).
+
+Grund: Die App bündelt einen Build eines CalcYou-Forks (`app/src/main/res/raw/calcyou.apk`) als Raw-Ressource für den Taschenrechner-Vault, und der ist selbst GPL-3.0. Da die App ohnehin öffentlich verteilt wird, steht das ganze Projekt unter derselben Lizenz — konsistent und rechtlich sauber.
+
+Weil das Repository öffentlich ist, ist der Quellcode zu jedem veröffentlichten Paket an derselben Stelle verfügbar (Repository + Releases). Es gibt **keine Gewährleistung**: Das Patchen fremder Apps kann sie beschädigen, der Tarnungs-Reiter wird auf eigenes Risiko benutzt.
