@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptives Icon, Monochrom-Layer (Android 13+ "Themed Icons"): Silhouette
+     des Schilds mit echtem Loch fuer das Schluesselloch (fillType evenOdd -
+     aeusserer Umriss + Kreis + Schlitz als Teilpfade). Die Fuellfarbe wird
+     vom System ersetzt, sobald der Nutzer Themed Icons aktiviert. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"
+        android:pathData="M54,24.76L79.8,35.08V54C79.8,69.48 67.76,81.52 54,86.68C40.24,81.52 28.2,69.48 28.2,54V35.08Z
+                           M54,45.4m-6.88,0a6.88,6.88 0,1 1,13.76 0a6.88,6.88 0,1 1,-13.76 0
+                           M50.56,50.56L57.44,50.56L55.72,62.6L52.28,62.6Z" />
+</vector>

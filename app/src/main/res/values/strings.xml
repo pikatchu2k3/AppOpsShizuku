@@ -110,6 +110,10 @@
     <!-- Privacy-Profil-Export/-Import (JSON) -->
     <string name="menu_export_profiles">Profile exportieren</string>
     <string name="menu_import_profiles">Profile importieren</string>
+    <string name="menu_dynamic_color">Systemfarben (Material You)</string>
+    <string name="menu_dynamic_color_unavailable">Systemfarben (erst ab Android 12 verfügbar)</string>
+    <string name="dynamic_color_on">Farben aus dem Hintergrundbild des Systems</string>
+    <string name="dynamic_color_off">Feste Petrol-Palette der App</string>
     <string name="profiles_export_empty">Keine gespeicherten Profile vorhanden</string>
     <string name="profiles_export_ok">%1$d Profile und %2$d App-Einstellungen exportiert: privacy_profiles.json (App-Ordner)</string>
     <string name="profiles_export_fail">Export fehlgeschlagen: %1$s</string>

@@ -25,5 +25,5 @@
         android:layout_weight="1"
         android:text="@string/components_disable_all"
         android:textAppearance="?attr/textAppearanceLabelMedium"
-        android:textColor="?attr/colorError" />
+        android:textColor="?attr/colorTertiary" />
 </LinearLayout>

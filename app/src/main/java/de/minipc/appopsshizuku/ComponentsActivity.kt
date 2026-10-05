@@ -19,10 +19,14 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -30,6 +34,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.switchmaterial.SwitchMaterial
+import de.minipc.appopsshizuku.appops.DesignSettings
 import de.minipc.appopsshizuku.shizuku.isFailure
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShellBackend
@@ -81,8 +86,18 @@ class ComponentsActivity : AppCompatActivity() {
     private var pendingRestore = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        DesignSettings.applyDynamicColorsIfEnabled(this)
         setContentView(R.layout.activity_components)
+
+        // Edge-to-Edge (siehe MainActivity): Systemleisten-Abstaende als Padding,
+        // damit Toolbar/Inhalt nicht unter den Systemleisten verschwinden.
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
+            insets
+        }
 
         findViewById<MaterialToolbar>(R.id.toolbar).setNavigationOnClickListener { finish() }
 

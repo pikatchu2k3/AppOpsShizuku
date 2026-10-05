@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Material-3-Palette, Dunkel. Gleicher Seed/Hue/Chroma wie values/colors.xml
+  (Seed #006874, siehe dortiger Kommentar), nur die Ton-Zuordnung je Rolle
+  wechselt auf die M3-Dunkel-Tabelle:
+
+    Farbe=80, OnFarbe=20, FarbeContainer=30, OnFarbeContainer=90
+    Surface=6, OnSurface=90, SurfaceVariant=30, OnSurfaceVariant=80
+    Outline=60, OutlineVariant=30, InverseSurface=90, InverseOnSurface=20, InversePrimary=40
+    SurfaceDim=6, SurfaceBright=24, ContainerLowest=4, ContainerLow=10,
+    Container=12, ContainerHigh=17, ContainerHighest=22
+-->
+<resources>
+
+    <color name="md_primary_80">#13DAF1</color>
+    <color name="md_primary_20">#01363D</color>
+    <color name="md_primary_30">#054E58</color>
+    <color name="md_primary_90">#99F0FF</color>
+    <color name="md_primary_40">#036874</color>
+
+    <color name="md_secondary_80">#A0CED6</color>
+    <color name="md_secondary_20">#01363D</color>
+    <color name="md_secondary_30">#1F4D54</color>
+    <color name="md_secondary_90">#BCEBF3</color>
+
+    <color name="md_tertiary_80">#A8C8FF</color>
+    <color name="md_tertiary_20">#023259</color>
+    <color name="md_tertiary_30">#194878</color>
+    <color name="md_tertiary_90">#D6E3FF</color>
+
+    <color name="md_neutral_6">#0B1516</color>
+    <color name="md_neutral_90">#D9E4E6</color>
+    <color name="md_neutral_24">#323B3C</color>
+    <color name="md_neutral_4">#031012</color>
+    <color name="md_neutral_10">#151D1E</color>
+    <color name="md_neutral_12">#192122</color>
+    <color name="md_neutral_17">#232B2D</color>
+    <color name="md_neutral_22">#2D3638</color>
+    <color name="md_neutral_20">#293233</color>
+
+    <color name="md_neutral_variant_30">#374A4D</color>
+    <color name="md_neutral_variant_80">#B4CACE</color>
+    <color name="md_neutral_variant_60">#7F9498</color>
+
+    <!-- Error (offizielle M3-Baseline dunkel, unabhaengig vom Seed) -->
+    <color name="md_error_80">#F2B8B5</color>
+    <color name="md_error_20">#601410</color>
+    <color name="md_error_30">#8C1D18</color>
+    <color name="md_error_90">#F9DEDC</color>
+
+    <!-- Warning (Zusatzrolle, Amber-Hue 75) -->
+    <color name="md_warning_80">#FBBA62</color>
+    <color name="md_warning_20">#442B01</color>
+    <color name="md_warning_30">#633F02</color>
+    <color name="md_warning_90">#FFDDB7</color>
+
+    <!-- ===== Rollen (dunkel) ===== -->
+    <color name="primary">@color/md_primary_80</color>
+    <color name="on_primary">@color/md_primary_20</color>
+    <color name="primary_container">@color/md_primary_30</color>
+    <color name="on_primary_container">@color/md_primary_90</color>
+
+    <color name="secondary">@color/md_secondary_80</color>
+    <color name="on_secondary">@color/md_secondary_20</color>
+    <color name="secondary_container">@color/md_secondary_30</color>
+    <color name="on_secondary_container">@color/md_secondary_90</color>
+
+    <color name="tertiary">@color/md_tertiary_80</color>
+    <color name="on_tertiary">@color/md_tertiary_20</color>
+    <color name="tertiary_container">@color/md_tertiary_30</color>
+    <color name="on_tertiary_container">@color/md_tertiary_90</color>
+
+    <color name="error">@color/md_error_80</color>
+    <color name="on_error">@color/md_error_20</color>
+    <color name="error_container">@color/md_error_30</color>
+    <color name="on_error_container">@color/md_error_90</color>
+
+    <color name="background">@color/md_neutral_6</color>
+    <color name="on_background">@color/md_neutral_90</color>
+    <color name="surface">@color/md_neutral_6</color>
+    <color name="on_surface">@color/md_neutral_90</color>
+    <color name="surface_variant">@color/md_neutral_variant_30</color>
+    <color name="on_surface_variant">@color/md_neutral_variant_80</color>
+
+    <color name="surface_dim">@color/md_neutral_6</color>
+    <color name="surface_bright">@color/md_neutral_24</color>
+    <color name="surface_container_lowest">@color/md_neutral_4</color>
+    <color name="surface_container_low">@color/md_neutral_10</color>
+    <color name="surface_container">@color/md_neutral_12</color>
+    <color name="surface_container_high">@color/md_neutral_17</color>
+    <color name="surface_container_highest">@color/md_neutral_22</color>
+
+    <color name="outline">@color/md_neutral_variant_60</color>
+    <color name="outline_variant">@color/md_neutral_variant_30</color>
+
+    <color name="inverse_surface">@color/md_neutral_90</color>
+    <color name="inverse_on_surface">@color/md_neutral_20</color>
+    <color name="inverse_primary">@color/md_primary_40</color>
+
+    <color name="scrim">#000000</color>
+    <color name="surface_tint">@color/md_primary_80</color>
+
+    <color name="warning">@color/md_warning_80</color>
+    <color name="on_warning">@color/md_warning_20</color>
+    <color name="warning_container">@color/md_warning_30</color>
+    <color name="on_warning_container">@color/md_warning_90</color>
+</resources>

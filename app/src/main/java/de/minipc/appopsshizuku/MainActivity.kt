@@ -30,8 +30,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.minipc.appopsshizuku.appops.BehaviorBackup
+import de.minipc.appopsshizuku.appops.DesignSettings
 import de.minipc.appopsshizuku.appops.ProfileBackup
 import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
@@ -104,6 +106,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        DesignSettings.applyDynamicColorsIfEnabled(this)
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
@@ -399,6 +402,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        menu.findItem(R.id.action_dynamic_color).apply {
+            if (DynamicColors.isDynamicColorAvailable()) {
+                isChecked = DesignSettings.isDynamicColorEnabled(this@MainActivity)
+            } else {
+                isEnabled = false
+                isChecked = false
+                setTitle(R.string.menu_dynamic_color_unavailable)
+            }
+        }
         return true
     }
 
@@ -410,6 +422,18 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_import_profiles -> {
                 importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
+                true
+            }
+            R.id.action_dynamic_color -> {
+                val enabled = !DesignSettings.isDynamicColorEnabled(this)
+                DesignSettings.setDynamicColorEnabled(this, enabled)
+                item.isChecked = enabled
+                Toast.makeText(
+                    this,
+                    if (enabled) R.string.dynamic_color_on else R.string.dynamic_color_off,
+                    Toast.LENGTH_SHORT
+                ).show()
+                recreate() // Theme wird nur beim Erzeugen der Activity gesetzt
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -582,11 +606,12 @@ class MainActivity : AppCompatActivity() {
                 fgAttr = com.google.android.material.R.attr.colorOnSecondaryContainer
             }
             !manager.hasPermission -> {
+                // Berechtigung fehlt = gesperrt/verweigert, kein Fehler -> tertiary statt error.
                 title.setText(R.string.status_permission_missing)
                 detail.setText(R.string.status_detail_permission)
                 button.setText(R.string.btn_connect)
-                bgAttr = com.google.android.material.R.attr.colorErrorContainer
-                fgAttr = com.google.android.material.R.attr.colorOnErrorContainer
+                bgAttr = com.google.android.material.R.attr.colorTertiaryContainer
+                fgAttr = com.google.android.material.R.attr.colorOnTertiaryContainer
             }
             else -> {
                 title.setText(R.string.status_shizuku_connected)

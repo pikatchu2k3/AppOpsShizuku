@@ -1,61 +1,61 @@
 ### English
 
-**App Ops Shizuku 1.15.1** — the tracker overview now also reads the app's code, and it says out loud that it cannot switch anything off.
+**App Ops Shizuku 1.17.0** — new colour design following Google's Material 3 guidelines, plus a switch for system colours.
 
-**New**
-- The tracker overview no longer looks at the manifest alone: it also searches the app's DEX files (base APK plus every split of an app bundle) for the class names of known building blocks. Those files are readable by a normal app — no root, no Shizuku needed.
-- Every entry now shows where it was found: *manifest + code*, *code only*, *manifest only*, or not found. Building blocks without manifest components were invisible before and are caught now: Segment, Amplitude, the old Google Analytics, Facebook SDK (app events) and the Google advertising ID library.
-- Real measurements on a test device: 37 MB app → 4.6 s, 196 MB app bundle → 21.8 s, on a background thread, with a progress line, measured runtime in the log and a result cache per app.
-- The tab states clearly why per-tracker switches are missing: Android refuses component changes to the shell without root. Blocking is done by the three switches above; only the APK patch (Stealth tab) removes code.
+**New colour system**
+- The app now uses a **complete** Material 3 palette that is **derived systematically** from a calm petrol/teal seed (`#006874`): seed → CIELAB → tonal palettes per colour family → roles by the official table (light *and* dark). No more half-defined baseline colours.
+- **Red is reserved for real errors now.** Until this release `colorError` was used for states like "blocked" or "denied" in six layouts — that was the harsh look. Blocked = calm tertiary/secondary container, active = primary container, unknown = neutral, and **one** amber warning role for risky (but not failed) actions.
+- **Adaptive launcher icon** with a monochrome layer for themed icons (Android 13+) — the shield-and-keyhole motif stays, now in the palette instead of hard-coded blue.
+- **Edge-to-edge** on all screens with matching system bars, and monochrome icons that follow the theme (in dark mode they used to be hard-coded black).
+- Measured contrast (WCAG, computed in a test): worst text pair **6.49:1** light and **5.46:1** dark — target was 4.5:1. A pixel check of the screens shows **0.00 % harsh red**.
 
-**Fixed**
-- False alarm: Google's advertising ID library (`AdvertisingIdClient`) is present in many apps that show no ads at all — it made the AdMob entry light up. AdMob now uses precise class names, and the advertising ID has its own honest entry. Verified on two real apps: an app without ads now correctly reports "AdMob: not found" instead of a wrong hit.
+**New switch: system colours (Material You)**
+- Menu of the main list → *System colors (Material You)*: on = the app takes its colours from the system wallpaper (Android 12+), off = the app's own petrol palette. The choice is remembered and takes effect immediately.
+- On Android 11 and older the entry is greyed out and labelled accordingly — the petrol palette always applies there.
+- Measured on a test device: switch on → resolved colours come from the system (`primary #006973`), switch off → from the app palette (`primary #036874`). On a wallpaper that is not teal the difference is clearly visible.
 
 **Honest limits**
-- The code search works on names. An obfuscated app can rename library classes, and SDKs loaded only by reflection or remote config leave no name behind — "not found" stays a probability, not a promise.
-- Disabling single *components* of other apps is not offered: Android 15/16 refuses it to the shell (`SecurityException: Shell cannot change component state`).
-- The switches stop network traffic, not the tracking code inside the app.
+- Material You exists from Android 12 on. Below that the app palette is the only option.
+- The switch lives in the menu of the main list; screens that are already open keep the old colour choice until they are reopened.
+- Colours are not a proof: this release changes how the app looks, not what it can do.
 
-**App Ops Shizuku 1.16.0** — Stealth tab: tracker switch-off while patching, plus the work in progress from the previous release.
-- **In development (beta).** Patching and switching trackers off can damage the app. Back up the app's data before you patch.
-- The patched app is signed with **our own key** — **not** with the manufacturer's or Google's key. So: **no more Play updates**, Play Protect may warn, and the way back to the original app is a reinstall.
-- New *Disable trackers (beta)*: sets `android:enabled="false"` on the components of the chosen groups (nothing is deleted) and adds the documented Firebase switches. Push, WorkManager, billing, login and the DataTransport scheduler are never touched. The patched APK is scanned and compared with the original ("before: 5 — after: 2 — switched off: …"), the original APKs are saved first, and the app is started once with a ~15 s log check (`FATAL EXCEPTION`, `ClassNotFoundException`, `NoSuchMethodError`, `VerifyError`, `SecurityException`).
-- Clone: package-rename fix for `android:authorities` lists like `a.x;a.y` (every entry is renamed now), a clone is refused with a clear message when a split carries its own code, the target package name is checked for collisions, default label "Original (Kopie)".
-- Limits (measured on a test device): the code of switched-off building blocks stays in the APK and the switch-off is a statement about the manifest, not a guarantee that nothing is sent. A 39 MB app took ~90 s for the manifest-only route, while the clone's code rewrite is CPU-bound and slow on weak hardware (9 MB app: several minutes in DEX_PATCH; 37 MB: no progress past 40 % in nine minutes). On a real app the result was "before: 8 — after: 6", with AdMob, advertising-ID, Braze, Adjust, DataTransport and Crashlytics explicitly reported as still active, and SDKs unknown to the catalog (Microsoft Clarity) not covered at all. SDKs without manifest components cannot be switched off this way; a clone gets its own data, Firebase `google_app_id` / AdMob app ID are bound to package and signature, and Play Integrity apps may refuse to start.
+**Still from the previous releases**
+- Tracker overview reads manifest **and** code (DEX) and names the source per entry.
+- Stealth tab (in development / beta): tracker switch-off while patching, plus cloning with its own package name; patched apps are signed with **our own key**, not with the manufacturer's or Google's.
+- License: **GNU General Public License v3.0**.
 
-Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
-Automatic updates: add this repository to [Obtainium](https://github.com/ImranR98/Obtainium) (source: GitHub Releases).
+Download: this repository is **private again** — releases are available to you only; for updates through [Obtainium](https://github.com/ImranR98/Obtainium) you need a GitHub token.
 
-Build: `:app:assembleDebug` · package `de.minipc.appopsshizuku` · versionCode 30 · debug signature (certificate SHA-256 `652394f7…7226e`).
+Build: `:app:assembleDebug` · package `de.minipc.appopsshizuku` · versionCode 31 · debug signature (certificate SHA-256 `652394f7…7226e`).
 License: **GNU General Public License v3.0** — see [LICENSE](https://github.com/pikatchu2k3/AppOpsShizuku/blob/master/LICENSE).
 
 ### Deutsch
 
-**App Ops Shizuku 1.15.1** — die Tracker-Übersicht liest jetzt auch den Code der App und sagt deutlich, dass sie nichts abschalten kann.
+**App Ops Shizuku 1.17.0** — neues Farbsystem nach Googles Material-3-Richtlinien, dazu ein Schalter für Systemfarben.
 
-**Neu**
-- Die Tracker-Übersicht schaut nicht mehr nur ins Manifest: Sie durchsucht zusätzlich die DEX-Dateien der App (Basis-APK und alle Splits eines App-Bundles) nach den Klassennamen bekannter Bausteine. Diese Dateien darf eine normale App lesen — ohne Root, ohne Shizuku.
-- Jeder Eintrag zeigt jetzt die Herkunft: *Manifest + Code*, *nur Code*, *nur Manifest* oder nicht gefunden. Bausteine ohne Manifest-Komponenten waren vorher unsichtbar und werden nun erfasst: Segment, Amplitude, das alte Google Analytics, Facebook SDK (App-Events) und die Google-Werbe-ID-Bibliothek.
-- Echte Messwerte am Testgerät: 37-MB-App → 4,6 s, 196-MB-App-Bundle → 21,8 s, im Hintergrund-Thread, mit Fortschrittszeile, gemessener Laufzeit im Log und Ergebnis-Cache je App.
-- Der Reiter sagt jetzt klar, warum Schalter pro Tracker fehlen: Android verweigert der Shell ohne Root das Ändern von Komponenten. Blockiert wird über die drei Schalter oben; Code entfernt nur der APK-Patch (Reiter Tarnung).
+**Neues Farbsystem**
+- Die App nutzt jetzt eine **vollständige** Material-3-Palette, **systematisch** abgeleitet aus einer ruhigen Petrol-Startfarbe (`#006874`): Seed → CIELAB → Tonalpaletten je Farbfamilie → Rollen nach der offiziellen Tabelle (hell **und** dunkel). Keine halb definierten Vorgabefarben mehr.
+- **Rot ist jetzt echten Fehlern vorbehalten.** Bisher wurde `colorError` in sechs Layouts für Zustände wie „gesperrt" oder „verweigert" benutzt — das war der harte Eindruck. Gesperrt = ruhige Tertiär-/Sekundärfläche, aktiv = Primärfläche, unbekannt = neutral, und für riskante (nicht fehlgeschlagene) Aktionen gibt es **eine** amber Warnfarbe.
+- **Adaptives Launcher-Icon** mit Monochrom-Layer für Themed Icons (Android 13+) — das Schild-mit-Schlüsselloch-Motiv bleibt, jetzt in der Palette statt in fest verdrahtetem Blau.
+- **Edge-to-edge** auf allen Ansichten mit passenden Systemleisten; die Icons folgen dem Theme (im Dunkelmodus waren sie vorher fest schwarz).
+- Kontrast gemessen (WCAG, im Test berechnet): schlechtester Textwert **6,49:1** hell und **5,46:1** dunkel — Ziel war 4,5:1. Die Pixelprüfung der Bildschirme ergibt **0,00 % grelles Rot**.
 
-**Behoben**
-- Fehlalarm: Die Google-Werbe-ID-Bibliothek (`AdvertisingIdClient`) steckt in vielen Apps, die gar keine Werbung zeigen — sie ließ den AdMob-Eintrag aufleuchten. AdMob prüft jetzt genaue Klassennamen, die Werbe-ID hat einen eigenen, ehrlichen Eintrag. An zwei echten Apps belegt: Eine App ohne Werbung meldet nun korrekt „AdMob: nicht gefunden" statt eines falschen Treffers.
+**Neuer Schalter: Systemfarben (Material You)**
+- Menü der Hauptliste → *Systemfarben (Material You)*: an = die App übernimmt die Farben aus dem Hintergrundbild des Systems (Android 12+), aus = die eigene Petrol-Palette. Die Wahl bleibt gespeichert und wirkt sofort.
+- Auf Android 11 und älter ist der Eintrag ausgegraut und entsprechend beschriftet — dort gilt immer die Petrol-Palette.
+- Am Testgerät gemessen: Schalter an → aufgelöste Farben kommen vom System (`primary #006973`), Schalter aus → aus der App-Palette (`primary #036874`). Bei einem Hintergrundbild, das nicht petrolfarben ist, sieht man den Unterschied deutlich.
 
 **Ehrliche Grenzen**
-- Die Code-Suche arbeitet über Namen. Eine verschleierte App kann Bibliotheksnamen umbenennen, und SDKs, die nur per Reflection oder Remote-Konfiguration geladen werden, hinterlassen keinen Namen — „nicht gefunden" bleibt eine Wahrscheinlichkeit, keine Zusage.
-- Das Abschalten einzelner *Komponenten* fremder Apps wird bewusst nicht angeboten: Android 15/16 verweigert es der Shell (`SecurityException: Shell cannot change component state`).
-- Die Schalter stoppen Netzverkehr, nicht den Tracker-Code in der App.
+- Material You gibt es erst ab Android 12. Darunter bleibt nur die App-Palette.
+- Der Schalter liegt im Menü der Hauptliste; bereits geöffnete Ansichten behalten die alte Farbwahl, bis sie neu geöffnet werden.
+- Farben sind kein Nachweis: Dieses Release ändert das Aussehen, nicht die Fähigkeiten der App.
 
-**App Ops Shizuku 1.16.0** — Reiter Tarnung: Tracker beim Patchen abschalten, dazu die schon begonnene Arbeit aus dem vorigen Release.
-- **In Entwicklung (Beta).** Patch und Abschalten können die App beschädigen. Wichtig ist eine Sicherung der App-Daten, bevor du patchst.
-- Die gepatchte App wird mit **unserem eigenen Schlüssel** signiert — **nicht** mit dem Schlüssel des Herstellers bzw. von Google. Deshalb: **keine Play-Updates mehr**, Play Protect kann warnen, und zurück zur Original-App geht es nur über Neuinstallation.
-- Neu: *Tracker abschalten (Beta)*: setzt `android:enabled="false"` an den Komponenten der gewählten Gruppen (nichts wird gelöscht) und hängt die dokumentierten Firebase-Schalter an. Push, WorkManager, Bezahlung, Login und der DataTransport-Scheduler werden nie angefasst. Das gepatchte APK wird gescannt und mit dem Original verglichen („vorher: 5 — nachher: 2 — abgeschaltet: …"), die Original-APKs werden vorher gesichert, und die App wird einmal gestartet, mit ca. 15 s Logprüfung (`FATAL EXCEPTION`, `ClassNotFoundException`, `NoSuchMethodError`, `VerifyError`, `SecurityException`).
-- Klon: Paket-Umbenennung korrigiert für `android:authorities`-Listen wie `a.x;a.y` (jeder Eintrag wird umbenannt), ein Klon wird mit klarer Meldung abgelehnt, wenn ein Split eigenen Code enthält, der Ziel-Paketname wird auf Kollisionen geprüft, Standard-Name „Original (Kopie)".
-- Grenzen (am Testgerät gemessen): Der Code abgeschalteter Bausteine bleibt in der APK, und das Abschalten ist eine Aussage über das Manifest, keine Zusage, dass nichts gesendet wird. Eine 39-MB-App brauchte über den Manifest-Weg rund 90 s, während der Code-Umbau des Klons CPU-gebunden und auf schwacher Hardware langsam ist (9-MB-App: mehrere Minuten in DEX_PATCH; 37 MB: in neun Minuten kein Fortschritt über 40 %). An einer echten App lautete das Ergebnis „vorher: 8 — nachher: 6", wobei AdMob, Werbe-ID, Braze, Adjust, Datentransport und Crashlytics ausdrücklich als weiter aktiv gemeldet wurden und dem Katalog unbekannte SDKs (Microsoft Clarity) gar nicht erfasst sind. SDKs ohne Manifest-Komponenten lassen sich so nicht abschalten; ein Klon hat eigene Daten, Firebase-`google_app_id` / AdMob-App-ID sind an Paketname und Signatur gebunden, und Apps mit Play Integrity können den Start verweigern.
+**Weiterhin aus den vorigen Releases**
+- Tracker-Übersicht liest Manifest **und** Code (DEX) und nennt je Eintrag die Herkunft.
+- Reiter Tarnung (in Entwicklung/Beta): Tracker beim Patchen abschalten, dazu Klonen mit eigenem Paketnamen; gepatchte Apps werden mit **unserem eigenen Schlüssel** signiert, nicht mit dem des Herstellers oder von Google.
+- Lizenz: **GNU General Public License v3.0**.
 
-Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
-Automatische Updates: dieses Repository in [Obtainium](https://github.com/ImranR98/Obtainium) hinzufügen (Quelle: GitHub Releases).
+Download: Dieses Repository ist **wieder privat** — die Releases sind nur für dich erreichbar; für Updates über [Obtainium](https://github.com/ImranR98/Obtainium) brauchst du einen GitHub-Token.
 
-Build: `:app:assembleDebug` · Paket `de.minipc.appopsshizuku` · versionCode 30 · Debug-Signatur (Zertifikat SHA-256 `652394f7…7226e`).
+Build: `:app:assembleDebug` · Paket `de.minipc.appopsshizuku` · versionCode 31 · Debug-Signatur (Zertifikat SHA-256 `652394f7…7226e`).
 Lizenz: **GNU General Public License v3.0** — siehe [LICENSE](https://github.com/pikatchu2k3/AppOpsShizuku/blob/master/LICENSE).

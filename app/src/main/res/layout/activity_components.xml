@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:fitsSystemWindows="true"
     android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -90,8 +90,8 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="1dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorError"
-                app:cardBackgroundColor="?attr/colorErrorContainer">
+                app:strokeColor="?attr/colorTertiary"
+                app:cardBackgroundColor="?attr/colorTertiaryContainer">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -111,7 +111,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/components_disable_app"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
-                            android:textColor="?attr/colorOnErrorContainer" />
+                            android:textColor="?attr/colorOnTertiaryContainer" />
 
                         <TextView
                             android:id="@+id/disableAppSubtitle"
@@ -119,7 +119,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:textAppearance="?attr/textAppearanceBodySmall"
-                            android:textColor="?attr/colorOnErrorContainer" />
+                            android:textColor="?attr/colorOnTertiaryContainer" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -138,8 +138,8 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="1dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorError"
-                app:cardBackgroundColor="?attr/colorErrorContainer">
+                app:strokeColor="?attr/colorTertiary"
+                app:cardBackgroundColor="?attr/colorTertiaryContainer">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -159,7 +159,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/components_freeze_app"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
-                            android:textColor="?attr/colorOnErrorContainer" />
+                            android:textColor="?attr/colorOnTertiaryContainer" />
 
                         <TextView
                             android:id="@+id/freezeAppSubtitle"
@@ -167,7 +167,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:textAppearance="?attr/textAppearanceBodySmall"
-                            android:textColor="?attr/colorOnErrorContainer" />
+                            android:textColor="?attr/colorOnTertiaryContainer" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -183,7 +183,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorWarning"
+                app:cardBackgroundColor="?attr/colorWarningContainer">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -194,7 +199,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/components_clear_data"
                         android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="?attr/colorOnErrorContainer" />
+                        android:textColor="?attr/colorOnWarningContainer" />
                     <TextView
                         android:id="@+id/clearDataSubtitle"
                         android:layout_width="match_parent"
@@ -202,7 +207,7 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/components_clear_data_warning"
                         android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:textColor="?attr/colorOnErrorContainer" />
+                        android:textColor="?attr/colorOnWarningContainer" />
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/clearDataButton"
                         android:layout_width="wrap_content"

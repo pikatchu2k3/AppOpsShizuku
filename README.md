@@ -87,6 +87,10 @@ export ANDROID_SDK_ROOT=$ANDROID_HOME
 
 The APK ends up in `app/build/outputs/apk/debug/`. Unit tests: `./gradlew :app:testDebugUnitTest`. `scripts/release.sh` builds, tests, checks the signature and publishes a GitHub release (maintainer use).
 
+### Colours
+
+The app uses a **complete Material 3 palette** derived systematically from a calm petrol/teal seed (light and dark), with red reserved for real errors. Menu of the main list → **System colors (Material You)**: on (default) = colours from the system wallpaper (Android 12+), off = the app's own petrol palette; the choice is remembered. On Android 11 and older the entry is greyed out. Measured contrast: worst text pair 6.49:1 (light) / 5.46:1 (dark) — target was 4.5:1.
+
 ### Signature
 
 Releases are signed with the debug certificate, SHA-256 `652394f7…7226e` (full value: `652394f75d9ed1ea168561e4056556fd82d3645a6c88020cd30b18c0a3d7226e`). An update can only be installed over an existing install if it has the **same signature**; an APK you build yourself with a different debug key will not update the released app (uninstall first, which deletes app data).
@@ -187,6 +191,10 @@ export ANDROID_SDK_ROOT=$ANDROID_HOME
 ```
 
 Das APK liegt danach unter `app/build/outputs/apk/debug/`. Unit-Tests: `./gradlew :app:testDebugUnitTest`. `scripts/release.sh` baut, testet, prüft die Signatur und veröffentlicht ein GitHub-Release (für den Maintainer).
+
+### Farben
+
+Die App nutzt eine **vollständige Material-3-Palette**, systematisch aus einer ruhigen Petrol-Startfarbe abgeleitet (hell und dunkel), Rot bleibt echten Fehlern vorbehalten. Menü der Hauptliste → **Systemfarben (Material You)**: an (Standard) = Farben aus dem Hintergrundbild des Systems (Android 12+), aus = die eigene Petrol-Palette; die Wahl bleibt gespeichert. Auf Android 11 und älter ist der Eintrag ausgegraut. Gemessener Kontrast: schlechtester Textwert 6,49:1 (hell) / 5,46:1 (dunkel) — Ziel war 4,5:1.
 
 ### Signatur
 

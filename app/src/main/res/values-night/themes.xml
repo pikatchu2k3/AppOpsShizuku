@@ -1,28 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 Dark (Baseline-Referenzfarben) — aktiv wenn System Dark Mode -->
+    <!-- Material 3 Dunkel - aktiv wenn System Dark Mode. Gleiche Struktur wie
+         values/themes.xml; die @color-Referenzen werden aus values-night/colors.xml
+         aufgeloest (kein Rueckfall auf die M3-Baseline mehr). -->
     <style name="Theme.AppOpsShizuku" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#D0BCFF</item>
-        <item name="colorOnPrimary">#381E72</item>
-        <item name="colorPrimaryContainer">#4F378B</item>
-        <item name="colorOnPrimaryContainer">#EADDFF</item>
-        <item name="colorSecondary">#CCC2DC</item>
-        <item name="colorOnSecondary">#332D41</item>
-        <item name="colorSecondaryContainer">#4A4458</item>
-        <item name="colorOnSecondaryContainer">#E8DEF8</item>
-        <item name="colorSurface">#141218</item>
-        <item name="colorOnSurface">#E6E0E9</item>
-        <item name="colorSurfaceVariant">#49454F</item>
-        <item name="colorOnSurfaceVariant">#CAC4D0</item>
-        <item name="colorSurfaceContainerLow">#1D1B20</item>
-        <item name="colorSurfaceContainer">#211F26</item>
-        <item name="colorSurfaceContainerHigh">#2B2930</item>
-        <item name="colorSurfaceContainerHighest">#36343B</item>
-        <item name="colorOutline">#938F99</item>
-        <item name="colorOutlineVariant">#49454F</item>
-        <item name="colorError">#F2B8B5</item>
-        <item name="colorOnError">#601410</item>
-        <item name="colorErrorContainer">#8C1D18</item>
-        <item name="colorOnErrorContainer">#F9DEDC</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryInverse">@color/inverse_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorSecondaryContainer">@color/secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/on_secondary_container</item>
+
+        <item name="colorTertiary">@color/tertiary</item>
+        <item name="colorOnTertiary">@color/on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/on_tertiary_container</item>
+
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorOnBackground">@color/on_background</item>
+
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+        <item name="colorSurfaceInverse">@color/inverse_surface</item>
+        <item name="colorOnSurfaceInverse">@color/inverse_on_surface</item>
+        <item name="colorSurfaceDim">@color/surface_dim</item>
+        <item name="colorSurfaceBright">@color/surface_bright</item>
+        <item name="colorSurfaceContainerLowest">@color/surface_container_lowest</item>
+        <item name="colorSurfaceContainerLow">@color/surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/surface_container_highest</item>
+
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/outline_variant</item>
+
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/on_error</item>
+        <item name="colorErrorContainer">@color/error_container</item>
+        <item name="colorOnErrorContainer">@color/on_error_container</item>
+
+        <item name="colorWarning">@color/warning</item>
+        <item name="colorOnWarning">@color/on_warning</item>
+        <item name="colorWarningContainer">@color/warning_container</item>
+        <item name="colorOnWarningContainer">@color/on_warning_container</item>
     </style>
 </resources>

@@ -3,13 +3,18 @@ package de.minipc.appopsshizuku
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import de.minipc.appopsshizuku.appops.DesignSettings
 
 /**
  * App-Detailseite mit drei Reitern: Berechtigungen / Verhalten / Tarnung.
@@ -35,8 +40,18 @@ class AppDetailActivity : AppCompatActivity() {
     private lateinit var packageName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        DesignSettings.applyDynamicColorsIfEnabled(this)
         setContentView(R.layout.activity_app_detail)
+
+        // Edge-to-Edge (siehe MainActivity): Systemleisten-Abstaende als Padding,
+        // damit Toolbar/Tabs nicht unter der Statusleiste verschwinden.
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
+            insets
+        }
 
         findViewById<MaterialToolbar>(R.id.toolbar).let { toolbar ->
             setSupportActionBar(toolbar)

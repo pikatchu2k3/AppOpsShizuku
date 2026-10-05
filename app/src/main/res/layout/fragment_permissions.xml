@@ -83,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:text="0"
                 android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                android:textColor="?attr/colorError" />
+                android:textColor="?attr/colorTertiary" />
 
             <TextView
                 android:layout_width="wrap_content"

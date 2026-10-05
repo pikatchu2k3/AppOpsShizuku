@@ -23,8 +23,8 @@
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeWidth="1dp"
-            app:strokeColor="?attr/colorError"
-            app:cardBackgroundColor="?attr/colorErrorContainer">
+            app:strokeColor="?attr/colorWarning"
+            app:cardBackgroundColor="?attr/colorWarningContainer">
 
             <TextView
                 android:layout_width="match_parent"
@@ -32,7 +32,7 @@
                 android:padding="16dp"
                 android:text="@string/stealth_beta_notice"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnErrorContainer" />
+                android:textColor="?attr/colorOnWarningContainer" />
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Stealth-Modus: Launcher-Icon entfernen (AXML), App bleibt startbar -->

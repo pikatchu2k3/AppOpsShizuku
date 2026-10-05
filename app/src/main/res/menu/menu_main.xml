@@ -9,4 +9,9 @@
         android:id="@+id/action_import_profiles"
         android:title="@string/menu_import_profiles"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_dynamic_color"
+        android:title="@string/menu_dynamic_color"
+        android:checkable="true"
+        app:showAsAction="never" />
 </menu>

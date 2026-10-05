@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Einzige Zusatzrolle neben dem M3-Standardsatz (siehe colors.xml): fuer
+         "Warnung" (riskant, aber keine Fehlermeldung) - z.B. App-Daten loeschen,
+         Beta-Hinweis. Ueberall dieselbe Rolle verwenden, nicht mehr als diese vier. -->
+    <attr name="colorWarning" format="color" />
+    <attr name="colorOnWarning" format="color" />
+    <attr name="colorWarningContainer" format="color" />
+    <attr name="colorOnWarningContainer" format="color" />
+</resources>

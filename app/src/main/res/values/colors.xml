@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Material-3-Palette, Licht. Systematisch aus einem Seed abgeleitet (nicht per
+  Hand geraten): Seed-Hex -> CIELAB -> Tonalpalette pro Rollen-Farbfamilie
+  (Ton = CIELAB-L*, wie im offiziellen M3-Farbsystem), Rollen-Zuordnung nach
+  der Google-Referenztabelle (androidx.core "DynamicScheme" / material-color-
+  utilities). Nachvollziehbar in app/src/test/.../PaletteContrastTest.kt.
+
+  Seed:        #006874 (gedecktes Petrol/Teal, bewusst kein Lila/Blau/Rot)
+  Seed-Hue:    214.0 Grad (CIELAB a*/b*)
+
+  Farbfamilien (Hue in Grad, Ziel-Chroma C* in CIELAB, wie M3 "TonalSpot"):
+    Primary:         Hue 214.0, Chroma 48
+    Secondary:       Hue 214.0, Chroma 16
+    Tertiary:        Hue 274.0 (Seed+60, M3-Standardrotation), Chroma 32
+    Neutral:         Hue 214.0, Chroma  4  (Surface/Background)
+    Neutral Variant: Hue 214.0, Chroma  8  (SurfaceVariant/Outline)
+    Error:           offizielle M3-Fehlpalette (fix, nicht vom Seed abgeleitet)
+    Warning (Zusatzrolle, siehe attrs.xml): Hue 75.0, Chroma 55 (Amber)
+
+  Rollen-Ton-Zuordnung hell (Google-Standard):
+    Farbe=40, OnFarbe=100, FarbeContainer=90, OnFarbeContainer=10
+    Surface=98, OnSurface=10, SurfaceVariant=90, OnSurfaceVariant=30
+    Outline=50, OutlineVariant=80, InverseSurface=20, InverseOnSurface=95, InversePrimary=80
+    SurfaceDim=87, SurfaceBright=98, ContainerLowest=100, ContainerLow=96,
+    Container=94, ContainerHigh=92, ContainerHighest=90
+-->
+<resources>
+
+    <!-- Primary (Petrol/Teal-Seed) -->
+    <color name="md_primary_40">#036874</color>
+    <color name="md_primary_80">#13DAF1</color>
+    <color name="md_primary_90">#99F0FF</color>
+    <color name="md_primary_10">#011F24</color>
+    <color name="md_primary_30">#054E58</color>
+    <color name="md_primary_20">#01363D</color>
+    <color name="md_primary_100">#FFFFFF</color>
+
+    <!-- Secondary -->
+    <color name="md_secondary_40">#38656C</color>
+    <color name="md_secondary_90">#BCEBF3</color>
+    <color name="md_secondary_10">#001F24</color>
+    <color name="md_secondary_100">#FFFFFF</color>
+
+    <!-- Tertiary (Hue +60) -->
+    <color name="md_tertiary_40">#386092</color>
+    <color name="md_tertiary_90">#D6E3FF</color>
+    <color name="md_tertiary_10">#001C37</color>
+    <color name="md_tertiary_100">#FFFFFF</color>
+
+    <!-- Neutral (Surface/Background) -->
+    <color name="md_neutral_98">#F0FBFD</color>
+    <color name="md_neutral_10">#151D1E</color>
+    <color name="md_neutral_87">#D1DCDE</color>
+    <color name="md_neutral_100">#FFFFFF</color>
+    <color name="md_neutral_96">#EAF6F8</color>
+    <color name="md_neutral_94">#E5F0F2</color>
+    <color name="md_neutral_92">#DFEAEC</color>
+    <color name="md_neutral_90">#D9E4E6</color>
+    <color name="md_neutral_20">#293233</color>
+    <color name="md_neutral_95">#E8F3F5</color>
+
+    <!-- Neutral Variant (SurfaceVariant/Outline) -->
+    <color name="md_neutral_variant_90">#D0E7EB</color>
+    <color name="md_neutral_variant_30">#374A4D</color>
+    <color name="md_neutral_variant_50">#667B7E</color>
+    <color name="md_neutral_variant_80">#B4CACE</color>
+
+    <!-- Error (offizielle M3-Baseline, unabhaengig vom Seed) -->
+    <color name="md_error_40">#B3261E</color>
+    <color name="md_error_100">#FFFFFF</color>
+    <color name="md_error_90">#F9DEDC</color>
+    <color name="md_error_10">#410E0B</color>
+
+    <!-- Warning (Zusatzrolle, Amber-Hue 75) -->
+    <color name="md_warning_40">#825502</color>
+    <color name="md_warning_100">#FFFFFF</color>
+    <color name="md_warning_90">#FFDDB7</color>
+    <color name="md_warning_10">#271902</color>
+
+    <!-- ===== Rollen (hell) ===== -->
+    <color name="primary">@color/md_primary_40</color>
+    <color name="on_primary">@color/md_primary_100</color>
+    <color name="primary_container">@color/md_primary_90</color>
+    <color name="on_primary_container">@color/md_primary_10</color>
+
+    <color name="secondary">@color/md_secondary_40</color>
+    <color name="on_secondary">@color/md_secondary_100</color>
+    <color name="secondary_container">@color/md_secondary_90</color>
+    <color name="on_secondary_container">@color/md_secondary_10</color>
+
+    <color name="tertiary">@color/md_tertiary_40</color>
+    <color name="on_tertiary">@color/md_tertiary_100</color>
+    <color name="tertiary_container">@color/md_tertiary_90</color>
+    <color name="on_tertiary_container">@color/md_tertiary_10</color>
+
+    <color name="error">@color/md_error_40</color>
+    <color name="on_error">@color/md_error_100</color>
+    <color name="error_container">@color/md_error_90</color>
+    <color name="on_error_container">@color/md_error_10</color>
+
+    <color name="background">@color/md_neutral_98</color>
+    <color name="on_background">@color/md_neutral_10</color>
+    <color name="surface">@color/md_neutral_98</color>
+    <color name="on_surface">@color/md_neutral_10</color>
+    <color name="surface_variant">@color/md_neutral_variant_90</color>
+    <color name="on_surface_variant">@color/md_neutral_variant_30</color>
+
+    <color name="surface_dim">@color/md_neutral_87</color>
+    <color name="surface_bright">@color/md_neutral_98</color>
+    <color name="surface_container_lowest">@color/md_neutral_100</color>
+    <color name="surface_container_low">@color/md_neutral_96</color>
+    <color name="surface_container">@color/md_neutral_94</color>
+    <color name="surface_container_high">@color/md_neutral_92</color>
+    <color name="surface_container_highest">@color/md_neutral_90</color>
+
+    <color name="outline">@color/md_neutral_variant_50</color>
+    <color name="outline_variant">@color/md_neutral_variant_80</color>
+
+    <color name="inverse_surface">@color/md_neutral_20</color>
+    <color name="inverse_on_surface">@color/md_neutral_95</color>
+    <color name="inverse_primary">@color/md_primary_80</color>
+
+    <color name="scrim">#000000</color>
+    <color name="surface_tint">@color/md_primary_40</color>
+
+    <color name="warning">@color/md_warning_40</color>
+    <color name="on_warning">@color/md_warning_100</color>
+    <color name="warning_container">@color/md_warning_90</color>
+    <color name="on_warning_container">@color/md_warning_10</color>
+</resources>

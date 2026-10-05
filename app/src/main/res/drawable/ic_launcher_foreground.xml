@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptives Icon, Vordergrund-Layer: Schild mit Schlüsselloch (Motiv
+     beibehalten), in der neuen Petrol/Teal-Palette (md_primary_30/40/80,
+     siehe values/colors.xml) statt im alten festverdrahteten Blau. Auf
+     66dp-Safe-Zone skaliert (Faktor 0.86 um den Mittelpunkt 54,54), damit
+     kein Launcher-Maskenzuschnitt (Kreis/Squircle/Rund) etwas abschneidet. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Schild-Rand (dunklerer Rahmen) -->
+    <path
+        android:fillColor="#054E58"
+        android:pathData="M54,24.76L79.8,35.08V54C79.8,69.48 67.76,81.52 54,86.68C40.24,81.52 28.2,69.48 28.2,54V35.08Z" />
+
+    <!-- Schild-Koerper (Hauptfarbe = Seed) -->
+    <path
+        android:fillColor="#036874"
+        android:pathData="M54,28.2L76.36,37.66V54C76.36,67.76 66.04,78.08 54,83.24C41.96,78.08 31.64,67.76 31.64,54V37.66Z" />
+
+    <!-- Schild-Hochglanz (helle Tonalstufe) -->
+    <path
+        android:fillColor="#13DAF1"
+        android:pathData="M54,31.64L72.92,40.24V54C72.92,66.04 64.32,74.64 54,79.8C43.68,74.64 35.08,66.04 35.08,54V40.24Z" />
+
+    <!-- Schluesselloch-Kreis -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,45.4m-6.88,0a6.88,6.88 0,1 1,13.76 0a6.88,6.88 0,1 1,-13.76 0" />
+
+    <!-- Schluesselloch-Schlitz -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50.56,50.56L57.44,50.56L55.72,62.6L52.28,62.6Z" />
+</vector>

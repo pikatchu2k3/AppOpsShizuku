@@ -11,7 +11,11 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -19,6 +23,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.minipc.appopsshizuku.appops.AppOpsController
 import de.minipc.appopsshizuku.appops.AppOp
+import de.minipc.appopsshizuku.appops.DesignSettings
 import de.minipc.appopsshizuku.appops.PrivacyOps
 import de.minipc.appopsshizuku.appops.PrivacyProfileStore
 import de.minipc.appopsshizuku.shizuku.NoopBackend
@@ -72,8 +77,18 @@ class AppOpsActivity : AppCompatActivity() {
     private val ops: List<AppOp> = PrivacyOps.PRIVACY_OPS
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        DesignSettings.applyDynamicColorsIfEnabled(this)
         setContentView(R.layout.activity_appops)
+
+        // Edge-to-Edge (siehe MainActivity): Systemleisten-Abstaende als Padding,
+        // damit Toolbar/Liste nicht unter den Systemleisten verschwinden.
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
+            insets
+        }
 
         findViewById<MaterialToolbar>(R.id.toolbar).let { toolbar ->
             setSupportActionBar(toolbar)

@@ -1,16 +1,11 @@
 package de.minipc.appopsshizuku
 
 import android.app.Application
-import com.google.android.material.color.DynamicColors
 
 /**
- * Application-Einstieg: aktiviert Material-You-Systemfarben auf Android 12+.
- * Auf aelteren Geraeten passiert nichts — die Baseline-M3-Palette aus
- * themes.xml bleibt als Fallback aktiv.
+ * Application-Einstieg. Die Material-You-Systemfarben werden NICHT mehr hier per
+ * DynamicColors.applyToActivitiesIfAvailable() erzwungen: dessen Lifecycle-Callback
+ * wuerde die Wahl des Nutzers ueberschreiben. Stattdessen ruft jede Activity
+ * DesignSettings.applyDynamicColorsIfEnabled() auf (Einstellung "Systemfarben").
  */
-class AppOpsApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        DynamicColors.applyToActivitiesIfAvailable(this)
-    }
-}
+class AppOpsApp : Application()
