@@ -105,6 +105,22 @@ Because the repository is public, the source that belongs to every released pack
 
 ---
 
+### Languages / Sprachen
+
+The interface ships in English (base) plus 8 translations — 314 strings each, complete (every string translated, no gaps).
+
+| Language | Locale | Coverage |
+|---|---|---|
+| German/Deutsch | `values-de` | 314/314 (100%) |
+| Spanish/Español | `values-es` | 314/314 (100%) |
+| French/Français | `values-fr` | 314/314 (100%) |
+| Hindi/हिन्दी | `values-hi` | 314/314 (100%) |
+| Japanese/日本語 | `values-ja` | 314/314 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 314/314 (100%) |
+| Russian/Русский | `values-ru` | 314/314 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 314/314 (100%) |
+
+Alle Übersetzungen sind maschinell geprüft (Platzhalter, Pluralformen, XML-Struktur) — `R.array.*`-Ressourcen bleiben unberührt. English is the base, so any device with an unsupported language falls back to English instead of German.
 ## Deutsch
 
 [English](#english) · **Deutsch**
