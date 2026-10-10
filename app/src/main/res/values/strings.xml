@@ -238,9 +238,7 @@
     <string name="status_shizuku_connected">Shizuku connected</string>
     <string name="status_shizuku_disconnected">Shizuku not connected</string>
     <string name="stealth_apply">Apply</string>
-    <string name="stealth_beta_notice">In development (beta). Patching and disabling can damage the app. It is important to back up the app data before patching.
-
-The patched app is signed with our own key — not with the manufacturer\'s or Google\'s key. As a result: no more Play updates, Play Protect may warn, and returning to the original app is only possible by reinstalling.</string>
+    <string name="stealth_beta_notice">In development (beta). Patching and disabling can damage the app. It is important to back up the app data before patching.\n\nThe patched app is signed with our own key — not with the manufacturer\'s or Google\'s key. As a result: no more Play updates, Play Protect may warn, and returning to the original app is only possible by reinstalling.</string>
     <string name="stealth_clone_description">Installs the patched app as a parallel copy with its own package name — the original remains untouched and usable as normal. The clone has its own data and permissions.</string>
     <string name="stealth_clone_label">%1$s (copy)</string>
     <string name="stealth_clone_label_hint">Clone name (empty = Original (copy))</string>
