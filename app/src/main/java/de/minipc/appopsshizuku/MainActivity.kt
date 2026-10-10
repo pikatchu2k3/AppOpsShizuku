@@ -387,7 +387,7 @@ class MainActivity : AppCompatActivity() {
                     .setPackage("moe.shizuku.privileged.api")
             )
         } catch (e: Exception) {
-            Toast.makeText(this, "Shizuku-App nicht gefunden (shizuku.rikka.app)", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.error_shizuku_app_missing), Toast.LENGTH_LONG).show()
         }
     }
 
