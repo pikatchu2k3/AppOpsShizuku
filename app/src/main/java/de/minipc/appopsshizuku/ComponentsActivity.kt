@@ -48,6 +48,7 @@ import de.minipc.appopsshizuku.stealth.StealthStealer
 import de.minipc.appopsshizuku.stealth.VaultIntegration
 import de.minipc.appopsshizuku.ui.ComponentListItem
 import de.minipc.appopsshizuku.ui.ComponentsAdapter
+import de.minipc.appopsshizuku.ui.GuardedSwitch
 import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.Executors
@@ -73,6 +74,8 @@ class ComponentsActivity : AppCompatActivity() {
     private lateinit var backend: ShellBackend
     private lateinit var packageName: String
     private lateinit var adapter: ComponentsAdapter
+    private lateinit var disableSw: GuardedSwitch
+    private lateinit var freezeSw: GuardedSwitch
 
     private val handler = Handler(Looper.getMainLooper())
     private val executor = Executors.newSingleThreadExecutor()
@@ -225,13 +228,13 @@ class ComponentsActivity : AppCompatActivity() {
     }.getOrElse { "unbekannt" }
 
     private fun setupDisableAppSwitch() {
-        val sw = findViewById<SwitchMaterial>(R.id.appDisableSwitch)
+        val sw = GuardedSwitch(findViewById(R.id.appDisableSwitch)).also { disableSw = it }
         val appInfo = runCatching { packageManager.getApplicationInfo(packageName, 0) }.getOrNull()
         val isSystem = appInfo != null && (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
         val isSelf = packageName == applicationContext.packageName
         val subtitle = findViewById<TextView>(R.id.disableAppSubtitle)
 
-        sw.isEnabled = !isSystem && !isSelf
+        sw.view.isEnabled = !isSystem && !isSelf
         subtitle.text = when {
             isSelf -> getString(R.string.components_own_app)
             isSystem -> getString(R.string.components_system_app)
@@ -241,28 +244,18 @@ class ComponentsActivity : AppCompatActivity() {
         // Ist-Zustand: App-Level enabled/disabled via PackageManager (kein Shell-Call)
         // Listener erst NACH dem initialen isChecked setzen (Muster ComponentsAdapter)
         val appEnabled = packageManager.getApplicationEnabledSetting(packageName)
-        sw.isChecked =
+        sw.setQuietly(
             appEnabled == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
                 appEnabled == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
+        )
 
-        bindAppDisableSwitchListener()
-    }
-
-    /** Switch-Listener anhaengen (nach programmatischen isChecked-Aenderungen neu binden). */
-    private fun bindAppDisableSwitchListener() {
-        val sw = findViewById<SwitchMaterial>(R.id.appDisableSwitch)
-        sw.setOnCheckedChangeListener { _, checked ->
+        sw.onUserToggle { checked ->
             if (checked) {
                 MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.components_disable_app)
                     .setMessage(R.string.components_disable_warning)
-                    .setNegativeButton(R.string.btn_cancel) { _, _ ->
-                        // Programmatisches Zuruecksetzen OHNE Listener-Feuer:
-                        // sonst wuerde checked=false ein pm enable ausloesen
-                        sw.setOnCheckedChangeListener(null)
-                        sw.isChecked = false
-                        bindAppDisableSwitchListener()
-                    }
+                    .setNegativeButton(R.string.btn_cancel) { _, _ -> sw.setQuietly(false) }
+                    .setOnCancelListener { sw.setQuietly(false) }
                     .setPositiveButton(R.string.btn_disable) { _, _ ->
                         toggleApp(false)
                     }
@@ -280,11 +273,11 @@ class ComponentsActivity : AppCompatActivity() {
      * hat keinen Suspended-Filter (-s listet System-Apps).
      */
     private fun setupFreezeAppSwitch() {
-        val sw = findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
+        val sw = GuardedSwitch(findViewById(R.id.appFreezeSwitch)).also { freezeSw = it }
         val subtitle = findViewById<TextView>(R.id.freezeAppSubtitle)
         val isSelf = packageName == applicationContext.packageName
 
-        sw.isEnabled = !isSelf
+        sw.view.isEnabled = !isSelf
         subtitle.text = if (isSelf) {
             getString(R.string.components_own_app)
         } else {
@@ -293,16 +286,15 @@ class ComponentsActivity : AppCompatActivity() {
 
         val suspended = runCatching { packageManager.isPackageSuspended(packageName) }
             .getOrDefault(false)
-        sw.isChecked = suspended
+        sw.setQuietly(suspended)
 
-        sw.setOnCheckedChangeListener { _, checked ->
+        sw.onUserToggle { checked ->
             if (checked) {
                 MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.components_freeze_app)
                     .setMessage(R.string.components_freeze_warning)
-                    .setNegativeButton(R.string.btn_cancel) { _, _ ->
-                        sw.isChecked = false
-                    }
+                    .setNegativeButton(R.string.btn_cancel) { _, _ -> sw.setQuietly(false) }
+                    .setOnCancelListener { sw.setQuietly(false) }
                     .setPositiveButton(R.string.btn_freeze) { _, _ ->
                         toggleFreeze(true)
                     }
@@ -363,13 +355,12 @@ class ComponentsActivity : AppCompatActivity() {
     }
 
     private fun toggleFreeze(freeze: Boolean) {
-        val sw = findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
         executor.execute {
             val res = if (freeze) backend.suspendPackage(packageName)
             else backend.unsuspendPackage(packageName)
             handler.post {
                 if (isFailed(res)) {
-                    sw.isChecked = !freeze
+                    freezeSw.setQuietly(!freeze)
                     Toast.makeText(this, R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(
@@ -387,13 +378,12 @@ class ComponentsActivity : AppCompatActivity() {
 
     /** Switch nach dem Freeze-Wechsel neu synchronisieren (Shell-Ergebnis ist massgeblich). */
     private fun refreshSuspendState() {
-        val sw = findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
-        sw.isChecked = runCatching { packageManager.isPackageSuspended(packageName) }
-            .getOrDefault(false)
+        freezeSw.setQuietly(
+            runCatching { packageManager.isPackageSuspended(packageName) }.getOrDefault(false)
+        )
     }
 
     private fun toggleApp(enable: Boolean) {
-        val sw = findViewById<SwitchMaterial>(R.id.appDisableSwitch)
         executor.execute {
             val res = if (enable) {
                 backend.exec("pm", "enable", "--user", "0", packageName)
@@ -402,9 +392,7 @@ class ComponentsActivity : AppCompatActivity() {
             }
             handler.post {
                 if (isFailed(res)) {
-                    sw.setOnCheckedChangeListener(null)
-                    sw.isChecked = enable
-                    bindAppDisableSwitchListener()
+                    disableSw.setQuietly(enable)
                     Toast.makeText(this, R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(

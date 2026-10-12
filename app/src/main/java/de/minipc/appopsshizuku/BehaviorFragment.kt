@@ -50,6 +50,7 @@ import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShellResult
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import de.minipc.appopsshizuku.shizuku.isFailure
+import de.minipc.appopsshizuku.ui.GuardedSwitch
 import de.minipc.appopsshizuku.ui.ComponentListItem
 import de.minipc.appopsshizuku.ui.ComponentsAdapter
 import java.util.concurrent.ExecutorService
@@ -100,6 +101,9 @@ class BehaviorFragment : Fragment() {
 
     private lateinit var packageName: String
     private lateinit var root: View
+    private lateinit var disableSw: GuardedSwitch
+    private lateinit var freezeSw: GuardedSwitch
+    private lateinit var batterySw: GuardedSwitch
     private lateinit var executor: ExecutorService
     private val handler = Handler(Looper.getMainLooper())
 
@@ -194,7 +198,7 @@ class BehaviorFragment : Fragment() {
     // ---------------------------------------------------------------- Karte 1: deaktivieren
 
     private fun setupDisableSwitch(view: View) {
-        val sw = view.findViewById<SwitchMaterial>(R.id.appDisableSwitch)
+        val sw = GuardedSwitch(view.findViewById(R.id.appDisableSwitch)).also { disableSw = it }
         val subtitle = view.findViewById<TextView>(R.id.disableAppSubtitle)
         val isSelf = packageName == requireContext().packageName
         val isSystem = runCatching {
@@ -202,19 +206,20 @@ class BehaviorFragment : Fragment() {
                 ApplicationInfo.FLAG_SYSTEM) != 0
         }.getOrDefault(false)
 
-        sw.isEnabled = !isSelf
+        sw.view.isEnabled = !isSelf
         subtitle.text = when {
             isSelf -> getString(R.string.components_disable_own)
             isSystem -> getString(R.string.components_disable_system)
             else -> getString(R.string.components_disable_warning)
         }
 
-        sw.setOnCheckedChangeListener { _, checked ->
+        sw.onUserToggle { checked ->
             if (checked) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.components_disable_app)
                     .setMessage(R.string.components_disable_warning)
-                    .setNegativeButton(R.string.btn_cancel) { _, _ -> sw.isChecked = false }
+                    .setNegativeButton(R.string.btn_cancel) { _, _ -> sw.setQuietly(false) }
+                    .setOnCancelListener { sw.setQuietly(false) }
                     .setPositiveButton(R.string.components_disable_action) { _, _ -> toggleEnabled(false) }
                     .show()
             } else {
@@ -224,16 +229,14 @@ class BehaviorFragment : Fragment() {
     }
 
     private fun refreshEnabledState() {
-        val sw = root.findViewById<SwitchMaterial>(R.id.appDisableSwitch)
         val state = runCatching {
             requireContext().packageManager.getApplicationEnabledSetting(packageName)
         }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
-        sw.isChecked = state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
-            state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
+        disableSw.setQuietly(state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
+            state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER)
     }
 
     private fun toggleEnabled(enable: Boolean) {
-        val sw = root.findViewById<SwitchMaterial>(R.id.appDisableSwitch)
         executor.execute {
             val res = if (enable) backend.exec("pm", "enable", "--user", "0", packageName)
             else backend.exec("pm", "disable-user", "--user", "0", packageName)
@@ -255,23 +258,24 @@ class BehaviorFragment : Fragment() {
     // ---------------------------------------------------------------- Karte 2: einfrieren
 
     private fun setupFreezeSwitch(view: View) {
-        val sw = view.findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
+        val sw = GuardedSwitch(view.findViewById(R.id.appFreezeSwitch)).also { freezeSw = it }
         val subtitle = view.findViewById<TextView>(R.id.freezeAppSubtitle)
         val isSelf = packageName == requireContext().packageName
 
-        sw.isEnabled = !isSelf
+        sw.view.isEnabled = !isSelf
         subtitle.text = if (isSelf) {
             getString(R.string.components_own_app)
         } else {
             getString(R.string.components_freeze_warning)
         }
 
-        sw.setOnCheckedChangeListener { _, checked ->
+        sw.onUserToggle { checked ->
             if (checked) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.components_freeze_app)
                     .setMessage(R.string.components_freeze_warning)
-                    .setNegativeButton(R.string.btn_cancel) { _, _ -> sw.isChecked = false }
+                    .setNegativeButton(R.string.btn_cancel) { _, _ -> sw.setQuietly(false) }
+                    .setOnCancelListener { sw.setQuietly(false) }
                     .setPositiveButton(R.string.btn_freeze) { _, _ -> toggleFreeze(true) }
                     .show()
             } else {
@@ -281,12 +285,11 @@ class BehaviorFragment : Fragment() {
     }
 
     private fun toggleFreeze(freeze: Boolean) {
-        val sw = root.findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
         executor.execute {
             val res = if (freeze) backend.suspendPackage(packageName) else backend.unsuspendPackage(packageName)
             handler.post {
                 if (res.isFailure()) {
-                    sw.isChecked = !freeze
+                    freezeSw.setQuietly(!freeze)
                     Toast.makeText(requireContext(), R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(
@@ -301,9 +304,10 @@ class BehaviorFragment : Fragment() {
     }
 
     private fun refreshSuspendState() {
-        val sw = root.findViewById<SwitchMaterial>(R.id.appFreezeSwitch)
-        sw.isChecked = runCatching { requireContext().packageManager.isPackageSuspended(packageName) }
-            .getOrDefault(false)
+        freezeSw.setQuietly(
+            runCatching { requireContext().packageManager.isPackageSuspended(packageName) }
+                .getOrDefault(false)
+        )
     }
 
     // ------------------------------------------------------- Karte 3: Daten zuruecksetzen
@@ -430,14 +434,14 @@ class BehaviorFragment : Fragment() {
     // ------------------------------------------- Karte 5: Akku-Ausnahme (QW-6)
 
     private fun setupBattery(view: View) {
-        val sw = view.findViewById<SwitchMaterial>(R.id.batterySwitch)
-        sw.setOnCheckedChangeListener { _, checked ->
+        val sw = GuardedSwitch(view.findViewById(R.id.batterySwitch)).also { batterySw = it }
+        sw.onUserToggle { checked ->
             executor.execute {
                 val res = backend.exec("cmd", "deviceidle", "whitelist", (if (checked) "+" else "-") + packageName)
                 val after = isWhitelisted()
                 handler.post {
                     if (res.isFailure() || after != checked) {
-                        sw.isChecked = after
+                        sw.setQuietly(after)
                         Toast.makeText(requireContext(), R.string.behavior_battery_failed, Toast.LENGTH_LONG).show()
                     } else {
                         Toast.makeText(
@@ -462,14 +466,13 @@ class BehaviorFragment : Fragment() {
     }
 
     private fun loadBatteryState() {
-        val sw = root.findViewById<SwitchMaterial>(R.id.batterySwitch)
         val label = root.findViewById<TextView>(R.id.batteryState)
         executor.execute {
             val res = backend.exec("dumpsys", "deviceidle", "whitelist")
             val listed = whitelistContains(res.stdout, packageName)
             handler.post {
                 if (!isAdded) return@post
-                sw.isChecked = listed
+                batterySw.setQuietly(listed)
                 label.text = getString(
                     if (listed) R.string.behavior_battery_current_on else R.string.behavior_battery_current_off
                 )
