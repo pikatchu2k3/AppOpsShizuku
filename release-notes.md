@@ -1,61 +1,71 @@
 ### English
 
-**App Ops Shizuku 1.17.0** — new colour design following Google's Material 3 guidelines, plus a switch for system colours.
+**App Ops Shizuku 1.19.0** — remove permissions while patching (beta): offline clone, no ad ID, no app list, no location, no phone status, no accounts list.
 
-**New colour system**
-- The app now uses a **complete** Material 3 palette that is **derived systematically** from a calm petrol/teal seed (`#006874`): seed → CIELAB → tonal palettes per colour family → roles by the official table (light *and* dark). No more half-defined baseline colours.
-- **Red is reserved for real errors now.** Until this release `colorError` was used for states like "blocked" or "denied" in six layouts — that was the harsh look. Blocked = calm tertiary/secondary container, active = primary container, unknown = neutral, and **one** amber warning role for risky (but not failed) actions.
-- **Adaptive launcher icon** with a monochrome layer for themed icons (Android 13+) — the shield-and-keyhole motif stays, now in the palette instead of hard-coded blue.
-- **Edge-to-edge** on all screens with matching system bars, and monochrome icons that follow the theme (in dark mode they used to be hard-coded black).
-- Measured contrast (WCAG, computed in a test): worst text pair **6.49:1** light and **5.46:1** dark — target was 4.5:1. A pixel check of the screens shows **0.00 % harsh red**.
+**New section "Remove permissions (beta)"** in the Stealth tab, right below "Switch off trackers". Six checkboxes, each naming the permissions it removes:
 
-**New switch: system colours (Material You)**
-- Menu of the main list → *System colors (Material You)*: on = the app takes its colours from the system wallpaper (Android 12+), off = the app's own petrol palette. The choice is remembered and takes effect immediately.
-- On Android 11 and older the entry is greyed out and labelled accordingly — the petrol palette always applies there.
-- Measured on a test device: switch on → resolved colours come from the system (`primary #006973`), switch off → from the app palette (`primary #036874`). On a wallpaper that is not teal the difference is clearly visible.
+| Checkbox | Permissions removed |
+|---|---|
+| No internet (offline clone) | `INTERNET` |
+| No ad ID | `com.google.android.gms.permission.AD_ID`, `ACCESS_ADSERVICES_*` (Privacy Sandbox) |
+| Installed apps not visible | `QUERY_ALL_PACKAGES` |
+| No location | `ACCESS_FINE/COARSE/BACKGROUND_LOCATION` |
+| No phone status / no phone number | `READ_PHONE_STATE`, `READ_PHONE_NUMBERS` |
+| No accounts list | `GET_ACCOUNTS` |
+
+The `<uses-permission>` entries (including `uses-permission-sdk-23`) are cut out of the patched manifest. Unlike `pm revoke`, this is a property of the installed APK: it survives restarts, it needs no running Shizuku, and the app cannot even ask for the permission again. Without `INTERNET` the app's UID cannot open network sockets at all.
+
+**Checked before installing:** the manifest of the **signed** APK is compared with the original. If a selected permission is still in there, nothing gets installed. Afterwards the same start check as with switching trackers off runs: the app is started and watched for about 15 seconds.
 
 **Honest limits**
-- Material You exists from Android 12 on. Below that the app palette is the only option.
-- The switch lives in the menu of the main list; screens that are already open keep the old colour choice until they are reopened.
-- Colours are not a proof: this release changes how the app looks, not what it can do.
+- Google only promises the all-zeros ad ID from targetSdk 33, and Android only filters the app list from targetSdk 30. If the app targets lower, the result says so instead of pretending.
+- One line shows which of these permissions the app declares at all. If it declares none of the selected ones and no other option is picked, the run stops with a message instead of re-signing the APK.
+- **Without a clone** the patched app replaces the original — to get the permissions back you have to restore the original.
+- Removing a permission is not removing code: trackers that need no permission keep running. Apps that need the internet stop working without it — that is the purpose of the offline clone, not a bug.
+- **Not tested on a device.** Open: whether an offline clone of a small app starts and really gets no network, and whether Spooftest shows an all-zeros ad ID with "No Ad ID" (Spooftest has `AD_ID` and `READ_PHONE_STATE` in its real manifest — that path is covered by the unit tests, not by a phone).
 
-**Still from the previous releases**
+**Tests:** 249 unit tests, 0 failures, 1 skipped. The new `PermissionStripTest` adds 11 — checked with aapt2 against synthetic manifests, against the real manifests of FOSS Browser and Spooftest, and in combination with the clone rename.
+
+**Also in the box (since 1.18.x)**
+- Backup and restore of profiles plus behaviour settings in one file (format v2).
+- Switch state is only written through `SwitchGuard`, so opening the detail page no longer fires confirmation dialogs on its own.
 - Tracker overview reads manifest **and** code (DEX) and names the source per entry.
-- Stealth tab (in development / beta): tracker switch-off while patching, plus cloning with its own package name; patched apps are signed with **our own key**, not with the manufacturer's or Google's.
-- License: **GNU General Public License v3.0**.
 
-Download: this repository is **private again** — releases are available to you only; for updates through [Obtainium](https://github.com/ImranR98/Obtainium) you need a GitHub token.
-
-Build: `:app:assembleDebug` · package `de.minipc.appopsshizuku` · versionCode 31 · debug signature (certificate SHA-256 `652394f7…7226e`).
-License: **GNU General Public License v3.0** — see [LICENSE](https://github.com/pikatchu2k3/AppOpsShizuku/blob/master/LICENSE).
+Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — this repository is **private**; for updates through [Obtainium](https://github.com/ImranR98/Obtainium) you need a GitHub token with read access.
 
 ### Deutsch
 
-**App Ops Shizuku 1.17.0** — neues Farbsystem nach Googles Material-3-Richtlinien, dazu ein Schalter für Systemfarben.
+**App Ops Shizuku 1.19.0** — Berechtigungen beim Patchen entfernen (Beta): Offline-Klon, keine Werbe-ID, keine App-Liste, kein Standort, kein Telefonstatus, keine Kontenliste.
 
-**Neues Farbsystem**
-- Die App nutzt jetzt eine **vollständige** Material-3-Palette, **systematisch** abgeleitet aus einer ruhigen Petrol-Startfarbe (`#006874`): Seed → CIELAB → Tonalpaletten je Farbfamilie → Rollen nach der offiziellen Tabelle (hell **und** dunkel). Keine halb definierten Vorgabefarben mehr.
-- **Rot ist jetzt echten Fehlern vorbehalten.** Bisher wurde `colorError` in sechs Layouts für Zustände wie „gesperrt" oder „verweigert" benutzt — das war der harte Eindruck. Gesperrt = ruhige Tertiär-/Sekundärfläche, aktiv = Primärfläche, unbekannt = neutral, und für riskante (nicht fehlgeschlagene) Aktionen gibt es **eine** amber Warnfarbe.
-- **Adaptives Launcher-Icon** mit Monochrom-Layer für Themed Icons (Android 13+) — das Schild-mit-Schlüsselloch-Motiv bleibt, jetzt in der Palette statt in fest verdrahtetem Blau.
-- **Edge-to-edge** auf allen Ansichten mit passenden Systemleisten; die Icons folgen dem Theme (im Dunkelmodus waren sie vorher fest schwarz).
-- Kontrast gemessen (WCAG, im Test berechnet): schlechtester Textwert **6,49:1** hell und **5,46:1** dunkel — Ziel war 4,5:1. Die Pixelprüfung der Bildschirme ergibt **0,00 % grelles Rot**.
+**Neuer Abschnitt „Berechtigungen entfernen (Beta)"** im Reiter Tarnung, direkt unter „Tracker abschalten". Sechs Kästchen, jeweils mit den Berechtigungen, die sie entfernen:
 
-**Neuer Schalter: Systemfarben (Material You)**
-- Menü der Hauptliste → *Systemfarben (Material You)*: an = die App übernimmt die Farben aus dem Hintergrundbild des Systems (Android 12+), aus = die eigene Petrol-Palette. Die Wahl bleibt gespeichert und wirkt sofort.
-- Auf Android 11 und älter ist der Eintrag ausgegraut und entsprechend beschriftet — dort gilt immer die Petrol-Palette.
-- Am Testgerät gemessen: Schalter an → aufgelöste Farben kommen vom System (`primary #006973`), Schalter aus → aus der App-Palette (`primary #036874`). Bei einem Hintergrundbild, das nicht petrolfarben ist, sieht man den Unterschied deutlich.
+| Kästchen | Entfernte Berechtigungen |
+|---|---|
+| Kein Internet (Offline-Klon) | `INTERNET` |
+| Keine Werbe-ID | `com.google.android.gms.permission.AD_ID`, `ACCESS_ADSERVICES_*` (Privacy Sandbox) |
+| Installierte Apps nicht sichtbar | `QUERY_ALL_PACKAGES` |
+| Kein Standort | `ACCESS_FINE/COARSE/BACKGROUND_LOCATION` |
+| Kein Telefonstatus / keine Rufnummer | `READ_PHONE_STATE`, `READ_PHONE_NUMBERS` |
+| Keine Kontenliste | `GET_ACCOUNTS` |
+
+Die `<uses-permission>`-Einträge (auch `uses-permission-sdk-23`) werden aus dem gepatchten Manifest herausgeschnitten. Anders als `pm revoke` ist das eine Eigenschaft der installierten APK: Es übersteht Neustarts, braucht kein laufendes Shizuku, und die App kann die Berechtigung nicht einmal mehr anfragen. Ohne `INTERNET` kann die App-UID überhaupt keine Netz-Sockets öffnen.
+
+**Geprüft, bevor installiert wird:** Das Manifest der **signierten** APK wird mit dem Original verglichen. Steht eine gewählte Berechtigung noch drin, wird nichts installiert. Danach läuft dieselbe Startprobe wie beim Tracker-Abschalten: App starten, rund 15 Sekunden auf Abstürze achten.
 
 **Ehrliche Grenzen**
-- Material You gibt es erst ab Android 12. Darunter bleibt nur die App-Palette.
-- Der Schalter liegt im Menü der Hauptliste; bereits geöffnete Ansichten behalten die alte Farbwahl, bis sie neu geöffnet werden.
-- Farben sind kein Nachweis: Dieses Release ändert das Aussehen, nicht die Fähigkeiten der App.
+- Die Nullen-Werbe-ID sagt Google erst ab targetSdk 33 zu, den Filter der App-Liste gibt es erst ab targetSdk 30. Liegt die App darunter, steht das im Ergebnis, statt es zu verschweigen.
+- Eine Zeile zeigt vorab, welche dieser Berechtigungen die App überhaupt deklariert. Deklariert sie keine der gewählten und ist keine weitere Option gewählt, bricht der Lauf mit einer Meldung ab, statt neu zu signieren.
+- **Ohne Klon** ersetzt die gepatchte App das Original — um die Berechtigungen zurückzubekommen, muss das Original wiederhergestellt werden.
+- Eine Berechtigung zu entfernen ist nicht dasselbe wie Code zu entfernen: Tracker, die keine Berechtigung brauchen, laufen weiter. Apps, die Internet brauchen, funktionieren ohne nicht mehr — genau das ist der Zweck des Offline-Klons, kein Fehler.
+- **Nicht am Gerät getestet.** Offen: ob ein Offline-Klon einer kleinen App startet und wirklich kein Netz bekommt, und ob Spooftest mit „Keine Werbe-ID" eine Werbe-ID aus Nullen zeigt (Spooftest hat `AD_ID` und `READ_PHONE_STATE` im echten Manifest — dieser Pfad ist durch die Unit-Tests abgedeckt, nicht durch ein Telefon).
 
-**Weiterhin aus den vorigen Releases**
-- Tracker-Übersicht liest Manifest **und** Code (DEX) und nennt je Eintrag die Herkunft.
-- Reiter Tarnung (in Entwicklung/Beta): Tracker beim Patchen abschalten, dazu Klonen mit eigenem Paketnamen; gepatchte Apps werden mit **unserem eigenen Schlüssel** signiert, nicht mit dem des Herstellers oder von Google.
-- Lizenz: **GNU General Public License v3.0**.
+**Tests:** 249 Unit-Tests, 0 Fehler, 1 übersprungen. Neu sind 11 in `PermissionStripTest` — mit aapt2 an synthetischen Manifesten, an den echten Manifesten von FOSS Browser und Spooftest und in Kombination mit dem Klon-Rename geprüft.
 
-Download: Dieses Repository ist **wieder privat** — die Releases sind nur für dich erreichbar; für Updates über [Obtainium](https://github.com/ImranR98/Obtainium) brauchst du einen GitHub-Token.
+**Ebenfalls drin (seit 1.18.x)**
+- Sicherung und Wiederherstellung von Profilen samt Verhaltens-Einstellungen in einer Datei (Format v2).
+- Schalter-Zustand wird nur noch über `SwitchGuard` gesetzt — das Öffnen der Detailseite löst keine Bestätigungsdialoge mehr von selbst aus.
+- Tracker-Übersicht liest Manifest **und** Code (DEX) und nennt je Eintrag die Quelle.
 
-Build: `:app:assembleDebug` · Paket `de.minipc.appopsshizuku` · versionCode 31 · Debug-Signatur (Zertifikat SHA-256 `652394f7…7226e`).
-Lizenz: **GNU General Public License v3.0** — siehe [LICENSE](https://github.com/pikatchu2k3/AppOpsShizuku/blob/master/LICENSE).
+Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — dieses Repository ist **privat**; für Updates über [Obtainium](https://github.com/ImranR98/Obtainium) ist ein GitHub-Token mit Lesezugriff nötig.
+
+<sub>Paket `de.minipc.appopsshizuku` · versionCode 34 · debug-signiert (Zertifikat SHA-256 `652394f7…7226e`, updatefähig über 1.18.1) · targetSdk 35 · Lizenz GPL-3.0</sub>

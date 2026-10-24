@@ -318,4 +318,23 @@
     <string name="tracker_nothing_to_disable">Rastreadores: nada desativável foi encontrado nos grupos selecionados. Nada foi alterado aqui.</string>
     <string name="tracker_proof_failed">Comparação antes/depois não possível (%1$s).</string>
     <string name="error_shizuku_app_missing">App Shizuku não encontrado (shizuku.rikka.app)</string>
+    <string name="strip_title">Remover permissões (beta)</string>
+    <string name="strip_description">Remove as permissões selecionadas do manifesto do app modificado. Ao contrário de revogar, isso faz parte do app instalado: sobrevive a reinicializações, não precisa do Shizuku em execução e o app nem consegue pedi-las de novo. O app precisa lidar sozinho com o \"negado\" — apps que precisam de internet param de funcionar sem ela. Melhor usar junto com um clone.</string>
+    <string name="strip_declared_scanning">Declaradas por este app: procurando …</string>
+    <string name="strip_declared">Declaradas por este app: %1$s</string>
+    <string name="strip_declared_none">Declaradas por este app: nenhuma dessas permissões</string>
+    <string name="strip_declared_unreadable">Declaradas por este app: APK ilegível</string>
+    <string name="strip_offline">Sem internet (clone off-line)</string>
+    <string name="strip_ad_id">Sem ID de publicidade (AD_ID, Privacy Sandbox)</string>
+    <string name="strip_app_list">Não vê os apps instalados (QUERY_ALL_PACKAGES)</string>
+    <string name="strip_location">Sem localização</string>
+    <string name="strip_phone">Sem estado do telefone / número</string>
+    <string name="strip_accounts">Sem lista de contas (GET_ACCOUNTS)</string>
+    <string name="stealth_confirm_strip">Remover permissões (beta): as permissões selecionadas são removidas do manifesto; o app recebe \"negado\" para elas permanentemente. O resultado é verificado no APK modificado; depois o app é iniciado uma vez e observado por cerca de 15 s para detectar falhas.</string>
+    <string name="stealth_confirm_strip_no_clone">Sem clone, o app modificado substitui o original; para recuperar as permissões é preciso restaurar o original.</string>
+    <string name="strip_nothing_to_remove">Remover permissões: o app não declara nenhuma das permissões selecionadas — nada foi alterado aqui.</string>
+    <string name="strip_proof_removed">Permissões removidas (verificado no APK modificado): %1$s</string>
+    <string name="strip_proof_still">Falha ao remover permissões: ainda presentes no APK modificado: %1$s. Nada foi instalado.</string>
+    <string name="strip_hint_ad_id">Observação ID de publicidade: o app tem como alvo o SDK %1$d. O Google só garante um ID zerado a partir do targetSdk 33.</string>
+    <string name="strip_hint_app_list">Observação lista de apps: o app tem como alvo o SDK %1$d. O Android só filtra a lista de apps a partir do targetSdk 30.</string>
 </resources>

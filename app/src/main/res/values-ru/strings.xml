@@ -318,4 +318,23 @@
     <string name="tracker_nothing_to_disable">Трекеры: в выбранных группах ничего отключаемого не найдено, здесь ничего не изменено.</string>
     <string name="tracker_proof_failed">Сравнение до и после невозможно (%1$s).</string>
     <string name="error_shizuku_app_missing">Приложение Shizuku не найдено (shizuku.rikka.app)</string>
+    <string name="strip_title">Удалить разрешения (бета)</string>
+    <string name="strip_description">Удаляет выбранные разрешения из манифеста пропатченного приложения. В отличие от отзыва, это часть установленного приложения: сохраняется после перезагрузки, не требует запущенного Shizuku, и приложение даже не может снова их запросить. С ответом «отклонено» приложение должно справляться само — приложения, которым нужен интернет, без него работать не будут. Лучше всего вместе с клоном.</string>
+    <string name="strip_declared_scanning">Объявлено этим приложением: поиск …</string>
+    <string name="strip_declared">Объявлено этим приложением: %1$s</string>
+    <string name="strip_declared_none">Объявлено этим приложением: ни одного из этих разрешений</string>
+    <string name="strip_declared_unreadable">Объявлено этим приложением: APK не читается</string>
+    <string name="strip_offline">Без интернета (офлайн-клон)</string>
+    <string name="strip_ad_id">Без рекламного ID (AD_ID, Privacy Sandbox)</string>
+    <string name="strip_app_list">Не видит установленные приложения (QUERY_ALL_PACKAGES)</string>
+    <string name="strip_location">Без геолокации</string>
+    <string name="strip_phone">Без состояния телефона / номера</string>
+    <string name="strip_accounts">Без списка аккаунтов (GET_ACCOUNTS)</string>
+    <string name="stealth_confirm_strip">Удалить разрешения (бета): выбранные разрешения удаляются из манифеста; приложение навсегда получает «отклонено». Результат проверяется в пропатченном APK, затем приложение один раз запускается и около 15 с проверяется на сбои.</string>
+    <string name="stealth_confirm_strip_no_clone">Без клона пропатченное приложение заменяет оригинал; чтобы вернуть разрешения, нужно восстановить оригинал.</string>
+    <string name="strip_nothing_to_remove">Удалить разрешения: приложение не объявляет ни одного из выбранных разрешений — здесь ничего не изменено.</string>
+    <string name="strip_proof_removed">Разрешения удалены (проверено в пропатченном APK): %1$s</string>
+    <string name="strip_proof_still">Не удалось удалить разрешения: всё ещё есть в пропатченном APK: %1$s. Ничего не установлено.</string>
+    <string name="strip_hint_ad_id">Примечание о рекламном ID: приложение нацелено на SDK %1$d. Google гарантирует нулевой ID только начиная с targetSdk 33.</string>
+    <string name="strip_hint_app_list">Примечание о списке приложений: приложение нацелено на SDK %1$d. Android фильтрует список приложений только начиная с targetSdk 30.</string>
 </resources>

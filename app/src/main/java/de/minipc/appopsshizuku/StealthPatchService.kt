@@ -13,6 +13,8 @@ import android.os.PowerManager
 import android.os.Process
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import de.minipc.appopsshizuku.appops.PermissionStrip
+import de.minipc.appopsshizuku.appops.StripGroup
 import de.minipc.appopsshizuku.appops.TrackerDisable
 import de.minipc.appopsshizuku.appops.TrackerGroup
 import de.minipc.appopsshizuku.shizuku.NoopBackend
@@ -55,6 +57,8 @@ class StealthPatchService : Service() {
         const val EXTRA_CLONE_LABEL = "cloneLabel"
         /** String-Array mit [TrackerGroup]-Namen; leer/fehlend = Tracker nicht anfassen. */
         const val EXTRA_TRACKER_GROUPS = "trackerGroups"
+        /** String-Array mit [StripGroup]-Namen; leer/fehlend = Berechtigungen nicht anfassen. */
+        const val EXTRA_STRIP_GROUPS = "stripGroups"
 
         /** Wartezeit der Startprobe, bevor das Logcat gelesen wird. */
         private const val PROBE_MILLIS = 15_000L
@@ -290,10 +294,13 @@ class StealthPatchService : Service() {
                     val cloneNewPkg = intent.getStringExtra(EXTRA_CLONE_PKG)
                     val trackerGroups = intent.getStringArrayExtra(EXTRA_TRACKER_GROUPS).orEmpty()
                         .mapNotNull { runCatching { TrackerGroup.valueOf(it) }.getOrNull() }.toSet()
+                    val stripGroups = intent.getStringArrayExtra(EXTRA_STRIP_GROUPS).orEmpty()
+                        .mapNotNull { runCatching { StripGroup.valueOf(it) }.getOrNull() }.toSet()
                     val spoof = intent.spoofOptions()
                     var launcherForProbe: String? = null
                     var trackerNote = ""
-                    if (trackerGroups.isNotEmpty()) {
+                    var stripNote = ""
+                    if (trackerGroups.isNotEmpty() || stripGroups.isNotEmpty()) {
                         val m = ApkModifier.extractManifest(base)
                         val oldPkg = BinaryXml.packageName(m)
                         // Klon: die Launcher-Klasse liegt nach dem Rename unter dem neuen Paket
@@ -303,18 +310,25 @@ class StealthPatchService : Service() {
                                 if (cloneNewPkg != null && oldPkg != null && cls.startsWith("$oldPkg."))
                                     cloneNewPkg + cls.removePrefix(oldPkg) else cls
                             }
-                        if (TrackerDisable.apply(m, trackerGroups).contentEquals(m)) {
+                        // Beta-Optionen ohne Wirkung: allein -> abbrechen statt sinnlos neu zu signieren
+                        val trackerNoop = trackerGroups.isNotEmpty() &&
+                            TrackerDisable.apply(m, trackerGroups).contentEquals(m)
+                        val stripNoop = stripGroups.isNotEmpty() && PermissionStrip.present(m, stripGroups).isEmpty()
+                        if (trackerNoop || stripNoop) {
                             val otherOptions = intent.getBooleanExtra(EXTRA_EXCLUDE_RECENTS, false) ||
                                 intent.getBooleanExtra(EXTRA_REMOVE_ICON, false) ||
                                 intent.getBooleanExtra(EXTRA_SECURE_SNAPSHOT, false) ||
                                 intent.getBooleanExtra(EXTRA_REQUIRE_VPN, false) ||
                                 intent.getBooleanExtra(EXTRA_VAULT, false) ||
-                                spoof.anyEnabled || cloneNewPkg != null
+                                spoof.anyEnabled || cloneNewPkg != null ||
+                                (trackerGroups.isNotEmpty() && !trackerNoop) ||
+                                (stripGroups.isNotEmpty() && !stripNoop)
+                            if (trackerNoop) trackerNote = "\n\n" + getString(R.string.tracker_nothing_to_disable)
+                            if (stripNoop) stripNote = "\n\n" + getString(R.string.strip_nothing_to_remove)
                             if (!otherOptions) {
-                                finish(false, getString(R.string.tracker_nothing_to_disable))
+                                finish(false, (trackerNote + stripNote).trim())
                                 return
                             }
-                            trackerNote = "\n\n" + getString(R.string.tracker_nothing_to_disable)
                         }
                     }
                     val signed = stealer.buildStealthApkWithSplits(
@@ -327,7 +341,8 @@ class StealthPatchService : Service() {
                         spoof,
                         cloneNewPkg,
                         intent.getStringExtra(EXTRA_CLONE_LABEL),
-                        trackerGroups
+                        trackerGroups,
+                        stripGroups
                     )
                     if (signed == null) {
                         finish(false, (stealer.lastError ?: getString(R.string.stealth_error_patch)) + backupNote(stealer, pkg, workDir))
@@ -338,6 +353,29 @@ class StealthPatchService : Service() {
                         stealer.progressListener?.invoke(StealthPhase.PROOF, null)
                         trackerNote += "\n\n" + runCatching { TrackerDisable.proof(originals, signed).text() }
                             .getOrElse { getString(R.string.tracker_proof_failed, it.message ?: it.javaClass.simpleName) }
+                    }
+                    // Berechtigungen: gegen das Manifest der SIGNIERTEN APK pruefen, nicht gegen den Wunsch.
+                    // Steht noch etwas Gewaehltes drin, wird NICHT installiert.
+                    if (stripGroups.isNotEmpty()) {
+                        stealer.progressListener?.invoke(StealthPhase.PROOF, null)
+                        val targetSdk = targetSdkOf(pkg)
+                        val report = runCatching {
+                            PermissionStrip.compare(
+                                ApkModifier.extractManifest(base), ApkModifier.extractManifest(signed.first()),
+                                stripGroups, targetSdk
+                            )
+                        }.getOrElse {
+                            finish(false, getString(R.string.tracker_proof_failed, it.message ?: it.javaClass.simpleName))
+                            return
+                        }
+                        if (!report.ok) {
+                            finish(
+                                false,
+                                getString(R.string.strip_proof_still, report.stillPresent.joinToString(", ", transform = PermissionStrip::shortName))
+                            )
+                            return
+                        }
+                        stripNote += stripReportText(report, targetSdk)
                     }
                     val targetPkg = cloneNewPkg ?: pkg
                     val res = stealer.installApk(
@@ -363,9 +401,9 @@ class StealthPatchService : Service() {
                         } else {
                             getString(R.string.stealth_success)
                         }
-                        msg += trackerNote
+                        msg += trackerNote + stripNote
                         var ok = true
-                        if (trackerGroups.isNotEmpty()) {
+                        if (trackerGroups.isNotEmpty() || stripGroups.isNotEmpty()) {
                             val probe = startProbe(backend, stealer, targetPkg, launcherForProbe)
                             ok = probe.first
                             msg += "\n\n" + probe.second
@@ -379,6 +417,27 @@ class StealthPatchService : Service() {
         } catch (e: Exception) {
             Log.e(TAG, "Patch fehlgeschlagen", e)
             finish(false, e.message ?: "Unbekannter Fehler")
+        }
+    }
+
+    /** targetSdk des Originals (fuer "Effekt nicht zugesagt"); null = nicht lesbar. */
+    private fun targetSdkOf(pkg: String): Int? =
+        runCatching { packageManager.getApplicationInfo(pkg, 0).targetSdkVersion }.getOrNull()
+
+    /** Ergebnis "Berechtigungen entfernen" in Klartext, inkl. Hinweisen zu nicht zugesagten Effekten. */
+    private fun stripReportText(report: PermissionStrip.Report, targetSdk: Int?): String = buildString {
+        if (report.removed.isNotEmpty()) {
+            append("\n\n").append(
+                getString(R.string.strip_proof_removed, report.removed.joinToString(", ", transform = PermissionStrip::shortName))
+            )
+        }
+        for (g in report.notPromised) {
+            val res = when (g) {
+                StripGroup.AD_ID -> R.string.strip_hint_ad_id
+                StripGroup.APP_LIST -> R.string.strip_hint_app_list
+                else -> continue
+            }
+            append("\n").append(getString(res, targetSdk ?: 0))
         }
     }
 

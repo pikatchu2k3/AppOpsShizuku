@@ -257,6 +257,74 @@
                     android:text="@string/net_group_attribution"
                     android:textColor="?attr/colorOnPrimaryContainer" />
 
+                <!-- Berechtigungen entfernen (Beta) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/strip_title"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/strip_description"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <TextView
+                    android:id="@+id/stealthStripDeclared"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/strip_declared_scanning"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/stealthStripOffline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/strip_offline"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/stealthStripAdId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/strip_ad_id"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/stealthStripAppList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/strip_app_list"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/stealthStripLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/strip_location"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/stealthStripPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/strip_phone"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/stealthStripAccounts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/strip_accounts"
+                    android:textColor="?attr/colorOnPrimaryContainer" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

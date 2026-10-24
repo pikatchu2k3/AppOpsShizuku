@@ -25,6 +25,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.switchmaterial.SwitchMaterial
 import android.content.Intent
+import de.minipc.appopsshizuku.appops.PermissionStrip
+import de.minipc.appopsshizuku.appops.StripGroup
 import de.minipc.appopsshizuku.appops.TrackerCatalog
 import de.minipc.appopsshizuku.appops.TrackerCodeScan
 import de.minipc.appopsshizuku.appops.TrackerDisable
@@ -216,6 +218,7 @@ class StealthFragment : Fragment() {
             .doAfterTextChanged { updateCollisionHint() }
 
         detectTrackers()
+        detectStrippable()
     }
 
     /** Ziel-Paketname des Klons (null = kein Klon). Ohne Punkt wird `.stealth` angehaengt (Installer braucht 2 Segmente). */
@@ -263,6 +266,40 @@ class StealthFragment : Fragment() {
         if (root.findViewById<CheckBox>(R.id.stealthTrackerAds).isChecked) add(TrackerGroup.ADS)
         if (root.findViewById<CheckBox>(R.id.stealthTrackerAnalytics).isChecked) add(TrackerGroup.ANALYTICS)
         if (root.findViewById<CheckBox>(R.id.stealthTrackerAttribution).isChecked) add(TrackerGroup.ATTRIBUTION)
+    }
+
+    /** Kaestchen -> Gruppe fuer "Berechtigungen entfernen". */
+    private val stripBoxes = linkedMapOf(
+        StripGroup.OFFLINE to R.id.stealthStripOffline,
+        StripGroup.AD_ID to R.id.stealthStripAdId,
+        StripGroup.APP_LIST to R.id.stealthStripAppList,
+        StripGroup.LOCATION to R.id.stealthStripLocation,
+        StripGroup.PHONE to R.id.stealthStripPhone,
+        StripGroup.ACCOUNTS to R.id.stealthStripAccounts
+    )
+
+    private fun selectedStripGroups(): Set<StripGroup> =
+        stripBoxes.filter { (_, id) -> root.findViewById<CheckBox>(id).isChecked }.keys
+
+    /** Welche der entfernbaren Berechtigungen deklariert die installierte App ueberhaupt? (nur lesen) */
+    private fun detectStrippable() {
+        val appContext = requireContext().applicationContext
+        val pkg = packageName
+        val view = root.findViewById<TextView>(R.id.stealthStripDeclared)
+        Thread {
+            val names = runCatching {
+                val manifest = ApkModifier.extractManifest(File(appContext.packageManager.getApplicationInfo(pkg, 0).sourceDir))
+                PermissionStrip.present(manifest, StripGroup.values().toSet()).map(PermissionStrip::shortName)
+            }.getOrNull()
+            handler.post {
+                if (!isAdded) return@post
+                view.text = when {
+                    names == null -> getString(R.string.strip_declared_unreadable)
+                    names.isEmpty() -> getString(R.string.strip_declared_none)
+                    else -> getString(R.string.strip_declared, names.joinToString(", "))
+                }
+            }
+        }.start()
     }
 
     /** "Erkannte Bausteine dieser App": Manifest + Code-Scan der installierten APK(s), im Hintergrund. */
@@ -340,8 +377,9 @@ class StealthFragment : Fragment() {
         val cloneSwitch = root.findViewById<SwitchMaterial>(R.id.stealthCloneSwitch).isChecked
         val clonePkgInput = root.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.stealthClonePkgInput)
         val trackerGroups = selectedTrackerGroups()
+        val stripGroups = selectedStripGroups()
         if (!excludeRecents && !removeLauncherIcon && !secureSnapshot && !requireVpn && !vaultCalc && !spoofOptions.anyEnabled && !cloneSwitch &&
-            trackerGroups.isEmpty()
+            trackerGroups.isEmpty() && stripGroups.isEmpty()
         ) {
             Toast.makeText(requireContext(), R.string.stealth_need_launcher, Toast.LENGTH_SHORT).show()
             return
@@ -402,6 +440,11 @@ class StealthFragment : Fragment() {
             if (cloneNewPkg != null) append("\n\n").append(getString(R.string.stealth_clone_limits))
             if (collision != null) append("\n\n").append(collision.first)
             if (trackerGroups.isNotEmpty()) append("\n\n").append(getString(R.string.stealth_confirm_tracker))
+            if (stripGroups.isNotEmpty()) {
+                append("\n\n").append(getString(R.string.stealth_confirm_strip))
+                // Ohne Klon ersetzt die gepatchte App das Original (Daten weg) - Offline/Standort-Verlust inklusive
+                if (cloneNewPkg == null) append("\n").append(getString(R.string.stealth_confirm_strip_no_clone))
+            }
             append("\n\n").append(getString(R.string.stealth_beta_notice))
         }
         MaterialAlertDialogBuilder(requireContext())
@@ -409,7 +452,7 @@ class StealthFragment : Fragment() {
             .setMessage(message)
             .setNegativeButton(R.string.btn_cancel, null)
             .setPositiveButton(R.string.stealth_confirm_ok) { _, _ ->
-                runStealth(excludeRecents, removeLauncherIcon, secureSnapshot, requireVpn, vaultCalc, vaultPin, spoofOptions, cloneNewPkg, cloneLabel, trackerGroups)
+                runStealth(excludeRecents, removeLauncherIcon, secureSnapshot, requireVpn, vaultCalc, vaultPin, spoofOptions, cloneNewPkg, cloneLabel, trackerGroups, stripGroups)
             }
             .show()
     }
@@ -429,7 +472,8 @@ class StealthFragment : Fragment() {
         spoofOptions: DeviceSpoofOptions = DeviceSpoofOptions(),
         cloneNewPkg: String? = null,
         cloneLabel: String? = null,
-        trackerGroups: Set<TrackerGroup> = emptySet()
+        trackerGroups: Set<TrackerGroup> = emptySet(),
+        stripGroups: Set<StripGroup> = emptySet()
     ) {
         if (backend is NoopBackend) {
             Toast.makeText(requireContext(), R.string.status_no_permission, Toast.LENGTH_LONG).show()
@@ -470,6 +514,9 @@ class StealthFragment : Fragment() {
             cloneLabel?.let { putExtra(StealthPatchService.EXTRA_CLONE_LABEL, it) }
             if (trackerGroups.isNotEmpty()) {
                 putExtra(StealthPatchService.EXTRA_TRACKER_GROUPS, trackerGroups.map { it.name }.toTypedArray())
+            }
+            if (stripGroups.isNotEmpty()) {
+                putExtra(StealthPatchService.EXTRA_STRIP_GROUPS, stripGroups.map { it.name }.toTypedArray())
             }
             spoofOptions.putInto(this)
         }
