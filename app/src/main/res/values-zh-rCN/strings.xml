@@ -318,4 +318,23 @@
     <string name="tracker_nothing_to_disable">追踪器：所选组中未找到可禁用项，此处未做任何更改。</string>
     <string name="tracker_proof_failed">无法进行前后对比（%1$s）。</string>
     <string name="error_shizuku_app_missing">未找到 Shizuku 应用（shizuku.rikka.app）</string>
+    <string name="strip_title">移除权限（测试版）</string>
+    <string name="strip_description">从修补后应用的清单中移除所选权限。与撤销不同，这属于已安装应用本身：重启后依然有效，无需 Shizuku 运行，应用甚至无法再次申请。应用需要自行处理“已拒绝”——需要联网的应用没有网络将无法使用。建议与克隆一起使用。</string>
+    <string name="strip_declared_scanning">此应用声明的权限：正在查找 …</string>
+    <string name="strip_declared">此应用声明的权限：%1$s</string>
+    <string name="strip_declared_none">此应用声明的权限：不含这些权限</string>
+    <string name="strip_declared_unreadable">此应用声明的权限：无法读取 APK</string>
+    <string name="strip_offline">无网络（离线克隆）</string>
+    <string name="strip_ad_id">无广告 ID（AD_ID、Privacy Sandbox）</string>
+    <string name="strip_app_list">无法查看已安装应用（QUERY_ALL_PACKAGES）</string>
+    <string name="strip_location">无位置信息</string>
+    <string name="strip_phone">无电话状态 / 电话号码</string>
+    <string name="strip_accounts">无账号列表（GET_ACCOUNTS）</string>
+    <string name="stealth_confirm_strip">移除权限（测试版）：所选权限将从清单中移除，应用将永久收到“已拒绝”。结果会在修补后的 APK 中检查，然后启动应用一次，并在约 15 秒内检查是否崩溃。</string>
+    <string name="stealth_confirm_strip_no_clone">不使用克隆时，修补后的应用会替换原应用；要恢复权限，必须还原原应用。</string>
+    <string name="strip_nothing_to_remove">移除权限：应用未声明任何所选权限——此处未做任何更改。</string>
+    <string name="strip_proof_removed">已移除的权限（已在修补后的 APK 中检查）：%1$s</string>
+    <string name="strip_proof_still">移除权限失败：修补后的 APK 中仍然存在：%1$s。未安装任何内容。</string>
+    <string name="strip_hint_ad_id">广告 ID 提示：此应用的目标 SDK 为 %1$d。Google 仅保证 targetSdk 33 及以上返回全零 ID。</string>
+    <string name="strip_hint_app_list">应用列表提示：此应用的目标 SDK 为 %1$d。Android 仅从 targetSdk 30 起过滤应用列表。</string>
 </resources>

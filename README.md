@@ -58,6 +58,14 @@ The Stealth tab (patch, clone, tracker switch-off) is **in development**. It is 
 - **Way back:** the original APK(s) are saved before the patch; the result names the folder ("Original saved: …"). An aborted patch changes nothing on the installed app.
 - **Start test:** after installing, the patched app is started once and `logcat` is read for ~15 s (only the app's own processes): `FATAL EXCEPTION`, `ClassNotFoundException`, `NoSuchMethodError`, `VerifyError`, `SecurityException`. A fatal exception is reported as "app crashes after the patch"; other hits are reported as warnings. No silent success. If the app has no launcher activity or cannot be started, the result says the test was **not** done.
 
+**Remove permissions (beta)** — six check boxes, plus a line listing which of these permissions the app declares at all:
+- *No internet (offline clone)* `INTERNET` · *No advertising ID* `com.google.android.gms.permission.AD_ID` and the Privacy Sandbox `ACCESS_ADSERVICES_*` permissions · *Cannot see installed apps* `QUERY_ALL_PACKAGES` · *No location* `ACCESS_FINE/COARSE/BACKGROUND_LOCATION` · *No phone state / number* `READ_PHONE_STATE`, `READ_PHONE_NUMBERS` · *No account list* `GET_ACCOUNTS`.
+- The `<uses-permission>` entries (including `uses-permission-sdk-23`) are removed from the patched manifest. Unlike *revoke* in the Permissions tab this is a property of the installed APK: it survives restarts, works without a running Shizuku, and the app cannot ask again (`requestPermissions` returns "denied" without a dialog). Without `INTERNET` the app's UID cannot open network sockets at all.
+- **Proof:** the manifest of the **signed** APK is compared with the original. If a selected permission is still in it, nothing is installed. Afterwards the same start test as for trackers runs.
+- Not promised by the platform below a certain `targetSdk`, and reported as such in the result: zeroed advertising ID only from targetSdk 33 (Google documentation), app-list filtering only from targetSdk 30.
+- Without a clone the patched app replaces the original (data loss, see above). The app has to cope with "denied" itself; apps that need the internet stop working without it.
+- **Not yet tested on a device** — only unit tests with aapt2 on synthetic and real manifests.
+
 **Honest limits of the patch**
 - The code of switched-off building blocks stays in the APK. Building blocks without manifest components (Segment, Amplitude, old Google Analytics, advertising-ID library, Facebook app events) cannot be switched off this way.
 - "Switched off" in the proof means: all switchable manifest components of that building block are disabled. It is a statement about the manifest, not a guarantee that nothing is sent.
@@ -107,18 +115,18 @@ Because the repository is public, the source that belongs to every released pack
 
 ### Languages / Sprachen
 
-The interface ships in English (base) plus 8 translations — 314 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 333 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
-| German/Deutsch | `values-de` | 314/314 (100%) |
-| Spanish/Español | `values-es` | 314/314 (100%) |
-| French/Français | `values-fr` | 314/314 (100%) |
-| Hindi/हिन्दी | `values-hi` | 314/314 (100%) |
-| Japanese/日本語 | `values-ja` | 314/314 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 314/314 (100%) |
-| Russian/Русский | `values-ru` | 314/314 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 314/314 (100%) |
+| German/Deutsch | `values-de` | 333/333 (100%) |
+| Spanish/Español | `values-es` | 333/333 (100%) |
+| French/Français | `values-fr` | 333/333 (100%) |
+| Hindi/हिन्दी | `values-hi` | 333/333 (100%) |
+| Japanese/日本語 | `values-ja` | 333/333 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 333/333 (100%) |
+| Russian/Русский | `values-ru` | 333/333 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 333/333 (100%) |
 
 Alle Übersetzungen sind maschinell geprüft (Platzhalter, Pluralformen, XML-Struktur) — `R.array.*`-Ressourcen bleiben unberührt. English is the base, so any device with an unsupported language falls back to English instead of German.
 ## Deutsch
@@ -178,6 +186,14 @@ Der Reiter Tarnung (Patch, Klon, Tracker abschalten) ist **in Entwicklung**. Er 
 - **Beweis:** Das gepatchte APK wird mit dem eingebauten Katalog gescannt (Manifest und Code-Scan) und mit dem Original verglichen: „Bausteine vorher: 5 — nachher: 2 — abgeschaltet: …".
 - **Rückweg:** Vor dem Patch werden die Original-APK(s) gesichert; das Ergebnis nennt den Ordner („Original gesichert: …"). Ein abgebrochener Patch ändert nichts an der installierten App.
 - **Startprobe:** Nach der Installation wird die gepatchte App einmal gestartet und ca. 15 s lang das `logcat` gelesen (nur die eigenen Prozesse der App): `FATAL EXCEPTION`, `ClassNotFoundException`, `NoSuchMethodError`, `VerifyError`, `SecurityException`. Ein Absturz wird als „App stürzt nach dem Patch ab" gemeldet, andere Treffer als Warnung. Kein stiller Erfolg. Hat die App keine Launcher-Activity oder lässt sie sich nicht starten, steht im Ergebnis, dass **nicht** geprüft wurde.
+
+**Berechtigungen entfernen (Beta)** — sechs Ankreuzfelder und eine Zeile, welche dieser Berechtigungen die App überhaupt deklariert:
+- *Kein Internet (Offline-Klon)* `INTERNET` · *Keine Werbe-ID* `com.google.android.gms.permission.AD_ID` und die Privacy-Sandbox-Rechte `ACCESS_ADSERVICES_*` · *Installierte Apps nicht sichtbar* `QUERY_ALL_PACKAGES` · *Kein Standort* `ACCESS_FINE/COARSE/BACKGROUND_LOCATION` · *Kein Telefonstatus / keine Rufnummer* `READ_PHONE_STATE`, `READ_PHONE_NUMBERS` · *Keine Kontenliste* `GET_ACCOUNTS`.
+- Die `<uses-permission>`-Einträge (auch `uses-permission-sdk-23`) werden aus dem gepatchten Manifest entfernt. Anders als *Entziehen* im Reiter Berechtigungen ist das eine Eigenschaft der installierten APK: Es übersteht Neustarts, wirkt ohne laufendes Shizuku, und die App kann nicht erneut fragen (`requestPermissions` liefert ohne Dialog „abgelehnt"). Ohne `INTERNET` kann die UID der App überhaupt keine Netz-Sockets öffnen.
+- **Beweis:** Das Manifest der **signierten** APK wird mit dem Original verglichen. Steht eine gewählte Berechtigung noch drin, wird nichts installiert. Danach läuft dieselbe Startprobe wie bei den Trackern.
+- Unterhalb eines bestimmten `targetSdk` von der Plattform nicht zugesagt und im Ergebnis so gemeldet: Nullen-Werbe-ID erst ab targetSdk 33 (Google-Doku), Filter der App-Liste erst ab targetSdk 30.
+- Ohne Klon ersetzt die gepatchte App das Original (Datenverlust, siehe oben). Mit „abgelehnt" muss die App selbst zurechtkommen; Apps, die Internet brauchen, funktionieren ohne nicht mehr.
+- **Noch nicht am Gerät getestet** — bisher nur Unit-Tests mit aapt2 an synthetischen und echten Manifesten.
 
 **Ehrliche Grenzen des Patches**
 - Der Code abgeschalteter Bausteine bleibt in der APK. Bausteine ohne Manifest-Komponenten (Segment, Amplitude, altes Google Analytics, Werbe-ID-Bibliothek, Facebook-App-Events) lassen sich so nicht abschalten.

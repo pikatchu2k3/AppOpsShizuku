@@ -318,4 +318,23 @@
     <string name="tracker_nothing_to_disable">トラッカー: 選択したグループで無効化できるものは見つかりませんでした。ここでは何も変更されていません。</string>
     <string name="tracker_proof_failed">適用前後の比較はできません(%1$s)。</string>
     <string name="error_shizuku_app_missing">Shizuku アプリが見つかりません (shizuku.rikka.app)</string>
+    <string name="strip_title">権限を削除（ベータ）</string>
+    <string name="strip_description">パッチを当てたアプリのマニフェストから選択した権限を削除します。取り消しと違い、インストールされたアプリ自体の一部になります。再起動後も維持され、Shizuku の起動も不要で、アプリは権限を再要求することすらできません。「拒否」への対応はアプリ次第です。インターネットが必要なアプリは使えなくなります。クローンとの併用がおすすめです。</string>
+    <string name="strip_declared_scanning">このアプリが宣言している権限：検索中 …</string>
+    <string name="strip_declared">このアプリが宣言している権限：%1$s</string>
+    <string name="strip_declared_none">このアプリが宣言している権限：該当なし</string>
+    <string name="strip_declared_unreadable">このアプリが宣言している権限：APK を読み取れません</string>
+    <string name="strip_offline">インターネットなし（オフラインクローン）</string>
+    <string name="strip_ad_id">広告 ID なし（AD_ID、プライバシー サンドボックス）</string>
+    <string name="strip_app_list">インストール済みアプリを見られない（QUERY_ALL_PACKAGES）</string>
+    <string name="strip_location">位置情報なし</string>
+    <string name="strip_phone">電話の状態・電話番号なし</string>
+    <string name="strip_accounts">アカウント一覧なし（GET_ACCOUNTS）</string>
+    <string name="stealth_confirm_strip">権限を削除（ベータ）：選択した権限をマニフェストから削除し、アプリには常に「拒否」が返されます。結果はパッチ後の APK で確認し、その後アプリを一度起動して約 15 秒間クラッシュを確認します。</string>
+    <string name="stealth_confirm_strip_no_clone">クローンなしの場合、パッチを当てたアプリが元のアプリを置き換えます。権限を戻すには元のアプリを復元する必要があります。</string>
+    <string name="strip_nothing_to_remove">権限を削除：選択した権限をアプリは宣言していません。ここでは何も変更していません。</string>
+    <string name="strip_proof_removed">削除した権限（パッチ後の APK で確認済み）：%1$s</string>
+    <string name="strip_proof_still">権限の削除に失敗：パッチ後の APK にまだ残っています：%1$s。何もインストールしていません。</string>
+    <string name="strip_hint_ad_id">広告 ID について：このアプリのターゲット SDK は %1$d です。Google がゼロの ID を保証するのは targetSdk 33 以降のみです。</string>
+    <string name="strip_hint_app_list">アプリ一覧について：このアプリのターゲット SDK は %1$d です。Android がアプリ一覧を制限するのは targetSdk 30 以降のみです。</string>
 </resources>

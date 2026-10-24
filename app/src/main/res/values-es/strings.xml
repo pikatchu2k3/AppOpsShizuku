@@ -320,4 +320,23 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="tracker_nothing_to_disable">Rastreadores: no se encontró nada desactivable en los grupos seleccionados; aquí no se ha cambiado nada.</string>
     <string name="tracker_proof_failed">No es posible comparar antes y después (%1$s).</string>
     <string name="error_shizuku_app_missing">App Shizuku no encontrada (shizuku.rikka.app)</string>
+    <string name="strip_title">Eliminar permisos (beta)</string>
+    <string name="strip_description">Elimina los permisos seleccionados del manifiesto de la app parcheada. A diferencia de revocarlos, forma parte de la app instalada: sobrevive a los reinicios, no necesita Shizuku en ejecución y la app ni siquiera puede volver a pedirlos. La app debe gestionar el \"denegado\" por sí misma; las apps que necesitan internet dejan de funcionar sin él. Mejor junto con un clon.</string>
+    <string name="strip_declared_scanning">Declarados por esta app: buscando …</string>
+    <string name="strip_declared">Declarados por esta app: %1$s</string>
+    <string name="strip_declared_none">Declarados por esta app: ninguno de estos permisos</string>
+    <string name="strip_declared_unreadable">Declarados por esta app: APK no legible</string>
+    <string name="strip_offline">Sin internet (clon sin conexión)</string>
+    <string name="strip_ad_id">Sin ID de publicidad (AD_ID, Privacy Sandbox)</string>
+    <string name="strip_app_list">No puede ver las apps instaladas (QUERY_ALL_PACKAGES)</string>
+    <string name="strip_location">Sin ubicación</string>
+    <string name="strip_phone">Sin estado del teléfono / número</string>
+    <string name="strip_accounts">Sin lista de cuentas (GET_ACCOUNTS)</string>
+    <string name="stealth_confirm_strip">Eliminar permisos (beta): los permisos seleccionados se eliminan del manifiesto; la app recibe \"denegado\" de forma permanente. El resultado se comprueba en el APK parcheado; después la app se inicia una vez y se vigila durante unos 15 s por si falla.</string>
+    <string name="stealth_confirm_strip_no_clone">Sin clon, la app parcheada sustituye al original; para recuperar los permisos hay que restaurar el original.</string>
+    <string name="strip_nothing_to_remove">Eliminar permisos: la app no declara ninguno de los permisos seleccionados; aquí no se ha cambiado nada.</string>
+    <string name="strip_proof_removed">Permisos eliminados (comprobado en el APK parcheado): %1$s</string>
+    <string name="strip_proof_still">Error al eliminar permisos: siguen en el APK parcheado: %1$s. No se ha instalado nada.</string>
+    <string name="strip_hint_ad_id">Nota ID de publicidad: la app apunta al SDK %1$d. Google solo garantiza un ID a ceros desde targetSdk 33.</string>
+    <string name="strip_hint_app_list">Nota lista de apps: la app apunta al SDK %1$d. Android solo filtra la lista de apps desde targetSdk 30.</string>
 </resources>

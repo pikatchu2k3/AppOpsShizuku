@@ -3,6 +3,8 @@ package de.minipc.appopsshizuku.stealth
 import android.content.Context
 import android.util.Base64
 import android.util.Log
+import de.minipc.appopsshizuku.appops.PermissionStrip
+import de.minipc.appopsshizuku.appops.StripGroup
 import de.minipc.appopsshizuku.appops.TrackerDisable
 import de.minipc.appopsshizuku.appops.TrackerGroup
 import de.minipc.appopsshizuku.shizuku.ShellBackend
@@ -296,7 +298,8 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         spoofOptions: DeviceSpoofOptions = DeviceSpoofOptions(),
         cloneNewPkg: String? = null,
         cloneLabel: String? = null,
-        trackerGroups: Set<TrackerGroup> = emptySet()
+        trackerGroups: Set<TrackerGroup> = emptySet(),
+        stripGroups: Set<StripGroup> = emptySet()
     ): File? {
         return try {
             val manifest = ApkModifier.extractManifest(originalApk)
@@ -328,6 +331,10 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
             // Tracker abschalten: VOR dem Klon-Rename (Katalognamen sind absolut, Paketnamen ohne Belang)
             if (trackerGroups.isNotEmpty()) {
                 patchedManifest = TrackerDisable.apply(patchedManifest, trackerGroups)
+            }
+            // Berechtigungen entfernen: Namen sind absolut (android.permission.*), Klon-Rename egal
+            if (stripGroups.isNotEmpty()) {
+                patchedManifest = PermissionStrip.apply(patchedManifest, stripGroups)
             }
             // App-Cloning: Paketnamen im Manifest tauschen (package + Komponenten)
             if (cloneNewPkg != null) {
@@ -405,7 +412,8 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         spoofOptions: DeviceSpoofOptions = DeviceSpoofOptions(),
         cloneNewPkg: String? = null,
         cloneLabel: String? = null,
-        trackerGroups: Set<TrackerGroup> = emptySet()
+        trackerGroups: Set<TrackerGroup> = emptySet(),
+        stripGroups: Set<StripGroup> = emptySet()
     ): List<File>? {
         lastError = null
         // Klon + Split mit eigenem Code (Dynamic Feature): der Dex-Rename laeuft nur ueber die base-APK,
@@ -420,7 +428,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         val signedBase = buildStealthApk(
             originalApk, workDir,
             excludeFromRecents, removeLauncherIcon, secureSnapshot, requireVpn,
-            vaultCalc, spoofOptions, cloneNewPkg, cloneLabel, trackerGroups
+            vaultCalc, spoofOptions, cloneNewPkg, cloneLabel, trackerGroups, stripGroups
         ) ?: return null
         val result = ArrayList<File>()
         result.add(signedBase)

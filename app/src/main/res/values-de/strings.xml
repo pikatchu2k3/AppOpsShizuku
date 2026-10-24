@@ -341,4 +341,23 @@
     <string name="lifecycle_notif_title">Bildschirm-Aus-Wächter: %1$d App(s)</string>
     <string name="lifecycle_notif_text">Wartet auf Bildschirm aus/an</string>
     <string name="error_shizuku_app_missing">Shizuku-App nicht gefunden (shizuku.rikka.app)</string>
+    <string name="strip_title">Berechtigungen entfernen (Beta)</string>
+    <string name="strip_description">Entfernt die gewählten Berechtigungen aus dem Manifest der gepatchten App. Anders als Entziehen ist das Teil der installierten App: Es übersteht Neustarts, braucht kein laufendes Shizuku, und die App kann nicht einmal mehr danach fragen. Mit „abgelehnt“ muss die App selbst zurechtkommen — Apps, die Internet brauchen, funktionieren ohne nicht mehr. Am besten zusammen mit einem Klon.</string>
+    <string name="strip_declared_scanning">Von dieser App deklariert: wird gesucht …</string>
+    <string name="strip_declared">Von dieser App deklariert: %1$s</string>
+    <string name="strip_declared_none">Von dieser App deklariert: keine dieser Berechtigungen</string>
+    <string name="strip_declared_unreadable">Von dieser App deklariert: APK nicht lesbar</string>
+    <string name="strip_offline">Kein Internet (Offline-Klon)</string>
+    <string name="strip_ad_id">Keine Werbe-ID (AD_ID, Privacy Sandbox)</string>
+    <string name="strip_app_list">Installierte Apps nicht sichtbar (QUERY_ALL_PACKAGES)</string>
+    <string name="strip_location">Kein Standort</string>
+    <string name="strip_phone">Kein Telefonstatus / keine Rufnummer</string>
+    <string name="strip_accounts">Keine Kontenliste (GET_ACCOUNTS)</string>
+    <string name="stealth_confirm_strip">Berechtigungen entfernen (Beta): Die gewählten Berechtigungen werden aus dem Manifest entfernt; die App bekommt dafür dauerhaft „abgelehnt“. Das Ergebnis wird in der gepatchten APK geprüft, danach wird die App einmal gestartet und ca. 15 s lang auf Abstürze geprüft.</string>
+    <string name="stealth_confirm_strip_no_clone">Ohne Klon ersetzt die gepatchte App das Original; um die Berechtigungen zurückzubekommen, muss das Original wiederhergestellt werden.</string>
+    <string name="strip_nothing_to_remove">Berechtigungen entfernen: Die App deklariert keine der gewählten Berechtigungen — hier wurde nichts geändert.</string>
+    <string name="strip_proof_removed">Berechtigungen entfernt (in der gepatchten APK geprüft): %1$s</string>
+    <string name="strip_proof_still">Berechtigungen entfernen fehlgeschlagen: in der gepatchten APK weiterhin vorhanden: %1$s. Es wurde nichts installiert.</string>
+    <string name="strip_hint_ad_id">Hinweis Werbe-ID: Die App zielt auf SDK %1$d. Google sagt die Nullen-ID erst ab targetSdk 33 zu.</string>
+    <string name="strip_hint_app_list">Hinweis App-Liste: Die App zielt auf SDK %1$d. Android filtert die App-Liste erst ab targetSdk 30.</string>
 </resources>

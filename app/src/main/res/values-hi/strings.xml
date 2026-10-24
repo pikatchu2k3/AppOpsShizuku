@@ -318,4 +318,23 @@
     <string name="tracker_nothing_to_disable">ट्रैकर: चुने गए समूहों में बंद करने योग्य कुछ नहीं मिला – यहाँ कुछ नहीं बदला गया।</string>
     <string name="tracker_proof_failed">पहले/बाद की तुलना संभव नहीं (%1$s)।</string>
     <string name="error_shizuku_app_missing">Shizuku-App nicht gefunden</string>
+    <string name="strip_title">अनुमतियाँ हटाएँ (बीटा)</string>
+    <string name="strip_description">पैच की गई ऐप के मैनिफ़ेस्ट से चुनी गई अनुमतियाँ हटाता है। रद्द करने के विपरीत, यह इंस्टॉल की गई ऐप का हिस्सा है: यह रीस्टार्ट के बाद भी रहता है, इसके लिए Shizuku चालू होना ज़रूरी नहीं, और ऐप इन्हें दोबारा माँग भी नहीं सकती। \"अस्वीकृत\" को ऐप को ख़ुद संभालना होगा — जिन ऐप को इंटरनेट चाहिए, वे इसके बिना काम नहीं करेंगी। क्लोन के साथ उपयोग करना सबसे अच्छा है।</string>
+    <string name="strip_declared_scanning">इस ऐप द्वारा घोषित: खोज रहे हैं …</string>
+    <string name="strip_declared">इस ऐप द्वारा घोषित: %1$s</string>
+    <string name="strip_declared_none">इस ऐप द्वारा घोषित: इनमें से कोई अनुमति नहीं</string>
+    <string name="strip_declared_unreadable">इस ऐप द्वारा घोषित: APK पढ़ा नहीं जा सका</string>
+    <string name="strip_offline">इंटरनेट नहीं (ऑफ़लाइन क्लोन)</string>
+    <string name="strip_ad_id">विज्ञापन ID नहीं (AD_ID, Privacy Sandbox)</string>
+    <string name="strip_app_list">इंस्टॉल की गई ऐप नहीं दिखेंगी (QUERY_ALL_PACKAGES)</string>
+    <string name="strip_location">स्थान नहीं</string>
+    <string name="strip_phone">फ़ोन स्थिति / फ़ोन नंबर नहीं</string>
+    <string name="strip_accounts">खातों की सूची नहीं (GET_ACCOUNTS)</string>
+    <string name="stealth_confirm_strip">अनुमतियाँ हटाएँ (बीटा): चुनी गई अनुमतियाँ मैनिफ़ेस्ट से हटा दी जाती हैं; ऐप को इनके लिए हमेशा \"अस्वीकृत\" मिलेगा। परिणाम पैच की गई APK में जाँचा जाता है, फिर ऐप एक बार शुरू की जाती है और लगभग 15 सेकंड तक क्रैश के लिए जाँची जाती है।</string>
+    <string name="stealth_confirm_strip_no_clone">क्लोन के बिना पैच की गई ऐप मूल ऐप की जगह ले लेती है; अनुमतियाँ वापस पाने के लिए मूल ऐप को पुनर्स्थापित करना होगा।</string>
+    <string name="strip_nothing_to_remove">अनुमतियाँ हटाएँ: ऐप चुनी गई किसी भी अनुमति की घोषणा नहीं करती — यहाँ कुछ नहीं बदला गया।</string>
+    <string name="strip_proof_removed">अनुमतियाँ हटाई गईं (पैच की गई APK में जाँचा गया): %1$s</string>
+    <string name="strip_proof_still">अनुमतियाँ हटाना विफल: पैच की गई APK में अब भी मौजूद: %1$s। कुछ भी इंस्टॉल नहीं किया गया।</string>
+    <string name="strip_hint_ad_id">विज्ञापन ID पर नोट: ऐप SDK %1$d को लक्षित करती है। Google शून्य वाली ID की गारंटी केवल targetSdk 33 से देता है।</string>
+    <string name="strip_hint_app_list">ऐप सूची पर नोट: ऐप SDK %1$d को लक्षित करती है। Android ऐप सूची को केवल targetSdk 30 से फ़िल्टर करता है।</string>
 </resources>
