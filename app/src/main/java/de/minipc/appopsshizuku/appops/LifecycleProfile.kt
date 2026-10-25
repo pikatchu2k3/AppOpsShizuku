@@ -402,7 +402,12 @@ data class LifecycleEntry(
     val before: LifecycleSnapshot? = null,
     val screenOffExit: Boolean? = null,
     val screenOffEffect: ScreenOffEffect? = null,
-    val releaseOnScreenOn: Boolean? = null
+    val releaseOnScreenOn: Boolean? = null,
+    /** "Nur bei Bedarf": App bleibt gesperrt und laeuft nur nach Start ueber unsere Verknuepfung. */
+    val onDemand: Boolean? = null,
+    val onDemandLock: OnDemandLock? = null,
+    /** Frist nach dem Verlassen bis zum Sperren; 0 = nur beim Bildschirm-Aus sperren. */
+    val onDemandGraceSeconds: Int? = null
 ) {
     fun profile(): LifecycleProfile {
         val d = LifecycleProfile()
@@ -421,7 +426,10 @@ data class LifecycleEntry(
         before = other.before ?: before,
         screenOffExit = other.screenOffExit ?: screenOffExit,
         screenOffEffect = other.screenOffEffect ?: screenOffEffect,
-        releaseOnScreenOn = other.releaseOnScreenOn ?: releaseOnScreenOn
+        releaseOnScreenOn = other.releaseOnScreenOn ?: releaseOnScreenOn,
+        onDemand = other.onDemand ?: onDemand,
+        onDemandLock = other.onDemandLock ?: onDemandLock,
+        onDemandGraceSeconds = other.onDemandGraceSeconds ?: onDemandGraceSeconds
     )
 }
 
@@ -441,6 +449,9 @@ fun lifecycleEntryToJson(e: LifecycleEntry): JSONObject {
     e.screenOffExit?.let { o.put("screenOffExit", it) }
     e.screenOffEffect?.let { o.put("screenOffEffect", it.json) }
     e.releaseOnScreenOn?.let { o.put("releaseOnScreenOn", it) }
+    e.onDemand?.let { o.put("onDemand", it) }
+    e.onDemandLock?.let { o.put("onDemandLock", it.json) }
+    e.onDemandGraceSeconds?.let { o.put("onDemandGraceSeconds", it) }
     return o
 }
 
@@ -461,7 +472,10 @@ fun lifecycleEntryFromJson(o: JSONObject): LifecycleEntry {
         screenOffExit = if (o.has("screenOffExit")) o.optBoolean("screenOffExit") else null,
         // Unbekannte Wirkung -> null (nicht anfassen), nicht raten
         screenOffEffect = ScreenOffEffect.fromJson(o.optString("screenOffEffect")),
-        releaseOnScreenOn = if (o.has("releaseOnScreenOn")) o.optBoolean("releaseOnScreenOn") else null
+        releaseOnScreenOn = if (o.has("releaseOnScreenOn")) o.optBoolean("releaseOnScreenOn") else null,
+        onDemand = if (o.has("onDemand")) o.optBoolean("onDemand") else null,
+        onDemandLock = OnDemandLock.fromJson(o.optString("onDemandLock")),
+        onDemandGraceSeconds = if (o.has("onDemandGraceSeconds")) o.optInt("onDemandGraceSeconds") else null
     )
 }
 

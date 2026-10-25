@@ -39,6 +39,7 @@ class LifecycleStore(context: Context) {
     fun remove(packageName: String) {
         prefs.edit().remove(packageName).apply()
         if (packageName in suspendedByUs) suspendedByUs = suspendedByUs - packageName
+        if (packageName in onDemandOpen) onDemandOpen = onDemandOpen - packageName
     }
 
     /** Import: feldweise mergen - in der Datei fehlende Felder bleiben unangetastet. */
@@ -56,6 +57,22 @@ class LifecycleStore(context: Context) {
             state.edit().putStringSet(KEY_SUSPENDED_BY_US, value.toSet()).apply()
         }
 
+    /** "Nur bei Bedarf": Apps, die gerade ueber unsere Verknuepfung geoeffnet (freigegeben) sind. */
+    var onDemandOpen: Set<String>
+        get() = state.getStringSet(KEY_ON_DEMAND_OPEN, emptySet())?.toSet().orEmpty()
+        set(value) {
+            state.edit().putStringSet(KEY_ON_DEMAND_OPEN, value.toSet()).apply()
+        }
+
+    /** Ueber die Verknuepfung geoeffnet: in die Offen-Liste + Zeitpunkt (Fenster fuer Nutzungsereignisse). */
+    fun markOpened(packageName: String, timeMs: Long) {
+        state.edit().putLong(KEY_OPENED_AT_PREFIX + packageName, timeMs).apply()
+        onDemandOpen = onDemandOpen + packageName
+    }
+
+    fun openedAt(packageName: String): Long? =
+        state.getLong(KEY_OPENED_AT_PREFIX + packageName, -1L).takeIf { it > 0 }
+
     /** Letzte Meldung des Dienstes (fuer die Oberflaeche), z. B. "Bildschirm aus: ...". */
     var lastReport: String
         get() = state.getString(KEY_LAST_REPORT, "").orEmpty()
@@ -66,5 +83,7 @@ class LifecycleStore(context: Context) {
     private companion object {
         const val KEY_SUSPENDED_BY_US = "suspended_by_us"
         const val KEY_LAST_REPORT = "last_report"
+        const val KEY_ON_DEMAND_OPEN = "on_demand_open"
+        const val KEY_OPENED_AT_PREFIX = "on_demand_opened_at_"
     }
 }

@@ -32,7 +32,11 @@ class FakeDevice(
     /** Firewall-Kette: am Redmi im Ausgangszustand AUS - Deny-Bit liest sich dann trotzdem als `deny`. */
     var chainEnabled: Boolean = true,
     /** Geraet laesst die Kette nicht einschalten. */
-    var ignoreChainSet: Boolean = false
+    var ignoreChainSet: Boolean = false,
+    /** enabled-Zustand aus dumpsys (0 Standard, 3 vom Nutzer deaktiviert). */
+    var enabledState: Int = 0,
+    /** Geraet ignoriert pm disable-user (SecurityException steht nur in der Ausgabe, exit=0). */
+    var ignoreDisable: Boolean = false
 ) : ShellBackend {
 
     val commands = mutableListOf<List<String>>()
@@ -95,8 +99,13 @@ class FakeDevice(
                 ok("Restrict background blacklisted UIDs: " + (blacklist.joinToString(" ").ifEmpty { "none" }))
             a.take(3) == listOf("cmd", "package", "compile") -> ok("Success")
             a.take(2) == listOf("am", "force-stop") -> { stopped = true; ok("") }
+            a.take(2) == listOf("pm", "disable-user") -> {
+                if (ignoreDisable) ok("Exception: Shell cannot change component state")
+                else { enabledState = 3; ok("Package new state: disabled-user") }
+            }
+            a.take(2) == listOf("pm", "enable") -> { enabledState = 1; ok("Package new state: enabled") }
             a.take(2) == listOf("dumpsys", "package") ->
-                ok("    User 0: ceDataInode=2622625 installed=true hidden=false suspended=$suspended stopped=$stopped enabled=0")
+                ok("  enabled=1\n    User 0: ceDataInode=2622625 installed=true hidden=false suspended=$suspended stopped=$stopped enabled=$enabledState")
             else -> ShellResult(1, "", "unbekannter Befehl: $a")
         }
     }

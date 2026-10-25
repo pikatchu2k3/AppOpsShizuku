@@ -35,6 +35,9 @@ import de.minipc.appopsshizuku.appops.LifecycleManager
 import de.minipc.appopsshizuku.appops.LifecycleProfile
 import de.minipc.appopsshizuku.appops.LifecycleResult
 import de.minipc.appopsshizuku.appops.LifecycleStore
+import de.minipc.appopsshizuku.appops.OnDemand
+import de.minipc.appopsshizuku.appops.OnDemandExecutor
+import de.minipc.appopsshizuku.appops.OnDemandLock
 import de.minipc.appopsshizuku.appops.ScreenAction
 import de.minipc.appopsshizuku.appops.ScreenOffEffect
 import de.minipc.appopsshizuku.appops.ScreenOffExecutor
@@ -112,6 +115,10 @@ class BehaviorFragment : Fragment() {
     private var backend: ShellBackend = NoopBackend()
     private var shizukuUsable = false
 
+    private lateinit var onDemandSw: GuardedSwitch
+    /** Ergebnis der letzten Sperren/Freigeben-Aktion von "Nur bei Bedarf" (fuer die Statuszeilen). */
+    private var onDemandLastResult: String? = null
+
     /** Fehler beim letzten Start des Bildschirm-Aus-Dienstes (null = kein Fehler). */
     private var screenOffSyncError: String? = null
 
@@ -137,6 +144,7 @@ class BehaviorFragment : Fragment() {
         setupBattery(view)
         setupCompile(view)
         setupLifecycle(view)
+        setupOnDemand(view)
         setupScreenOff(view)
 
         componentsAdapter = ComponentsAdapter()
@@ -185,6 +193,7 @@ class BehaviorFragment : Fragment() {
         refreshEnabledState()
         refreshSuspendState()
         refreshLifecycle()
+        refreshOnDemand()
         refreshScreenOff()
         if (shizukuUsable) {
             loadStandbyState()
@@ -724,8 +733,10 @@ class BehaviorFragment : Fragment() {
         val allowed = screenOffAllowed(packageName, ctx.packageName, isSystemApp())
         val sw = root.findViewById<SwitchMaterial>(R.id.screenOffSwitch)
         val on = sw.isChecked
+        // "Nur bei Bedarf" uebernimmt diese App komplett; Ausschalten bleibt trotzdem moeglich
+        val onDemandOn = LifecycleStore(ctx).get(packageName).onDemand == true
         // Ausschalten muss immer moeglich bleiben, Einschalten nur mit Shizuku
-        sw.isEnabled = allowed && (shizukuUsable || on)
+        sw.isEnabled = allowed && (shizukuUsable || on) && (!onDemandOn || on)
         val suspend = root.findViewById<RadioGroup>(R.id.screenOffEffectGroup).checkedRadioButtonId ==
             R.id.screenOffEffectSuspend
         root.findViewById<RadioGroup>(R.id.screenOffEffectGroup).let { g ->
@@ -739,6 +750,7 @@ class BehaviorFragment : Fragment() {
             !allowed -> lines.add(getString(R.string.screen_off_excluded_system))
             !shizukuUsable -> lines.add(getString(R.string.screen_off_no_shizuku))
         }
+        if (onDemandOn) lines.add(getString(R.string.ondemand_overrides_screen_off))
         if (allowed && on) {
             val err = screenOffSyncError
             lines.add(
@@ -755,6 +767,196 @@ class BehaviorFragment : Fragment() {
         LifecycleStore(ctx).lastReport.takeIf { it.isNotBlank() }
             ?.let { lines.add(getString(R.string.screen_off_last, it)) }
         root.findViewById<TextView>(R.id.screenOffState).text = lines.joinToString("\n")
+    }
+
+    // ---------------------------------------------- Nur bei Bedarf (OnDemand)
+
+    private fun graceButtonId(seconds: Int): Int = when (seconds) {
+        10 -> R.id.onDemandGrace10
+        300 -> R.id.onDemandGrace300
+        0 -> R.id.onDemandGrace0
+        else -> R.id.onDemandGrace60
+    }
+
+    private fun graceOfButton(id: Int): Int = when (id) {
+        R.id.onDemandGrace10 -> 10
+        R.id.onDemandGrace300 -> 300
+        R.id.onDemandGrace0 -> 0
+        else -> OnDemand.DEFAULT_GRACE_SECONDS
+    }
+
+    private fun selectedLock(): OnDemandLock =
+        if (root.findViewById<RadioGroup>(R.id.onDemandLockGroup).checkedRadioButtonId == R.id.onDemandLockDisable)
+            OnDemandLock.DISABLE else OnDemandLock.SUSPEND
+
+    private fun setupOnDemand(view: View) {
+        val e = LifecycleStore(requireContext()).get(packageName)
+        val sw = GuardedSwitch(view.findViewById(R.id.onDemandSwitch)).also { onDemandSw = it }
+        val lockGroup = view.findViewById<RadioGroup>(R.id.onDemandLockGroup)
+        val graceGroup = view.findViewById<RadioGroup>(R.id.onDemandGraceGroup)
+        // Erst Zustand setzen, dann Listener - sonst loest das Laden schon Aktionen aus.
+        sw.setQuietly(e.onDemand == true)
+        lockGroup.check(
+            if (OnDemand.lockOf(e) == OnDemandLock.DISABLE) R.id.onDemandLockDisable else R.id.onDemandLockSuspend
+        )
+        graceGroup.check(graceButtonId(OnDemand.graceOf(e)))
+
+        sw.onUserToggle { checked -> onOnDemandToggled(checked) }
+        lockGroup.setOnCheckedChangeListener { _, _ -> onLockChanged(selectedLock()) }
+        graceGroup.setOnCheckedChangeListener { _, id ->
+            saveScreenOff { it.copy(onDemandGraceSeconds = graceOfButton(id)) }
+            refreshOnDemand()
+        }
+        view.findViewById<MaterialButton>(R.id.onDemandShortcutButton).setOnClickListener { pinShortcut() }
+    }
+
+    private fun onOnDemandToggled(checked: Boolean) {
+        if (!checked) {
+            disableOnDemand()
+            return
+        }
+        if (!shizukuUsable) {
+            onDemandSw.setQuietly(false)
+            Toast.makeText(requireContext(), R.string.screen_off_no_shizuku, Toast.LENGTH_LONG).show()
+            return
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.ondemand_title)
+            .setMessage(R.string.ondemand_confirm)
+            .setNegativeButton(R.string.btn_cancel) { _, _ -> onDemandSw.setQuietly(false) }
+            .setOnCancelListener { onDemandSw.setQuietly(false) }
+            .setPositiveButton(R.string.ondemand_confirm_ok) { _, _ -> enableOnDemand() }
+            .show()
+    }
+
+    /** Einschalten: Nutzungszugriff erteilen, App sofort beenden + sperren, Dienst starten, Verknuepfung anbieten. */
+    private fun enableOnDemand() {
+        val ctx = requireContext().applicationContext
+        val lock = selectedLock()
+        val grace = graceOfButton(root.findViewById<RadioGroup>(R.id.onDemandGraceGroup).checkedRadioButtonId)
+        saveScreenOff { it.copy(onDemand = true, onDemandLock = lock, onDemandGraceSeconds = grace) }
+        requestNotificationPermissionIfNeeded()
+        val b = backend
+        executor.execute {
+            OnDemandSupport.grantUsageAccess(ctx, b)
+            val store = LifecycleStore(ctx)
+            store.onDemandOpen = store.onDemandOpen - packageName
+            val r = OnDemandExecutor(b).lock(packageName, lock)
+            Log.i(LIFECYCLE_TAG, "$packageName Nur bei Bedarf an ($lock): ok=${r.ok} ${r.state} ${r.raw}")
+            handler.post {
+                if (!isAdded) return@post
+                onDemandLastResult = if (r.ok) getString(R.string.ondemand_locked_now)
+                else getString(R.string.ondemand_lock_failed_now, r.state.toString())
+                screenOffSyncError = LifecycleScreenService.sync(requireContext())
+                refreshEnabledState()
+                refreshSuspendState()
+                refreshOnDemand()
+                refreshScreenOff()
+                if (r.ok) pinShortcut()
+            }
+        }
+    }
+
+    /** Ausschalten: App freigeben (beide Sperrarten), Verknuepfung ausgrauen, Dienst ggf. beenden. */
+    private fun disableOnDemand() {
+        val ctx = requireContext().applicationContext
+        saveScreenOff { it.copy(onDemand = false) }
+        OnDemandSupport.disableShortcut(ctx, packageName, getString(R.string.ondemand_shortcut_disabled))
+        val b = backend
+        executor.execute {
+            val store = LifecycleStore(ctx)
+            store.onDemandOpen = store.onDemandOpen - packageName
+            val r = OnDemandExecutor(b).unlock(packageName)
+            Log.i(LIFECYCLE_TAG, "$packageName Nur bei Bedarf aus: freigegeben ok=${r.ok} ${r.state} ${r.raw}")
+            handler.post {
+                if (!isAdded) return@post
+                onDemandLastResult = if (r.ok) getString(R.string.ondemand_unlocked_now)
+                else getString(R.string.ondemand_unlock_failed, r.state.toString())
+                screenOffSyncError = LifecycleScreenService.sync(requireContext())
+                refreshEnabledState()
+                refreshSuspendState()
+                refreshOnDemand()
+                refreshScreenOff()
+            }
+        }
+    }
+
+    /** Sperrart gewechselt: bei aktivem Modus sofort umstellen (alte Sperre aufheben, neue setzen). */
+    private fun onLockChanged(lock: OnDemandLock) {
+        saveScreenOff { it.copy(onDemandLock = lock) }
+        val ctx = requireContext().applicationContext
+        val store = LifecycleStore(ctx)
+        if (store.get(packageName).onDemand != true || !shizukuUsable || packageName in store.onDemandOpen) {
+            refreshOnDemand()
+            return
+        }
+        val b = backend
+        executor.execute {
+            val exec = OnDemandExecutor(b)
+            exec.unlock(packageName)
+            val r = exec.lock(packageName, lock)
+            handler.post {
+                if (!isAdded) return@post
+                onDemandLastResult = if (r.ok) getString(R.string.ondemand_locked_now)
+                else getString(R.string.ondemand_lock_failed_now, r.state.toString())
+                refreshEnabledState()
+                refreshSuspendState()
+                refreshOnDemand()
+            }
+        }
+    }
+
+    private fun pinShortcut() {
+        val ctx = requireContext()
+        val ok = OnDemandSupport.requestPinShortcut(ctx, packageName)
+        if (!ok) Toast.makeText(ctx, R.string.ondemand_shortcut_unsupported, Toast.LENGTH_LONG).show()
+        handler.postDelayed({ if (isAdded) refreshOnDemand() }, 1500)
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQ_NOTIF
+            )
+        }
+    }
+
+    private fun refreshOnDemand() {
+        val ctx = requireContext()
+        val store = LifecycleStore(ctx)
+        val e = store.get(packageName)
+        val allowed = screenOffAllowed(packageName, ctx.packageName, isSystemApp())
+        val on = e.onDemand == true
+        // Ausschalten muss immer moeglich bleiben, Einschalten nur mit Shizuku
+        onDemandSw.view.isEnabled = allowed && (shizukuUsable || on)
+        for (id in listOf(R.id.onDemandLockGroup, R.id.onDemandGraceGroup)) {
+            val g = root.findViewById<RadioGroup>(id)
+            for (i in 0 until g.childCount) g.getChildAt(i).isEnabled = allowed
+        }
+        root.findViewById<MaterialButton>(R.id.onDemandShortcutButton).isEnabled = allowed && on
+
+        val lines = mutableListOf<String>()
+        when {
+            packageName == ctx.packageName -> lines.add(getString(R.string.screen_off_excluded_own))
+            !allowed -> lines.add(getString(R.string.screen_off_excluded_system))
+            !shizukuUsable -> lines.add(getString(R.string.screen_off_no_shizuku))
+        }
+        if (allowed && on) {
+            lines.add(
+                getString(
+                    if (packageName in store.onDemandOpen) R.string.ondemand_state_open else R.string.ondemand_state_locked
+                )
+            )
+            if (OnDemandSupport.isPinned(ctx, packageName) == false) lines.add(getString(R.string.ondemand_state_no_shortcut))
+            if (!OnDemandSupport.hasUsageAccess(ctx)) lines.add(getString(R.string.ondemand_state_no_usage))
+            screenOffSyncError?.let { lines.add(getString(R.string.screen_off_service_failed, it)) }
+            lines.add(getString(R.string.ondemand_state_needs_shizuku))
+        }
+        onDemandLastResult?.let { lines.add(it) }
+        root.findViewById<TextView>(R.id.onDemandState).text = lines.joinToString("\n")
     }
 
     // ---------------------------------------------- Komponenten (aus ComponentsActivity)

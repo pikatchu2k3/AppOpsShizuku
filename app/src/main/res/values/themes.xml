@@ -51,4 +51,13 @@
         <item name="colorWarningContainer">@color/warning_container</item>
         <item name="colorOnWarningContainer">@color/on_warning_container</item>
     </style>
+
+    <!-- Unsichtbarer Zwischenschritt (Verknuepfung "Nur bei Bedarf"): nur Dialoge sind sichtbar -->
+    <style name="Theme.AppOpsShizuku.Translucent" parent="Theme.AppOpsShizuku">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

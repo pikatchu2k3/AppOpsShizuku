@@ -18,7 +18,10 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import de.minipc.appopsshizuku.appops.LifecycleEntry
 import de.minipc.appopsshizuku.appops.LifecycleStore
+import de.minipc.appopsshizuku.appops.OnDemand
+import de.minipc.appopsshizuku.appops.OnDemandExecutor
 import de.minipc.appopsshizuku.appops.ScreenOffExecutor
 import de.minipc.appopsshizuku.appops.installedOnly
 import de.minipc.appopsshizuku.appops.screenActions
@@ -29,6 +32,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 
 /**
  * Feature 3 "Screen-Off-Exit": beobachtet Bildschirm an/aus und haelt die
@@ -47,6 +52,10 @@ import java.util.concurrent.Executors
  * Benachrichtigung: wegwischbar (Android 14+) und ueber "Ausblenden" in den
  * Kanal-Einstellungen abschaltbar - der Dienst laeuft in beiden Faellen weiter.
  * Deinstallierte Apps zaehlen nicht mehr; ihr Eintrag wird beim Entfernen geloescht.
+ *
+ * "Nur bei Bedarf" ([OnDemand]): Solange eine ueber die Verknuepfung geoeffnete App frei ist,
+ * prueft der Dienst alle [POLL_SECONDS] s, ob sie noch vorne ist. Nach der Frist (oder beim
+ * Bildschirm-Aus sofort) wird sie beendet und gesperrt. Beim Bildschirm-An wird sie nie freigegeben.
  */
 class LifecycleScreenService : Service() {
 
@@ -54,6 +63,7 @@ class LifecycleScreenService : Service() {
         const val TAG = "AppOps.Lifecycle"
         private const val CHANNEL_ID = "lifecycle_screen"
         private const val NOTIF_ID = 43
+        private const val POLL_SECONDS = 3L
         private const val ACTION_NOTIF_DISMISSED = "de.minipc.appopsshizuku.lifecycle.NOTIF_DISMISSED"
 
         /**
@@ -98,7 +108,14 @@ class LifecycleScreenService : Service() {
         }
     }
 
-    private val executor = Executors.newSingleThreadExecutor()
+    /** Ein Thread fuer alles (Bildschirm, Abfrage, Sperren) - keine Wettlaeufe zwischen ihnen. */
+    private val executor = Executors.newSingleThreadScheduledExecutor()
+    private var poll: ScheduledFuture<*>? = null
+    /** Seit wann die App als geoeffnet gilt (Fenster fuer Nutzungsereignisse) / seit wann sie verlassen ist. */
+    private val openedAt = HashMap<String, Long>()
+    private val leftAt = HashMap<String, Long>()
+    /** "Shizuku fehlt" pro Abfrage-Serie nur einmal melden. */
+    private var pollShizukuReported = false
     private lateinit var store: LifecycleStore
     private var registered = false
     /** Nutzer hat die Benachrichtigung weggewischt: nicht bei jedem Bildschirm-Wechsel neu zeigen. */
@@ -203,11 +220,14 @@ class LifecycleScreenService : Service() {
             registered = true
             Log.i(TAG, "Bildschirm-Empfaenger registriert")
         }
+        // Bedarfs-Apps: offene ueberwachen, alle anderen sicher gesperrt halten
+        executor.execute { onDemandSweep() }
         return START_STICKY
     }
 
     override fun onDestroy() {
         destroyed = true
+        poll?.cancel(false)
         if (registered) {
             runCatching { unregisterReceiver(screenReceiver) }
             runCatching { unregisterReceiver(otherReceiver) }
@@ -235,6 +255,7 @@ class LifecycleScreenService : Service() {
         val alreadySuspended = if (screenOn) emptySet() else entries
             .filter { it.value.screenOffExit == true && it.key !in suspendedByUs }
             .keys.filter { exec.isSuspended(it) }.toSet()
+        if (!screenOn) lockOnDemandApps(entries, exec = OnDemandExecutor(backend), all = true, reason = label)
         val actions = screenActions(entries, screenOn, packageName, system, suspendedByUs, alreadySuspended)
         if (actions.isEmpty()) {
             Log.i(TAG, "$label: nichts zu tun")
@@ -268,9 +289,126 @@ class LifecycleScreenService : Service() {
         }
     }
 
+    // ------------------------------------------------------------------ Nur bei Bedarf
+
+    private fun onDemandEntries(): Map<String, LifecycleEntry> {
+        val entries = installedEntries(this, store)
+        val apps = OnDemand.apps(entries, packageName, systemPackagesOf(this, entries.keys))
+        return entries.filterKeys { it in apps }
+    }
+
+    /**
+     * Beim Dienst-Start / nach jedem Oeffnen: Offene Apps ueberwachen; Bedarfs-Apps, die NICHT
+     * ueber die Verknuepfung geoeffnet sind, aber frei laufen, sofort wieder sperren.
+     */
+    private fun onDemandSweep() {
+        val entries = onDemandEntries()
+        // Offen-Liste bereinigen: Modus aus oder App weg -> nicht mehr ueberwachen
+        val open = store.onDemandOpen.filter { it in entries }.toSet()
+        if (open != store.onDemandOpen) store.onDemandOpen = open
+        val now = System.currentTimeMillis()
+        // Fenster fuer Nutzungsereignisse ab dem gespeicherten Oeffnen (fehlt er: letzte Stunde)
+        for (pkg in open) {
+            val t = store.openedAt(pkg) ?: (now - TimeUnit.HOURS.toMillis(1))
+            // Erneut ueber die Verknuepfung geoeffnet: alte "verlassen um"-Zeit gilt nicht mehr
+            if (openedAt[pkg] != t) leftAt.remove(pkg)
+            openedAt[pkg] = t
+        }
+        openedAt.keys.retainAll(open)
+        leftAt.keys.retainAll(open)
+        val backend = ShizukuBackend()
+        if (runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)) {
+            lockOnDemandApps(entries, OnDemandExecutor(backend), all = false, reason = getString(R.string.ondemand_report_sweep))
+        }
+        updatePoll()
+    }
+
+    /** Abfrage nur laufen lassen, solange eine Bedarfs-App offen ist. */
+    private fun updatePoll() {
+        val needed = store.onDemandOpen.isNotEmpty()
+        if (needed && poll == null) {
+            pollShizukuReported = false
+            poll = executor.scheduleWithFixedDelay({ runCatching { pollTick() }.onFailure {
+                Log.w(TAG, "Abfrage fehlgeschlagen: $it")
+            } }, POLL_SECONDS, POLL_SECONDS, TimeUnit.SECONDS)
+        } else if (!needed) {
+            poll?.cancel(false)
+            poll = null
+        }
+    }
+
+    private fun pollTick() {
+        val entries = onDemandEntries()
+        val open = store.onDemandOpen.filter { it in entries }
+        if (open.isEmpty()) {
+            store.onDemandOpen = emptySet()
+            updatePoll()
+            return
+        }
+        val backend = ShizukuBackend()
+        val usable = runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)
+        val now = System.currentTimeMillis()
+        for (pkg in open) {
+            val since = openedAt.getOrPut(pkg) { store.openedAt(pkg) ?: now } - 2000
+            val fg = OnDemandSupport.isForeground(this, if (usable) backend else null, pkg, since)
+            when (fg) {
+                true -> leftAt.remove(pkg)
+                false -> leftAt.putIfAbsent(pkg, now)
+                null -> Unit // keine Aussage: nichts aendern, lieber nicht faelschlich sperren
+            }
+            val e = entries.getValue(pkg)
+            if (!OnDemand.shouldLock(now, leftAt[pkg], OnDemand.graceOf(e))) continue
+            if (!usable) {
+                if (!pollShizukuReported) report(getString(R.string.ondemand_report_no_shizuku))
+                pollShizukuReported = true
+                continue
+            }
+            lockOne(pkg, e, OnDemandExecutor(backend), getString(R.string.ondemand_report_left))
+        }
+    }
+
+    /**
+     * Sperrt Bedarfs-Apps. [all] = true (Bildschirm aus): jede noch freie Bedarfs-App, auch die
+     * offenen. false (Sweep): nur die NICHT geoeffneten, die trotzdem frei sind.
+     */
+    private fun lockOnDemandApps(
+        entries: Map<String, LifecycleEntry>,
+        exec: OnDemandExecutor,
+        all: Boolean,
+        reason: String
+    ) {
+        val apps = OnDemand.apps(entries, packageName, systemPackagesOf(this, entries.keys))
+        val open = store.onDemandOpen
+        for (pkg in apps.sorted()) {
+            if (!all && pkg in open) continue
+            val e = entries.getValue(pkg)
+            if (exec.state(pkg).isLocked(OnDemand.lockOf(e)) && pkg !in open) continue
+            lockOne(pkg, e, exec, reason)
+        }
+    }
+
+    private fun lockOne(pkg: String, e: LifecycleEntry, exec: OnDemandExecutor, reason: String) {
+        val r = exec.lock(pkg, OnDemand.lockOf(e))
+        Log.i(TAG, "$reason: $pkg gesperrt ok=${r.ok} ${r.state} ${r.raw}")
+        if (r.ok) {
+            store.onDemandOpen = store.onDemandOpen - pkg
+            openedAt.remove(pkg)
+            leftAt.remove(pkg)
+            updatePoll()
+        }
+        report(
+            if (r.ok) getString(R.string.ondemand_report_locked, reason, appLabel(pkg))
+            else getString(R.string.ondemand_report_lock_failed, reason, appLabel(pkg), r.state.toString())
+        )
+    }
+
+    private fun appLabel(pkg: String): String = runCatching {
+        packageManager.getApplicationInfo(pkg, 0).loadLabel(packageManager).toString()
+    }.getOrDefault(pkg)
+
     private fun buildNotification(): Notification {
         val count = runCatching {
-            installedEntries(this, store).count { it.value.screenOffExit == true }
+            installedEntries(this, store).count { it.value.screenOffExit == true || it.value.onDemand == true }
         }.getOrDefault(0)
         val last = runCatching { store.lastReport }.getOrDefault("")
         val contentIntent = PendingIntent.getActivity(

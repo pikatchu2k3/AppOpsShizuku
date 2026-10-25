@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- App-Liste anzeigen (alle installierten Apps, Android 11+) -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
@@ -16,6 +17,11 @@
          dataSync ist ab Android 15 auf 6 h/Tag begrenzt und passt inhaltlich nicht;
          "specialUse" ist der einzige passende Typ ohne Zeitlimit und braucht genau dieses Recht. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- "Nur bei Bedarf": erkennen, wann die geoeffnete App verlassen wurde (Nutzungsereignisse).
+         Wird per Shizuku fuer die EIGENE App erteilt (cmd appops set ... GET_USAGE_STATS allow). -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:name=".AppOpsApp"
@@ -53,6 +59,16 @@
             android:name=".ComponentsActivity"
             android:exported="false" />
 
+        <!-- "Nur bei Bedarf": Ziel der Launcher-Verknuepfung (gibt frei + startet die App).
+             Nicht exportiert - angeheftete Verknuepfungen startet der Launcher im Namen dieser App. -->
+        <activity
+            android:name=".OnDemandLaunchActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.AppOpsShizuku.Translucent" />
+
         <!-- Stealth-Patch im Hintergrund (Foreground-Service, Fortschritt in Notification) -->
         <service
             android:name=".StealthPatchService"
@@ -68,7 +84,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Beobachtet Bildschirm an/aus, um vom Nutzer gewaehlte Apps beim Ausschalten anzuhalten (pm suspend / am force-stop)." />
+                android:value="Beobachtet Bildschirm an/aus und das Verlassen vom Nutzer gewaehlter Apps, um sie anzuhalten bzw. wieder zu sperren (pm suspend / pm disable-user / am force-stop)." />
         </service>
     </application>
 </manifest>

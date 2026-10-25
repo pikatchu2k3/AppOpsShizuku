@@ -54,7 +54,6 @@ data class ScreenActionResult(
 fun screenOffAllowed(packageName: String, ownPackage: String, isSystemApp: Boolean): Boolean =
     packageName != ownPackage && !isSystemApp
 
-/** Solange mindestens eine erlaubte App den Haken hat, muss der Dienst laufen. */
 /**
  * Nur Eintraege installierter Apps. Ohne diesen Filter hielte der Eintrag einer
  * deinstallierten App den Dienst samt Benachrichtigung am Leben (realer Fall 10/2026).
@@ -64,12 +63,13 @@ fun installedOnly(
     isInstalled: (String) -> Boolean
 ): Map<String, LifecycleEntry> = entries.filterKeys(isInstalled)
 
+/** Solange mindestens eine erlaubte App den Haken hat, muss der Dienst laufen. */
 fun screenOffServiceNeeded(
     entries: Map<String, LifecycleEntry>,
     ownPackage: String,
     systemPackages: Set<String>
 ): Boolean = entries.any { (pkg, e) ->
-    e.screenOffExit == true && screenOffAllowed(pkg, ownPackage, pkg in systemPackages)
+    (e.screenOffExit == true || e.onDemand == true) && screenOffAllowed(pkg, ownPackage, pkg in systemPackages)
 }
 
 /**
@@ -81,6 +81,7 @@ fun screenOffServiceNeeded(
  * - Bildschirm an: nur Apps freigeben, die WIR eingefroren haben ([suspendedByUs])
  *   und bei denen "wieder freigeben" nicht abgeschaltet ist.
  * - Eigene App und System-Apps: nie.
+ * - Apps im Modus "Nur bei Bedarf": nie hier, die sperrt [OnDemand] selbst.
  */
 fun screenActions(
     entries: Map<String, LifecycleEntry>,
@@ -97,13 +98,15 @@ fun screenActions(
         for (pkg in suspendedByUs.sorted()) {
             if (!screenOffAllowed(pkg, ownPackage, pkg in systemPackages)) continue
             val e = entries[pkg] ?: LifecycleEntry()
+            // "Nur bei Bedarf" gibt beim Bildschirm-An NIE frei (eigene Logik in OnDemand)
+            if (e.onDemand == true) continue
             val release = e.releaseOnScreenOn ?: true
             if (release || e.screenOffExit != true) out.add(ScreenAction(pkg, ScreenAction.Kind.UNSUSPEND))
         }
         return out
     }
     for ((pkg, e) in entries.toSortedMap()) {
-        if (e.screenOffExit != true) continue
+        if (e.screenOffExit != true || e.onDemand == true) continue
         if (!screenOffAllowed(pkg, ownPackage, pkg in systemPackages)) continue
         when (e.screenOffEffect ?: ScreenOffEffect.SUSPEND) {
             ScreenOffEffect.SUSPEND ->

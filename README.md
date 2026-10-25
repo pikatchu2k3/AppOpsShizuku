@@ -25,6 +25,7 @@ To get updates automatically, add the repository to [Obtainium](https://github.c
 - **App list** with live search (label and package name), sorting by name / install date / update date, and a "blocked" filter.
 - **Privacy profile per app** (tab *Permissions*): camera, microphone, contacts, calendar, call log, accounts, clipboard, sensors and more, set per app to default / allow / ignore / deny. "Block all", "Reset all to default", and JSON export/import of profiles. Every change is read back from the device; ops the device refuses are shown as "not settable".
 - **Behaviour control** (tab *Behavior*): disable an app, freeze it (`pm suspend`), clear its data (confirmed by typing the package name), set the standby bucket, grant/remove the battery (Doze) exemption, "optimize app" (force recompile). Also a lifecycle profile (battery exemption + standby bucket + background ops in one step, revertible) and an optional "stop app when the screen turns off" (runs a foreground service while enabled).
+  - **Only on demand (new, not yet tested on a device):** the app stays closed and locked (`am force-stop` + `pm suspend`, or `pm disable-user`) and only runs after you open it via its own home-screen shortcut. After leaving it, it is locked again after 10 s / 1 min / 5 min, or only when the screen turns off; turning the screen on never releases it. Leaving is detected via usage events (usage access is granted to this app via Shizuku), otherwise via `dumpsys activity`. Opening needs a running Shizuku; with *Disable* the app can also be re-enabled in the system settings without Shizuku. While locked, the app's messages, alarms and background sync do not arrive.
 - **Stealth** (tab *Stealth*; the controls currently live in the *Components* screen): patches an app's APK on the device and re-signs it. Hide from recents, hide the launcher icon, blank the recents thumbnail (`FLAG_SECURE`), require an active VPN, hide behind a calculator (vault), app-specific device-ID spoofing (build fields, Android ID, IMEI/IMSI), or install as a parallel clone.
 - **Network & Trackers** (tab *Network & Trackers*):
   - block background data,
@@ -115,18 +116,18 @@ Because the repository is public, the source that belongs to every released pack
 
 ### Languages / Sprachen
 
-The interface ships in English (base) plus 8 translations — 335 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 372 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
-| German/Deutsch | `values-de` | 335/335 (100%) |
-| Spanish/Español | `values-es` | 335/335 (100%) |
-| French/Français | `values-fr` | 335/335 (100%) |
-| Hindi/हिन्दी | `values-hi` | 335/335 (100%) |
-| Japanese/日本語 | `values-ja` | 335/335 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 335/335 (100%) |
-| Russian/Русский | `values-ru` | 335/335 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 335/335 (100%) |
+| German/Deutsch | `values-de` | 372/372 (100%) |
+| Spanish/Español | `values-es` | 372/372 (100%) |
+| French/Français | `values-fr` | 372/372 (100%) |
+| Hindi/हिन्दी | `values-hi` | 372/372 (100%) |
+| Japanese/日本語 | `values-ja` | 372/372 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 372/372 (100%) |
+| Russian/Русский | `values-ru` | 372/372 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 372/372 (100%) |
 
 Alle Übersetzungen sind maschinell geprüft (Platzhalter, Pluralformen, XML-Struktur) — `R.array.*`-Ressourcen bleiben unberührt. English is the base, so any device with an unsupported language falls back to English instead of German.
 ## Deutsch
@@ -154,6 +155,7 @@ Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obta
 - **App-Liste** mit Live-Suche (Name und Paketname), Sortierung nach Name / Installations- / Aktualisierungsdatum und Filter „Blockiert".
 - **Privacy-Profil je App** (Reiter *Berechtigungen*): Kamera, Mikrofon, Kontakte, Kalender, Anrufliste, Konten, Zwischenablage, Sensoren u. a., je App auf Standard / erlauben / ignorieren / verweigern. „Alles blockieren", „Alle auf Standard" sowie JSON-Export/-Import der Profile. Jede Änderung wird vom Gerät zurückgelesen; Ops, die das Gerät verweigert, erscheinen als „nicht setzbar".
 - **Verhaltens-Steuerung** (Reiter *Verhalten*): App deaktivieren, einfrieren (`pm suspend`), Daten löschen (Bestätigung per Paketname), Standby-Stufe setzen, Akku-Ausnahme (Doze) erteilen/entfernen, „App optimieren" (neu kompilieren). Dazu ein Lifecycle-Profil (Akku-Ausnahme + Standby-Stufe + Hintergrund-Ops in einem Schritt, zurücknehmbar) und optional „Beim Bildschirm-Aus anhalten" (solange aktiv, läuft ein Vordergrunddienst).
+  - **Nur bei Bedarf (neu, noch nicht am Gerät getestet):** Die App bleibt geschlossen und gesperrt (`am force-stop` + `pm suspend` oder `pm disable-user`) und läuft nur, nachdem du sie über ihre eigene Verknüpfung auf dem Startbildschirm geöffnet hast. Nach dem Verlassen wird sie nach 10 s / 1 Min. / 5 Min. oder nur beim Bildschirm-Aus wieder gesperrt; das Einschalten des Bildschirms gibt sie nie frei. Das Verlassen wird über Nutzungsereignisse erkannt (Nutzungszugriff erteilt sich die App per Shizuku), sonst über `dumpsys activity`. Zum Öffnen muss Shizuku laufen; bei *Deaktivieren* lässt sich die App auch ohne Shizuku in den System-Einstellungen wieder aktivieren. Solange sie gesperrt ist, kommen Nachrichten, Wecker und Hintergrund-Sync der App nicht an.
 - **Tarnung / Stealth** (Reiter *Tarnung*; die Schalter liegen derzeit noch im Bildschirm *Komponenten*): patcht die APK einer App auf dem Gerät und signiert sie neu. Aus dem Verlauf ausblenden, Launcher-Icon entfernen, Verlaufs-Vorschau schwärzen (`FLAG_SECURE`), VPN-Pflicht, als Taschenrechner tarnen (Vault), app-spezifisches Geräte-Spoofing (Build-Felder, Android-ID, IMEI/IMSI) oder als parallelen Klon installieren.
 - **Netz & Tracker** (Reiter *Netz & Tracker*):
   - Hintergrund-Datenverkehr sperren,
