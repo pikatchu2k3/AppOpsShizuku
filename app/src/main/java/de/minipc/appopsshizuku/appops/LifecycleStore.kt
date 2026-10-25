@@ -35,6 +35,12 @@ class LifecycleStore(context: Context) {
         return out
     }
 
+    /** App wurde deinstalliert: Eintrag und Laufzeitzustand verwerfen. */
+    fun remove(packageName: String) {
+        prefs.edit().remove(packageName).apply()
+        if (packageName in suspendedByUs) suspendedByUs = suspendedByUs - packageName
+    }
+
     /** Import: feldweise mergen - in der Datei fehlende Felder bleiben unangetastet. */
     fun importEntries(entries: Map<String, LifecycleEntry>) {
         val editor = prefs.edit()

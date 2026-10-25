@@ -259,13 +259,13 @@
 
     <!-- QW-6: Standby-Stufe -->
     <string name="behavior_standby_title">Standby-Stufe</string>
-    <string name="behavior_standby_text">Bestimmt, wie oft Android die App im Hintergrund aufweckt. Niedrigere Stufen sparen Akku, Benachrichtigungen können dann aber später ankommen.</string>
+    <string name="behavior_standby_text">Wie stark Android die App im Hintergrund bremst. Niedriger spart Akku, Nachrichten und Sync kommen dann aber später an (ungefähr, je nach Android-Version):\n• Aktiv: keine Grenzen.\n• Ab und zu: Hintergrund-Aufgaben warten bis zu ~8 Std.\n• Selten: Aufgaben warten bis zu ~24 Std., Netz eingeschränkt.\n• Eingeschränkt: Hintergrund-Arbeit etwa einmal am Tag.</string>
     <string name="behavior_standby_current">Aktuell: %1$s</string>
     <string name="behavior_standby_done">Standby-Stufe gesetzt: %1$s</string>
     <string name="behavior_standby_failed">Das Gerät hat den Wert nicht übernommen – es bleibt bei: %1$s</string>
     <string name="behavior_bucket_active">Aktiv</string>
-    <string name="behavior_bucket_working_set">Häufig genutzt</string>
-    <string name="behavior_bucket_frequent">Häufig</string>
+    <string name="behavior_bucket_working_set">Regelmäßig</string>
+    <string name="behavior_bucket_frequent">Ab und zu</string>
     <string name="behavior_bucket_rare">Selten</string>
     <string name="behavior_bucket_restricted">Eingeschränkt</string>
     <string name="behavior_bucket_never">Nie</string>
@@ -307,11 +307,11 @@
     <string name="backup_status_import_fail">Import fehlgeschlagen: %1$s</string>
 
     <!-- Feature 3: Lifecycle-Profil -->
-    <string name="lifecycle_title">Lifecycle-Profil (Hintergrund)</string>
-    <string name="lifecycle_text">Setzt in einem Schritt: Akku-Ausnahme, Standby-Stufe und Hintergrund-Ausführung (RUN_IN_BACKGROUND, RUN_ANY_IN_BACKGROUND). Vorher wird der Ist-Zustand gemerkt, „Zurücknehmen“ stellt ihn wieder her. Jeder Wert wird danach neu vom Gerät gelesen.</string>
+    <string name="lifecycle_title">Im Hintergrund weiterlaufen lassen (Profil)</string>
+    <string name="lifecycle_text">Für Apps, die im Hintergrund zuverlässig arbeiten sollen (Messenger, Wecker, Sync). Stellt die Karten oben – Standby-Stufe und Akku-Ausnahme – plus die Erlaubnis zur Hintergrund-Ausführung in einem Schritt ein, auf Wunsch auch „App optimieren“. Vorher wird der jetzige Zustand gemerkt; „Zurücknehmen“ stellt ihn wieder her.</string>
     <string name="lifecycle_bucket_label">Standby-Stufe</string>
     <string name="lifecycle_battery_check">Akku-Ausnahme erteilen</string>
-    <string name="lifecycle_battery_hint">Mit Akku-Ausnahme hält Android die Stufe auf „vom System ausgenommen“ (5) – die gewählte Stufe greift dann nicht und wird als nicht übernommen gemeldet.</string>
+    <string name="lifecycle_battery_hint">Hinweis: Mit Akku-Ausnahme setzt Android die Stufe selbst auf „Vom System ausgenommen“. Die oben gewählte Stufe wird dann ignoriert und als „nicht übernommen“ angezeigt – das ist so gewollt, kein Fehler.</string>
     <string name="lifecycle_compile_check">App danach optimieren (dauert einige Sekunden)</string>
     <string name="lifecycle_apply">Profil anwenden</string>
     <string name="lifecycle_revert">Zurücknehmen</string>
@@ -324,15 +324,15 @@
 
     <!-- Feature 3: Screen-Off-Exit -->
     <string name="screen_off_title">Beim Bildschirm-Aus anhalten</string>
-    <string name="screen_off_text">Hält die App an, sobald der Bildschirm ausgeht. Preis: Android meldet Bildschirm an/aus nur an eine laufende App. Solange mindestens eine App diesen Haken hat, läuft deshalb ein Dienst mit dauerhafter Benachrichtigung. Standard: aus.</string>
+    <string name="screen_off_text">Das Gegenteil des Profils oben: Die App wird angehalten, sobald der Bildschirm ausgeht, und kann so nicht im Hintergrund weiterlaufen. Android meldet Bildschirm an/aus nur an eine laufende App. Solange mindestens eine App diesen Haken hat, läuft deshalb ein Dienst mit Benachrichtigung. Die Benachrichtigung lässt sich ausblenden, der Dienst arbeitet weiter. Standard: aus.</string>
     <string name="screen_off_switch">Beim Bildschirm-Aus anhalten</string>
-    <string name="screen_off_effect_suspend">Einfrieren (pm suspend) – wird zurückgenommen</string>
-    <string name="screen_off_effect_force_stop">Hart beenden (am force-stop)</string>
-    <string name="screen_off_release">Beim Einschalten wieder freigeben</string>
+    <string name="screen_off_effect_suspend">Einfrieren – die App kann bis zum Einschalten gar nicht starten; Daten bleiben</string>
+    <string name="screen_off_effect_force_stop">Beenden (force-stop) – die App wird geschlossen und bekommt keine Wecker oder Push-Nachrichten, bis sie wieder geöffnet wird; Öffnen bleibt möglich</string>
+    <string name="screen_off_release">Beim Einschalten wieder freigeben (sonst bleibt sie eingefroren, bis du sie oben freigibst)</string>
     <string name="screen_off_excluded_own">Nicht für die eigene App.</string>
     <string name="screen_off_excluded_system">Nicht für System-Apps.</string>
     <string name="screen_off_no_shizuku">Nicht möglich: Shizuku ist nicht verbunden oder nicht erlaubt.</string>
-    <string name="screen_off_service_running">Dienst läuft (Benachrichtigung sichtbar).</string>
+    <string name="screen_off_service_running">Dienst läuft. Die Benachrichtigung lässt sich ausblenden (wegwischen oder „Ausblenden“ tippen), der Dienst arbeitet weiter.</string>
     <string name="screen_off_service_failed">Dienst konnte nicht starten: %1$s</string>
     <string name="screen_off_last">Zuletzt: %1$s</string>
     <string name="screen_off_notif_denied">Benachrichtigungen sind nicht erlaubt – der Dienst läuft trotzdem, die Benachrichtigung ist aber versteckt.</string>
@@ -360,4 +360,6 @@
     <string name="strip_proof_still">Berechtigungen entfernen fehlgeschlagen: in der gepatchten APK weiterhin vorhanden: %1$s. Es wurde nichts installiert.</string>
     <string name="strip_hint_ad_id">Hinweis Werbe-ID: Die App zielt auf SDK %1$d. Google sagt die Nullen-ID erst ab targetSdk 33 zu.</string>
     <string name="strip_hint_app_list">Hinweis App-Liste: Die App zielt auf SDK %1$d. Android filtert die App-Liste erst ab targetSdk 30.</string>
+    <string name="lifecycle_bucket_help">Wie stark Android die App im Hintergrund bremst (ungefähr, je nach Android-Version):\n• Aktiv: keine Grenzen.\n• Regelmäßig: Hintergrund-Aufgaben warten bis zu ~2 Std.\n• Ab und zu: Aufgaben warten bis zu ~8 Std., weniger Wecker.</string>
+    <string name="lifecycle_notif_hide">Ausblenden</string>
 </resources>

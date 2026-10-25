@@ -26,6 +26,16 @@ class ScreenOffExitTest {
     }
 
     @Test
+    fun deinstallierteAppHaeltDienstNichtAmLeben() {
+        // Realer Fall 10/2026: App mit Haken deinstalliert -> Dienst + Benachrichtigung blieben stehen
+        val entries = mapOf(PKG to on, "com.weg" to on)
+        val installed = installedOnly(entries) { it == PKG }
+        assertEquals(setOf(PKG), installed.keys)
+        assertFalse(screenOffServiceNeeded(installedOnly(mapOf("com.weg" to on)) { false }, OWN, system))
+        assertTrue(off(installedOnly(mapOf("com.weg" to on)) { false }).isEmpty())
+    }
+
+    @Test
     fun bildschirmAus_suspendIstStandardwirkung() {
         assertEquals(listOf(ScreenAction(PKG, Kind.SUSPEND)), off(mapOf(PKG to on)))
     }

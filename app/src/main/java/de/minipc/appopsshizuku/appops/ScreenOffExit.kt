@@ -55,6 +55,15 @@ fun screenOffAllowed(packageName: String, ownPackage: String, isSystemApp: Boole
     packageName != ownPackage && !isSystemApp
 
 /** Solange mindestens eine erlaubte App den Haken hat, muss der Dienst laufen. */
+/**
+ * Nur Eintraege installierter Apps. Ohne diesen Filter hielte der Eintrag einer
+ * deinstallierten App den Dienst samt Benachrichtigung am Leben (realer Fall 10/2026).
+ */
+fun installedOnly(
+    entries: Map<String, LifecycleEntry>,
+    isInstalled: (String) -> Boolean
+): Map<String, LifecycleEntry> = entries.filterKeys(isInstalled)
+
 fun screenOffServiceNeeded(
     entries: Map<String, LifecycleEntry>,
     ownPackage: String,

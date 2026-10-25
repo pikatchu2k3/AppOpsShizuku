@@ -13,12 +13,14 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import de.minipc.appopsshizuku.appops.LifecycleStore
 import de.minipc.appopsshizuku.appops.ScreenOffExecutor
+import de.minipc.appopsshizuku.appops.installedOnly
 import de.minipc.appopsshizuku.appops.screenActions
 import de.minipc.appopsshizuku.appops.screenOffServiceNeeded
 import de.minipc.appopsshizuku.appops.updateSuspendedByUs
@@ -41,6 +43,10 @@ import java.util.concurrent.Executors
  * Typ "specialUse": dataSync ist ab Android 15 auf 6 h/Tag begrenzt und passt
  * inhaltlich nicht; specialUse hat kein Zeitlimit (braucht
  * FOREGROUND_SERVICE_SPECIAL_USE, siehe Manifest).
+ *
+ * Benachrichtigung: wegwischbar (Android 14+) und ueber "Ausblenden" in den
+ * Kanal-Einstellungen abschaltbar - der Dienst laeuft in beiden Faellen weiter.
+ * Deinstallierte Apps zaehlen nicht mehr; ihr Eintrag wird beim Entfernen geloescht.
  */
 class LifecycleScreenService : Service() {
 
@@ -48,6 +54,7 @@ class LifecycleScreenService : Service() {
         const val TAG = "AppOps.Lifecycle"
         private const val CHANNEL_ID = "lifecycle_screen"
         private const val NOTIF_ID = 43
+        private const val ACTION_NOTIF_DISMISSED = "de.minipc.appopsshizuku.lifecycle.NOTIF_DISMISSED"
 
         /**
          * Dienst starten oder stoppen - je nachdem, ob mindestens eine App den Haken hat.
@@ -55,11 +62,13 @@ class LifecycleScreenService : Service() {
          */
         fun sync(context: Context): String? {
             val app = context.applicationContext
-            val entries = LifecycleStore(app).all()
+            val entries = installedEntries(app, LifecycleStore(app))
             val needed = screenOffServiceNeeded(entries, app.packageName, systemPackagesOf(app, entries.keys))
             val intent = Intent(app, LifecycleScreenService::class.java)
             if (!needed) {
                 app.stopService(intent)
+                // Falls doch eine Meldung haengen geblieben ist (z. B. aus einer alten Version): weg damit
+                runCatching { app.getSystemService(NotificationManager::class.java).cancel(NOTIF_ID) }
                 return null
             }
             return runCatching { ContextCompat.startForegroundService(app, intent) }
@@ -70,6 +79,13 @@ class LifecycleScreenService : Service() {
                     it.message ?: it.javaClass.simpleName
                 }
         }
+
+        /** Eintraege nur fuer installierte Apps (deinstallierte zaehlen nicht). */
+        fun installedEntries(context: Context, store: LifecycleStore) =
+            installedOnly(store.all()) { isInstalled(context, it) }
+
+        private fun isInstalled(context: Context, pkg: String): Boolean =
+            runCatching { context.packageManager.getApplicationInfo(pkg, 0); true }.getOrDefault(false)
 
         /** Welche der Pakete sind System-Apps? (auf die wird nie etwas angewendet) */
         fun systemPackagesOf(context: Context, packages: Collection<String>): Set<String> {
@@ -85,6 +101,33 @@ class LifecycleScreenService : Service() {
     private val executor = Executors.newSingleThreadExecutor()
     private lateinit var store: LifecycleStore
     private var registered = false
+    /** Nutzer hat die Benachrichtigung weggewischt: nicht bei jedem Bildschirm-Wechsel neu zeigen. */
+    @Volatile private var notificationDismissed = false
+    /** Nach onDestroy keine Meldung mehr posten (sonst bliebe eine verwaiste Benachrichtigung). */
+    @Volatile private var destroyed = false
+
+    /** Deinstallation einer App + Wegwischen der Benachrichtigung. */
+    private val otherReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                ACTION_NOTIF_DISMISSED -> notificationDismissed = true
+                Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
+                    val pkg = intent.data?.schemeSpecificPart ?: return
+                    if (pkg !in store.all() && pkg !in store.suspendedByUs) return
+                    store.remove(pkg)
+                    Log.i(TAG, "$pkg deinstalliert - Eintrag entfernt")
+                    // Letzte App weg -> Dienst und Benachrichtigung enden; sonst Zaehler aktualisieren.
+                    // NICHT erst stoppen und danach notify(): das hinterliesse eine verwaiste Meldung.
+                    val entries = installedEntries(context, store)
+                    if (!screenOffServiceNeeded(entries, packageName, systemPackagesOf(context, entries.keys))) {
+                        stopSelf()
+                    } else if (!notificationDismissed) {
+                        refreshNotification()
+                    }
+                }
+            }
+        }
+    }
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -137,7 +180,7 @@ class LifecycleScreenService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        val entries = store.all()
+        val entries = installedEntries(this, store)
         if (!screenOffServiceNeeded(entries, packageName, systemPackagesOf(this, entries.keys))) {
             Log.i(TAG, "Keine App mit Screen-Off-Exit - Dienst endet")
             stopSelf()
@@ -149,6 +192,14 @@ class LifecycleScreenService : Service() {
                 addAction(Intent.ACTION_SCREEN_ON)
             }
             ContextCompat.registerReceiver(this, screenReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+            ContextCompat.registerReceiver(
+                this, otherReceiver,
+                IntentFilter(Intent.ACTION_PACKAGE_FULLY_REMOVED).apply { addDataScheme("package") },
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            ContextCompat.registerReceiver(
+                this, otherReceiver, IntentFilter(ACTION_NOTIF_DISMISSED), ContextCompat.RECEIVER_NOT_EXPORTED
+            )
             registered = true
             Log.i(TAG, "Bildschirm-Empfaenger registriert")
         }
@@ -156,7 +207,11 @@ class LifecycleScreenService : Service() {
     }
 
     override fun onDestroy() {
-        if (registered) runCatching { unregisterReceiver(screenReceiver) }
+        destroyed = true
+        if (registered) {
+            runCatching { unregisterReceiver(screenReceiver) }
+            runCatching { unregisterReceiver(otherReceiver) }
+        }
         registered = false
         executor.shutdown()
         super.onDestroy()
@@ -164,7 +219,9 @@ class LifecycleScreenService : Service() {
 
     private fun handleScreen(screenOn: Boolean) {
         val label = if (screenOn) "Bildschirm an" else "Bildschirm aus"
-        val entries = store.all()
+        val entries = installedEntries(this, store)
+        // Von uns eingefrorene Apps, die inzwischen deinstalliert sind: vergessen statt freigeben
+        store.suspendedByUs.filterNot { isInstalled(this, it) }.forEach { store.remove(it) }
         val backend = ShizukuBackend()
         val usable = runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)
         if (!usable) {
@@ -200,13 +257,21 @@ class LifecycleScreenService : Service() {
         val time = SimpleDateFormat("HH:mm", Locale.GERMANY).format(Date())
         store.lastReport = "$time $text"
         Log.i(TAG, text)
+        // Weggewischt: Meldung nur speichern (steht im Reiter Verhalten), nicht neu einblenden
+        if (!notificationDismissed) refreshNotification()
+    }
+
+    private fun refreshNotification() {
+        if (destroyed) return
         runCatching {
             getSystemService(NotificationManager::class.java).notify(NOTIF_ID, buildNotification())
         }
     }
 
     private fun buildNotification(): Notification {
-        val count = runCatching { store.all().count { it.value.screenOffExit == true } }.getOrDefault(0)
+        val count = runCatching {
+            installedEntries(this, store).count { it.value.screenOffExit == true }
+        }.getOrDefault(0)
         val last = runCatching { store.lastReport }.getOrDefault("")
         val contentIntent = PendingIntent.getActivity(
             this, 1,
@@ -219,7 +284,25 @@ class LifecycleScreenService : Service() {
             .setContentText(last.ifBlank { getString(R.string.lifecycle_notif_text) })
             .setStyle(NotificationCompat.BigTextStyle().bigText(last.ifBlank { getString(R.string.lifecycle_notif_text) }))
             .setContentIntent(contentIntent)
-            .setOngoing(true)
+            .setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    this, 2, Intent(ACTION_NOTIF_DISMISSED).setPackage(packageName),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            // Manche Geraete (und Android < 14) lassen Dienst-Meldungen nicht wegwischen:
+            // Kanal ausschalten geht immer, der Dienst laeuft trotzdem weiter.
+            .addAction(
+                0, getString(R.string.lifecycle_notif_hide),
+                PendingIntent.getActivity(
+                    this, 3,
+                    Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                        .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                        .putExtra(Settings.EXTRA_CHANNEL_ID, CHANNEL_ID)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()

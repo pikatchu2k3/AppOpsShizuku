@@ -334,8 +334,8 @@ fun bucketNotSettableReason(bucket: Int): String? = when {
 fun bucketText(bucket: Int): String = when (bucket) {
     5 -> "5 (vom System ausgenommen)"
     10 -> "10 (Aktiv)"
-    20 -> "20 (Häufig genutzt)"
-    30 -> "30 (Häufig)"
+    20 -> "20 (Regelmäßig)"
+    30 -> "30 (Ab und zu)"
     40 -> "40 (Selten)"
     45 -> "45 (Eingeschränkt)"
     50 -> "50 (Nie)"
