@@ -509,6 +509,10 @@ class MainActivity : AppCompatActivity() {
                 toggleQuarantine(item)
                 true
             }
+            R.id.action_system -> {
+                startActivity(Intent(this, SystemActivity::class.java))
+                true
+            }
             R.id.action_by_permission -> {
                 startActivity(Intent(this, PermissionOverviewActivity::class.java))
                 true

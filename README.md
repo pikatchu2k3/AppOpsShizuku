@@ -35,6 +35,15 @@ To get updates automatically, add the repository to [Obtainium](https://github.c
   
   Each switch is verified by reading the state back from the device. "Reset all" only undoes what this app changed.
 
+- **New, not yet tested on a device:**
+  - **Access log** (tab *Permissions*): last use, blocked attempts and "in use right now" per permission, from one `cmd appops get`. A suggestion card lists permissions that are granted but unused for 30 days, or unusual for the app's category (games, media, news) — nothing changes until you tap *Revoke*.
+  - **Only while in use**: extra mode for permissions Android has no foreground mode for (contacts, calendar, call log, media, accounts …). Granted while the app is in front, revoked 10 s after leaving or when the screen turns off (Android then ends the app in the background). Runs in the screen watcher service.
+  - **By permission** (menu): pick one permission and see which apps have it and when they last used it; switch per app or block it for all user apps at once (system apps never).
+  - **Status line in the app list** (blocked, offline, no background data, on demand, while in use, quarantine) and a filter chip *Changed* — from this app's own records, no shell call.
+  - **Quarantine for new apps** (menu, off by default): apps installed after switching it on get no background data, no clipboard and no background running until you release them in the *Permissions* tab.
+  - **System-wide** (menu): *Lockdown* takes camera/microphone (optionally location) from all user apps and gives it back to exactly those apps — also as a Quick Settings tile. *Private DNS* with presets (AdGuard, Mullvad adblock, Quad9, Cloudflare) or an own host, with "back to previous". *Powerful access*: accessibility services, notification access, keyboards, default apps (SMS, phone, assistant, browser), always-on VPN and device admins — revocable where the shell may, otherwise a button to the system settings.
+  - Blocking a permission now also sets `user-fixed`, so the app cannot simply ask again; granting and "Reset all" clear it.
+
 ### Honest limits
 
 - **Single components of other apps cannot be switched at runtime.** Android 15/16 refuses it to the shell (`SecurityException: Shell cannot change component state`), so there is deliberately no switch for it. The Stealth tab gets around this differently: it edits the manifest of a re-signed copy (see *Work in progress*).
@@ -116,7 +125,7 @@ Because the repository is public, the source that belongs to every released pack
 
 ### Languages / Sprachen
 
-The interface ships in English (base) plus 8 translations — 372 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 513 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
@@ -164,6 +173,15 @@ Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obta
   - Tracker-Erkennung: liest das Manifest der App und listet bekannte Bausteine (Firebase Analytics/DataTransport, Crashlytics, Facebook SDK, AdMob, Audience Network, Sentry, Mixpanel, Braze, AppsFlyer, Adjust, Kochava).
   
   Jeder Schalter wird durch Zurücklesen vom Gerät geprüft. „Alles zurücksetzen" macht nur rückgängig, was diese App selbst geändert hat.
+
+- **Neu, noch nicht am Gerät getestet:**
+  - **Zugriffsprotokoll** (Reiter *Berechtigungen*): letzte Nutzung, abgewehrte Versuche und „wird gerade benutzt" je Berechtigung, aus einem einzigen `cmd appops get`. Eine Empfehlungskarte nennt Berechtigungen, die erteilt, aber seit 30 Tagen ungenutzt oder für die App-Kategorie unüblich sind (Spiele, Medien, Nachrichten) — geändert wird erst nach Tipp auf *Entziehen*.
+  - **Nur während Nutzung**: zusätzlicher Modus für Berechtigungen ohne Vordergrund-Modus in Android (Kontakte, Kalender, Anrufliste, Medien, Konten …). Erteilt, solange die App vorne ist; entzogen 10 s nach dem Verlassen oder beim Bildschirm-Aus (Android beendet die App dann im Hintergrund). Läuft im Bildschirm-Wächter.
+  - **Nach Berechtigung** (Menü): eine Berechtigung wählen und sehen, welche Apps sie haben und wann sie sie zuletzt benutzt haben; je App umschalten oder allen Nutzer-Apps auf einmal entziehen (System-Apps nie).
+  - **Statuszeile in der App-Liste** (blockiert, offline, keine Hintergrunddaten, nur bei Bedarf, nur während Nutzung, Quarantäne) und Filter-Chip *Geändert* — aus den eigenen Speichern, ohne Shell-Aufruf.
+  - **Quarantäne für neue Apps** (Menü, standardmäßig aus): nach dem Einschalten installierte Apps bekommen keine Hintergrunddaten, keine Zwischenablage und keinen Hintergrund-Lauf, bis du sie im Reiter *Berechtigungen* freigibst.
+  - **Systemweit** (Menü): *Lockdown* entzieht allen Nutzer-Apps Kamera/Mikrofon (wahlweise Standort) und gibt sie genau diesen Apps zurück — auch als Schnelleinstellungs-Kachel. *Privates DNS* mit Vorlagen (AdGuard, Mullvad adblock, Quad9, Cloudflare) oder eigenem Host, mit „Zurück auf vorher". *Mächtige Rechte*: Bedienungshilfen, Benachrichtigungszugriff, Tastaturen, Standard-Apps (SMS, Telefon, Assistent, Browser), dauerhaftes VPN und Geräteadministratoren — entziehbar, wo die Shell es darf, sonst ein Knopf zu den Systemeinstellungen.
+  - Blockieren einer Berechtigung setzt jetzt zusätzlich `user-fixed`, die App kann also nicht einfach erneut fragen; Erteilen und „Alle auf Standard" heben das wieder auf.
 
 ### Ehrliche Grenzen
 

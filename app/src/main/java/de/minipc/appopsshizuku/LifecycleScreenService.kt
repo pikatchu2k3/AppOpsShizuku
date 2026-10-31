@@ -290,6 +290,9 @@ class LifecycleScreenService : Service() {
 
     private fun handleScreen(screenOn: Boolean) {
         this.screenOn = screenOn
+        // Nach dem Bildschirm-An gilt keine App als vorne, bis ein neues Ereignis das sagt
+        // (sonst wuerde schon auf dem Sperrbildschirm wieder erteilt)
+        if (!screenOn) wiuForeground.clear()
         // "Nur waehrend Nutzung": beim Bildschirm-Aus sofort zuruecknehmen, beim An wieder beobachten
         runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
         updateWiuPoll()
@@ -509,7 +512,11 @@ class LifecycleScreenService : Service() {
                 next = next - pkg
                 continue
             }
-            val ops = PrivacyOps.PRIVACY_OPS.filter { it.opName in names && it.permissionName != null }
+            val ops = PrivacyOps.PRIVACY_OPS.filter {
+                it.opName in names && it.permissionName != null &&
+                    // Lockdown hat Vorrang: waehrenddessen nichts davon erteilen
+                    !(action == WhileInUse.Action.GRANT && LockdownManager.blocksGrant(this, it.opName))
+            }
             val mode = if (action == WhileInUse.Action.GRANT) "allow" else "deny"
             val failed = ops.count { op -> controller.setMode(pkg, op, mode).exitCode != 0 }
             next = if (action == WhileInUse.Action.GRANT) next + pkg else next - pkg

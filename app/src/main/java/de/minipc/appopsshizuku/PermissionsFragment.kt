@@ -286,9 +286,7 @@ class PermissionsFragment : Fragment() {
             val pm = appContext.packageManager
             val info = pm.getPackageInfo(packageName, 0)
             installedAgoMs = System.currentTimeMillis() - info.firstInstallTime
-            appCategory = if (android.os.Build.VERSION.SDK_INT >= 26) {
-                info.applicationInfo?.category ?: -1
-            } else -1
+            appCategory = info.applicationInfo?.category ?: -1
         }
     }
 

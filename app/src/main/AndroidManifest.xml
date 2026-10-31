@@ -72,6 +72,23 @@
             android:taskAffinity=""
             android:theme="@style/Theme.AppOpsShizuku.Translucent" />
 
+        <activity
+            android:name=".SystemActivity"
+            android:exported="false" />
+
+        <!-- Schnellstart-Kachel "Lockdown" (Kamera/Mikrofon fuer alle Nutzer-Apps). Nur das System
+             darf sich binden (BIND_QUICK_SETTINGS_TILE). -->
+        <service
+            android:name=".LockdownTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_blocked"
+            android:label="@string/lockdown_tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- Stealth-Patch im Hintergrund (Foreground-Service, Fortschritt in Notification) -->
         <service
             android:name=".StealthPatchService"
