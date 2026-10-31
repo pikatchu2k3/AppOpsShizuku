@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         const val SORT_UPDATE = 2
         const val FILTER_ALL = 0
         const val FILTER_BLOCKED = 1
+        const val FILTER_CHANGED = 2
 
         /** Gleichzeitige Shell-Aufrufe beim Blockiert-Scan. */
         private const val SCAN_THREADS = 4
@@ -178,7 +179,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<ChipGroup>(R.id.filterChipGroup).setOnCheckedStateChangeListener { _, checkedIds ->
-            filterMode = if (R.id.chipBlocked in checkedIds) FILTER_BLOCKED else FILTER_ALL
+            filterMode = when {
+                R.id.chipBlocked in checkedIds -> FILTER_BLOCKED
+                R.id.chipChanged in checkedIds -> FILTER_CHANGED
+                else -> FILTER_ALL
+            }
             if (filterMode == FILTER_BLOCKED && blockedCache.isEmpty()) {
                 scanBlockedState()
             } else {
@@ -309,14 +314,49 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
+            // Status-Symbole aus den eigenen Speichern (kein Shell-Aufruf)
+            val withBadges = loaded.map { it.copy(badges = badgeText(it.packageName)) }
+
             handler.post {
                 // Atomare Zuweisung: keine Mutation, kein Datenrennen mit
                 // scanBlockedState()/applyFilterAndSort()
-                allApps = loaded
+                allApps = withBadges
                 applyFilterAndSort()
             }
         }
     }
+
+    private val profileStoreForBadges by lazy { de.minipc.appopsshizuku.appops.PrivacyProfileStore(this) }
+    private val netStoreForBadges by lazy { de.minipc.appopsshizuku.appops.NetStore(this) }
+    private val lifecycleStoreForBadges by lazy { de.minipc.appopsshizuku.appops.LifecycleStore(this) }
+
+    /** Status-Symbole als kurzer Text ("3 blockiert · Offline · Nur bei Bedarf"). */
+    private fun badgeText(pkg: String): String {
+        val set = runCatching {
+            de.minipc.appopsshizuku.appops.AppBadges.compute(
+                profile = profileStoreForBadges.getProfile(pkg),
+                net = netStoreForBadges.get(pkg),
+                lifecycle = lifecycleStoreForBadges.get(pkg),
+                whileInUse = badgeWhileInUse(pkg),
+                quarantined = badgeQuarantined(pkg)
+            )
+        }.getOrNull() ?: return ""
+        return set.badges.joinToString(" · ") { b ->
+            when (b) {
+                de.minipc.appopsshizuku.appops.AppBadge.BLOCKED -> getString(R.string.badge_blocked, set.blockedCount)
+                de.minipc.appopsshizuku.appops.AppBadge.OFFLINE -> getString(R.string.badge_offline)
+                de.minipc.appopsshizuku.appops.AppBadge.BG_NET -> getString(R.string.badge_bg_net)
+                de.minipc.appopsshizuku.appops.AppBadge.ON_DEMAND -> getString(R.string.badge_on_demand)
+                de.minipc.appopsshizuku.appops.AppBadge.SCREEN_OFF -> getString(R.string.badge_screen_off)
+                de.minipc.appopsshizuku.appops.AppBadge.WHILE_IN_USE -> getString(R.string.badge_while_in_use)
+                de.minipc.appopsshizuku.appops.AppBadge.QUARANTINE -> getString(R.string.badge_quarantine)
+            }
+        }
+    }
+
+    // Werden in Schritt 4 (Nur waehrend Nutzung / Quarantaene) an ihre Speicher angebunden
+    private fun badgeWhileInUse(pkg: String): Boolean = false
+    private fun badgeQuarantined(pkg: String): Boolean = false
 
     /** Live-Filter (Query) + Filter-Chip + Sortierung auf allApps. */
     private fun applyFilterAndSort() {
@@ -325,6 +365,7 @@ class MainActivity : AppCompatActivity() {
             when {
                 q.isNotEmpty() && !app.label.lowercase().contains(q) && !app.packageName.lowercase().contains(q) -> false
                 filterMode == FILTER_BLOCKED -> blockedCache[app.packageName] == true
+                filterMode == FILTER_CHANGED -> app.badges.isNotEmpty()
                 else -> true
             }
         }
@@ -426,6 +467,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_by_permission -> {
+                startActivity(Intent(this, PermissionOverviewActivity::class.java))
+                true
+            }
             R.id.action_export_profiles -> {
                 exportProfiles()
                 true

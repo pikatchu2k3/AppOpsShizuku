@@ -58,6 +58,9 @@
         <activity
             android:name=".ComponentsActivity"
             android:exported="false" />
+        <activity
+            android:name=".PermissionOverviewActivity"
+            android:exported="false" />
 
         <!-- "Nur bei Bedarf": Ziel der Launcher-Verknuepfung (gibt frei + startet die App).
              Nicht exportiert - angeheftete Verknuepfungen startet der Launcher im Namen dieser App. -->

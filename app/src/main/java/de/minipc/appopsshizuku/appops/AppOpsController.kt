@@ -67,7 +67,12 @@ class AppOpsController(private val backend: ShellBackend) {
     fun getMode(packageName: String, op: AppOp): String? {
         val result = backend.exec("cmd", "appops", "get", packageName, op.opName)
         if (result.exitCode != 0) return null
-        val stdout = result.stdout.trim()
+        return parseMode(result.stdout, op)
+    }
+
+    /** Wie [getMode], aber auf bereits gelesener Ausgabe von `cmd appops get <pkg> <op>`. */
+    fun parseMode(output: String, op: AppOp): String {
+        val stdout = output.trim()
         if (stdout.contains("No mode", ignoreCase = true)) return "default"
         if (stdout.contains("No operations", ignoreCase = true)) return "default"
         val opPrefix = op.opName.lowercase() + ":"
