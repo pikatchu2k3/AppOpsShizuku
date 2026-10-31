@@ -452,4 +452,17 @@
     <string name="overview_state_unknown">Состояние не читается</string>
     <string name="overview_system_app">Системное приложение</string>
     <string name="overview_switch_desc">%1$s для %2$s</string>
+    <string name="menu_quarantine">Карантин для новых приложений</string>
+    <string name="quarantine_enable_title">Помещать новые приложения в карантин?</string>
+    <string name="quarantine_enable_msg">Приложения, установленные с этого момента, не получат фоновых данных, доступа к буферу обмена и работы в фоне, пока вы их не освободите (вкладка «Разрешения»).\n\nПроверка при каждом открытии этого приложения и сразу, пока работает наблюдатель экрана. Нужен Shizuku.</string>
+    <string name="quarantine_enable_action">Включить</string>
+    <string name="quarantine_off">Карантин для новых приложений выключен. Уже помещённые остаются там до освобождения.</string>
+    <string name="quarantine_report">Карантин: новых приложений %1$d, не полностью применён к %2$d</string>
+    <string name="quarantine_card_text">В карантине с %1$s: без фоновых данных, буфера обмена и работы в фоне. Освободите, когда будете доверять приложению.</string>
+    <string name="quarantine_release">Освободить</string>
+    <string name="quarantine_released">Освобождено из карантина</string>
+    <string name="quarantine_release_failed">Не всё удалось отменить (Shizuku подключён?). Приложение остаётся отмеченным.</string>
+    <string name="while_in_use_on">%1$s: только во время использования. Выдаётся, пока приложение на экране; отзывается через 10 с после выхода или при выключении экрана (Android при этом завершает приложение в фоне).</string>
+    <string name="while_in_use_service_failed">Не удалось запустить наблюдатель: %1$s. Откройте это приложение ещё раз.</string>
+    <string name="while_in_use_report_failed">Только во время использования: %1$s – не изменено разрешений: %2$d</string>
 </resources>

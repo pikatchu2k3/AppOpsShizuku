@@ -354,9 +354,45 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Werden in Schritt 4 (Nur waehrend Nutzung / Quarantaene) an ihre Speicher angebunden
-    private fun badgeWhileInUse(pkg: String): Boolean = false
-    private fun badgeQuarantined(pkg: String): Boolean = false
+    private val wiuStoreForBadges by lazy { de.minipc.appopsshizuku.appops.WhileInUseStore(this) }
+    private val quarantineStoreForBadges by lazy { de.minipc.appopsshizuku.appops.QuarantineStore(this) }
+
+    private fun badgeWhileInUse(pkg: String): Boolean = wiuStoreForBadges.ops(pkg).isNotEmpty()
+    private fun badgeQuarantined(pkg: String): Boolean = quarantineStoreForBadges.isQuarantined(pkg)
+
+    /** Quarantaene: neue Apps seit dem letzten Oeffnen erfassen (im Hintergrund, mit Rueckmeldung). */
+    private fun checkQuarantine() {
+        executor.execute {
+            val r = runCatching { QuarantineManager.check(this) }.getOrNull() ?: return@execute
+            val total = r.applied.size + r.failed.size
+            if (total == 0) return@execute
+            handler.post {
+                setBackupStatus(getString(R.string.quarantine_report, total, r.failed.size), r.failed.isNotEmpty())
+                loadApps()
+            }
+        }
+    }
+
+    private fun toggleQuarantine(item: MenuItem) {
+        val store = quarantineStoreForBadges
+        if (store.enabled) {
+            store.enabled = false
+            item.isChecked = false
+            Toast.makeText(this, R.string.quarantine_off, Toast.LENGTH_LONG).show()
+            return
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.quarantine_enable_title)
+            .setMessage(R.string.quarantine_enable_msg)
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.quarantine_enable_action) { _, _ ->
+                // Ab jetzt: nur Apps, die NACH dem Einschalten installiert werden
+                store.checkedUntil = System.currentTimeMillis()
+                store.enabled = true
+                item.isChecked = true
+            }
+            .show()
+    }
 
     /** Live-Filter (Query) + Filter-Chip + Sortierung auf allApps. */
     private fun applyFilterAndSort() {
@@ -449,10 +485,12 @@ class MainActivity : AppCompatActivity() {
         // Liste neu laden: nach Rueckkehr aus Komponenten-Ansicht koennen Apps
         // deaktiviert/aktiviert worden sein
         loadApps()
+        checkQuarantine()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        menu.findItem(R.id.action_quarantine)?.isChecked = quarantineStoreForBadges.enabled
         menu.findItem(R.id.action_dynamic_color).apply {
             if (DynamicColors.isDynamicColorAvailable()) {
                 isChecked = DesignSettings.isDynamicColorEnabled(this@MainActivity)
@@ -467,6 +505,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_quarantine -> {
+                toggleQuarantine(item)
+                true
+            }
             R.id.action_by_permission -> {
                 startActivity(Intent(this, PermissionOverviewActivity::class.java))
                 true

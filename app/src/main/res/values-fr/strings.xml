@@ -452,4 +452,17 @@
     <string name="overview_state_unknown">État illisible</string>
     <string name="overview_system_app">Appli système</string>
     <string name="overview_switch_desc">%1$s pour %2$s</string>
+    <string name="menu_quarantine">Quarantaine pour les nouvelles applis</string>
+    <string name="quarantine_enable_title">Mettre les nouvelles applis en quarantaine ?</string>
+    <string name="quarantine_enable_msg">Les applis installées à partir de maintenant n\'ont ni données en arrière-plan, ni accès au presse-papiers, ni exécution en arrière-plan tant que vous ne les libérez pas (onglet Autorisations).\n\nVérifié à chaque ouverture de cette appli et immédiatement tant que le gardien d\'écran tourne. Nécessite Shizuku.</string>
+    <string name="quarantine_enable_action">Activer</string>
+    <string name="quarantine_off">La quarantaine des nouvelles applis est désactivée. Les applis déjà en quarantaine y restent jusqu\'à leur libération.</string>
+    <string name="quarantine_report">Quarantaine : %1$d nouvelle(s) appli(s), %2$d pas entièrement appliquée(s)</string>
+    <string name="quarantine_card_text">En quarantaine depuis %1$s : pas de données en arrière-plan, pas de presse-papiers, pas d\'exécution en arrière-plan. Libérez-la quand vous lui faites confiance.</string>
+    <string name="quarantine_release">Libérer</string>
+    <string name="quarantine_released">Libérée de la quarantaine</string>
+    <string name="quarantine_release_failed">Tout n\'a pas pu être annulé (Shizuku connecté ?). L\'appli reste marquée.</string>
+    <string name="while_in_use_on">%1$s : seulement pendant l\'utilisation. Accordée tant que l\'appli est au premier plan, retirée 10 s après l\'avoir quittée ou à l\'extinction de l\'écran (Android ferme alors l\'appli en arrière-plan).</string>
+    <string name="while_in_use_service_failed">Impossible de démarrer le gardien : %1$s. Rouvrez cette appli au premier plan.</string>
+    <string name="while_in_use_report_failed">Seulement pendant l\'utilisation : %1$s – %2$d autorisation(s) non modifiée(s)</string>
 </resources>

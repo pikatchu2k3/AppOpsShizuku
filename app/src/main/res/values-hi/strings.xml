@@ -452,4 +452,17 @@
     <string name="overview_state_unknown">स्थिति पढ़ी नहीं जा सकी</string>
     <string name="overview_system_app">सिस्टम ऐप</string>
     <string name="overview_switch_desc">%2$s के लिए %1$s</string>
+    <string name="menu_quarantine">नए ऐप्स के लिए क्वारंटाइन</string>
+    <string name="quarantine_enable_title">नए ऐप्स को क्वारंटाइन करें?</string>
+    <string name="quarantine_enable_msg">अब से इंस्टॉल किए गए ऐप्स को तब तक बैकग्राउंड डेटा, क्लिपबोर्ड एक्सेस और बैकग्राउंड में चलने की अनुमति नहीं मिलेगी जब तक आप उन्हें रिलीज़ नहीं करते (अनुमतियां टैब)।\n\nयह ऐप खोलने पर हर बार और स्क्रीन वॉचर चलने के दौरान तुरंत जांचा जाता है। Shizuku ज़रूरी है।</string>
+    <string name="quarantine_enable_action">चालू करें</string>
+    <string name="quarantine_off">नए ऐप्स के लिए क्वारंटाइन बंद है। जो ऐप्स पहले से क्वारंटाइन में हैं, वे रिलीज़ तक वहीं रहेंगे।</string>
+    <string name="quarantine_report">क्वारंटाइन: %1$d नए ऐप, %2$d पर पूरी तरह लागू नहीं</string>
+    <string name="quarantine_card_text">%1$s से क्वारंटाइन में: बैकग्राउंड डेटा, क्लिपबोर्ड और बैकग्राउंड में चलना बंद। ऐप पर भरोसा होने पर रिलीज़ करें।</string>
+    <string name="quarantine_release">रिलीज़ करें</string>
+    <string name="quarantine_released">क्वारंटाइन से रिलीज़ किया गया</string>
+    <string name="quarantine_release_failed">सब कुछ वापस नहीं हो सका (Shizuku कनेक्ट है?)। ऐप चिह्नित रहेगा।</string>
+    <string name="while_in_use_on">%1$s: केवल उपयोग के दौरान। ऐप सामने रहने तक दी जाती है; छोड़ने के 10 सेकंड बाद या स्क्रीन बंद होने पर हटाई जाती है (तब Android बैकग्राउंड में ऐप बंद कर देता है)।</string>
+    <string name="while_in_use_service_failed">वॉचर शुरू नहीं हो सका: %1$s। यह ऐप फिर से सामने खोलें।</string>
+    <string name="while_in_use_report_failed">केवल उपयोग के दौरान: %1$s – %2$d अनुमति नहीं बदली</string>
 </resources>

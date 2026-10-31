@@ -475,4 +475,17 @@
     <string name="overview_state_unknown">Zustand nicht lesbar</string>
     <string name="overview_system_app">System-App</string>
     <string name="overview_switch_desc">%1$s für %2$s</string>
+    <string name="menu_quarantine">Quarantäne für neue Apps</string>
+    <string name="quarantine_enable_title">Neue Apps unter Quarantäne stellen?</string>
+    <string name="quarantine_enable_msg">Ab jetzt installierte Apps bekommen keine Hintergrunddaten, keinen Zugriff auf die Zwischenablage und dürfen nicht im Hintergrund laufen, bis du sie freigibst (Reiter Berechtigungen).\n\nGeprüft wird bei jedem Öffnen dieser App und sofort, solange der Bildschirm-Wächter läuft. Braucht Shizuku.</string>
+    <string name="quarantine_enable_action">Einschalten</string>
+    <string name="quarantine_off">Quarantäne für neue Apps ist aus. Apps, die schon in Quarantäne sind, bleiben es bis zur Freigabe.</string>
+    <string name="quarantine_report">Quarantäne: %1$d neue App(s), bei %2$d nicht vollständig übernommen</string>
+    <string name="quarantine_card_text">In Quarantäne seit %1$s: keine Hintergrunddaten, keine Zwischenablage, kein Hintergrund-Lauf. Gib sie frei, sobald du der App vertraust.</string>
+    <string name="quarantine_release">Freigeben</string>
+    <string name="quarantine_released">Aus der Quarantäne freigegeben</string>
+    <string name="quarantine_release_failed">Nicht alles ließ sich zurücknehmen (Shizuku verbunden?). Die App bleibt markiert.</string>
+    <string name="while_in_use_on">%1$s: nur während Nutzung. Erteilt, solange die App vorne ist; entzogen 10 s nach dem Verlassen oder beim Bildschirm-Aus (Android beendet die App dann im Hintergrund).</string>
+    <string name="while_in_use_service_failed">Wächter ließ sich nicht starten: %1$s. Öffne diese App noch einmal im Vordergrund.</string>
+    <string name="while_in_use_report_failed">Nur während Nutzung: %1$s – %2$d Berechtigung(en) nicht geändert</string>
 </resources>

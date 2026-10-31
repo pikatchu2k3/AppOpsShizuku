@@ -81,8 +81,9 @@ class AppOpsAdapter(
                 // Permission-Ops (Kamera, Mic, Kontakte...): ignore ist wie deny (pm revoke)
                 // und wird deshalb nicht als eigene Option angeboten. Ist der aktuelle
                 // Zustand trotzdem ignore (z.B. Permission nicht granted), bleibt er sichtbar.
+                // "in-use" = nur waehrend Nutzung (erteilt, solange die App vorne ist)
                 val baseModes = if (item.op.permissionName != null) {
-                    listOf("default", "allow", "deny")
+                    listOf("default", "allow", "deny", de.minipc.appopsshizuku.appops.WhileInUse.MODE)
                 } else {
                     listOf("default", "allow", "ignore", "deny")
                 }

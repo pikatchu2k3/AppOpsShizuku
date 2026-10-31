@@ -452,4 +452,17 @@
     <string name="overview_state_unknown">Estado não legível</string>
     <string name="overview_system_app">App do sistema</string>
     <string name="overview_switch_desc">%1$s para %2$s</string>
+    <string name="menu_quarantine">Quarentena para novos apps</string>
+    <string name="quarantine_enable_title">Colocar novos apps em quarentena?</string>
+    <string name="quarantine_enable_msg">Apps instalados a partir de agora não terão dados em segundo plano, acesso à área de transferência nem execução em segundo plano até você liberá-los (aba Permissões).\n\nVerificado sempre que você abre este app e imediatamente enquanto o vigia de tela estiver ativo. Requer Shizuku.</string>
+    <string name="quarantine_enable_action">Ativar</string>
+    <string name="quarantine_off">A quarentena para novos apps está desativada. Apps já em quarentena continuam até serem liberados.</string>
+    <string name="quarantine_report">Quarentena: %1$d novo(s) app(s), %2$d não aplicado(s) por completo</string>
+    <string name="quarantine_card_text">Em quarentena desde %1$s: sem dados em segundo plano, sem área de transferência, sem execução em segundo plano. Libere quando confiar no app.</string>
+    <string name="quarantine_release">Liberar</string>
+    <string name="quarantine_released">Liberado da quarentena</string>
+    <string name="quarantine_release_failed">Nem tudo pôde ser desfeito (Shizuku conectado?). O app continua marcado.</string>
+    <string name="while_in_use_on">%1$s: somente durante o uso. Concedida enquanto o app está em primeiro plano; revogada 10 s após sair ou ao desligar a tela (o Android então encerra o app em segundo plano).</string>
+    <string name="while_in_use_service_failed">Não foi possível iniciar o vigia: %1$s. Abra este app novamente em primeiro plano.</string>
+    <string name="while_in_use_report_failed">Somente durante o uso: %1$s – %2$d permissão(ões) não alterada(s)</string>
 </resources>

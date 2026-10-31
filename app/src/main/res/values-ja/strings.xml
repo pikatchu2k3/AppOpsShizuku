@@ -452,4 +452,17 @@
     <string name="overview_state_unknown">状態を読み取れません</string>
     <string name="overview_system_app">システムアプリ</string>
     <string name="overview_switch_desc">%2$sの%1$s</string>
+    <string name="menu_quarantine">新しいアプリを隔離</string>
+    <string name="quarantine_enable_title">新しいアプリを隔離しますか？</string>
+    <string name="quarantine_enable_msg">今後インストールされるアプリは、解除するまでバックグラウンドデータ、クリップボード、バックグラウンド実行が使えません（権限タブで解除）。\n\nこのアプリを開くたびに、また画面ウォッチャーの実行中は即座に確認します。Shizukuが必要です。</string>
+    <string name="quarantine_enable_action">有効にする</string>
+    <string name="quarantine_off">新しいアプリの隔離はオフです。すでに隔離中のアプリは解除するまでそのままです。</string>
+    <string name="quarantine_report">隔離: 新しいアプリ %1$d 個、%2$d 個は一部未適用</string>
+    <string name="quarantine_card_text">%1$sから隔離中: バックグラウンドデータ、クリップボード、バックグラウンド実行なし。信頼できたら解除してください。</string>
+    <string name="quarantine_release">解除</string>
+    <string name="quarantine_released">隔離を解除しました</string>
+    <string name="quarantine_release_failed">すべてを元に戻せませんでした（Shizukuは接続中？）。アプリはマークされたままです。</string>
+    <string name="while_in_use_on">%1$s: 使用中のみ。アプリが前面にある間は許可し、離れて10秒後または画面オフ時に取り消します（その際Androidはバックグラウンドのアプリを終了します）。</string>
+    <string name="while_in_use_service_failed">ウォッチャーを開始できません: %1$s。このアプリをもう一度前面で開いてください。</string>
+    <string name="while_in_use_report_failed">使用中のみ: %1$s – %2$d件の権限を変更できませんでした</string>
 </resources>

@@ -23,6 +23,7 @@ import de.minipc.appopsshizuku.appops.AppOp
 import de.minipc.appopsshizuku.appops.OpAccess
 import de.minipc.appopsshizuku.appops.OpEffect
 import de.minipc.appopsshizuku.appops.Recommendations
+import de.minipc.appopsshizuku.appops.WhileInUse
 import de.minipc.appopsshizuku.appops.OpReset
 import de.minipc.appopsshizuku.appops.PrivacyOps
 import de.minipc.appopsshizuku.appops.PrivacyProfileStore
@@ -82,6 +83,8 @@ class PermissionsFragment : Fragment() {
     private lateinit var backend: de.minipc.appopsshizuku.shizuku.ShellBackend
     private lateinit var controller: AppOpsController
     private lateinit var profileStore: PrivacyProfileStore
+    private lateinit var wiuStore: de.minipc.appopsshizuku.appops.WhileInUseStore
+    private lateinit var quarantineStore: de.minipc.appopsshizuku.appops.QuarantineStore
     private lateinit var packageName: String
     private var adapter: AppOpsAdapter? = null
 
@@ -123,6 +126,8 @@ class PermissionsFragment : Fragment() {
         backend = if (shizukuOn) de.minipc.appopsshizuku.shizuku.ShizukuBackend() else NoopBackend()
         controller = AppOpsController(backend)
         profileStore = PrivacyProfileStore(appContext)
+        wiuStore = de.minipc.appopsshizuku.appops.WhileInUseStore(appContext)
+        quarantineStore = de.minipc.appopsshizuku.appops.QuarantineStore(appContext)
     }
 
     override fun onCreateView(
@@ -143,6 +148,7 @@ class PermissionsFragment : Fragment() {
         }
 
         view.findViewById<MaterialButton>(R.id.suggestionApply).setOnClickListener { applySuggestions() }
+        view.findViewById<MaterialButton>(R.id.quarantineRelease).setOnClickListener { releaseQuarantine() }
 
         view.findViewById<MaterialButton>(R.id.restoreAllButton).setOnClickListener {
             confirmRestoreAll()
@@ -201,6 +207,7 @@ class PermissionsFragment : Fragment() {
         adapter?.submitList(buildItems())
         updateStats()
         updateSuggestionCard()
+        updateQuarantineCard()
     }
 
     private fun loadAllModes() {
@@ -233,6 +240,8 @@ class PermissionsFragment : Fragment() {
      * - NOT_REQUESTED   = die App deklariert diese Berechtigung gar nicht (gegenstandslos, NICHT "nicht setzbar")
      */
     private fun readMode(op: AppOp, useCache: Boolean = true): String? {
+        // "Nur waehrend Nutzung" ist ein Modus dieser App, kein Systemzustand: so anzeigen
+        if (op.permissionName != null && wiuStore.has(packageName, op.opName)) return WhileInUse.MODE
         if (!op.readViaPermission) return controller.getMode(packageName, op)
         val perm = op.permissionName ?: return null
         val dump = if (useCache) (dumpsysCache ?: readPackageDump()) else readPackageDump()
@@ -433,6 +442,15 @@ class PermissionsFragment : Fragment() {
         // Die Liste kann eine beschriftete Kopie liefern ("nicht setzbar"/"nicht angefordert")
         // -> Original aus dem Katalog nehmen, sonst landet der Zusatz im gespeicherten Profil.
         val op = ops.firstOrNull { it.opName == selected.opName } ?: selected
+        if (mode == WhileInUse.MODE) {
+            enableWhileInUse(op)
+            return
+        }
+        // Anderer Modus gewaehlt: "Nur waehrend Nutzung" fuer diese Op beenden
+        if (wiuStore.has(packageName, op.opName)) {
+            wiuStore.set(packageName, op.opName, false)
+            LifecycleScreenService.sync(appContext)
+        }
         // Nicht angeforderte Berechtigung: nicht erst setzen (waere ein wirkungsloser Shell-Aufruf)
         if (opStates[op.opName] == OpEffect.NOT_REQUESTED) {
             Toast.makeText(
@@ -495,6 +513,87 @@ class PermissionsFragment : Fragment() {
         }
     }
 
+    /**
+     * "Nur waehrend Nutzung" einschalten: jetzt entziehen (die App ist gerade nicht vorne), merken,
+     * Nutzungszugriff fuer die eigene App sichern und den Waechter starten. Erteilt wird erst, wenn die
+     * App geoeffnet wird.
+     */
+    private fun enableWhileInUse(op: AppOp) {
+        if (packageName == appContext.packageName || opStates[op.opName] == OpEffect.NOT_REQUESTED || opStates[op.opName] == null) {
+            Toast.makeText(appContext, appContext.getString(R.string.op_not_settable, op.label), Toast.LENGTH_LONG).show()
+            handler.post { refreshList() }
+            return
+        }
+        executor.execute {
+            val res = controller.setMode(packageName, op, "deny")
+            dumpsysCache = null
+            val revoked = res.exitCode == 0 && run {
+                wiuStore.set(packageName, op.opName, false) // fuer das Zuruecklesen kurz ohne Modus
+                val actual = runCatching { readMode(op, useCache = false) }.getOrNull()
+                OpEffect.isSetEffective(op.permissionName, "deny", actual)
+            }
+            if (revoked) {
+                wiuStore.set(packageName, op.opName, true)
+                runCatching { OnDemandSupport.grantUsageAccess(appContext, backend) }
+                opStates[op.opName] = WhileInUse.MODE
+                runCatching { profileStore.setOpMode(packageName, op.opName, "deny") }
+            }
+            handler.post {
+                val err = if (revoked) LifecycleScreenService.sync(appContext) else null
+                Toast.makeText(
+                    appContext,
+                    when {
+                        !revoked -> appContext.getString(R.string.op_not_settable, op.label)
+                        err != null -> appContext.getString(R.string.while_in_use_service_failed, err)
+                        else -> appContext.getString(R.string.while_in_use_on, op.label)
+                    },
+                    Toast.LENGTH_LONG
+                ).show()
+                refreshList()
+            }
+        }
+    }
+
+    /** Sammelaktionen setzen jede Op explizit: "Nur waehrend Nutzung" darf danach nichts mehr erteilen. */
+    private fun endWhileInUse() {
+        if (wiuStore.ops(packageName).isEmpty()) return
+        wiuStore.remove(packageName)
+        handler.post { LifecycleScreenService.sync(appContext) }
+    }
+
+    private fun updateQuarantineCard() {
+        val root = view ?: return
+        val since = quarantineStore.since(packageName)
+        val card = root.findViewById<View>(R.id.quarantineCard)
+        if (since == null) {
+            card.visibility = View.GONE
+            return
+        }
+        card.visibility = View.VISIBLE
+        val when_ = android.text.format.DateUtils.getRelativeTimeSpanString(
+            since, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS
+        )
+        root.findViewById<TextView>(R.id.quarantineText).text =
+            appContext.getString(R.string.quarantine_card_text, when_)
+    }
+
+    private fun releaseQuarantine() {
+        setLoading(true)
+        executor.execute {
+            val ok = de.minipc.appopsshizuku.QuarantineManager.release(appContext, packageName)
+            for (op in ops) if (op.permissionName == null) opStates[op.opName] = runCatching { readMode(op) }.getOrNull()
+            handler.post {
+                setLoading(false)
+                refreshList()
+                Toast.makeText(
+                    appContext,
+                    if (ok) R.string.quarantine_released else R.string.quarantine_release_failed,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     /** Rueckfrage vor dem Lockdown - erst danach werden alle Ops gesetzt. */
     private fun confirmBlockAll() {
         // requireContext() (Activity-Kontext) ist Pflicht: mit dem Application-Kontext
@@ -514,6 +613,7 @@ class PermissionsFragment : Fragment() {
     private fun blockAll() {
         setLoading(true)
         executor.execute {
+            endWhileInUse()
             var failed = 0
             for (op in ops) {
                 val res = controller.setMode(packageName, op, "ignore")
@@ -555,6 +655,7 @@ class PermissionsFragment : Fragment() {
     private fun restoreAll() {
         setLoading(true)
         executor.execute {
+            endWhileInUse()
             var failed = 0
             for (op in ops) {
                 // Ops, die dieses Geraet nicht kennt (Zustand null), gar nicht erst anfassen:

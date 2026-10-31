@@ -145,6 +145,7 @@
     <string name="menu_dynamic_color_unavailable">System colors (only available from Android 12)</string>
     <string name="menu_export_profiles">Export profiles</string>
     <string name="menu_import_profiles">Import profiles</string>
+    <string name="menu_quarantine">Quarantine for new apps</string>
     <string name="net_bg_data">Block background data</string>
     <string name="net_bg_data_hint">The app may only load data while you are using it. Recommended.</string>
     <string name="net_bg_restrict">Restrict in background</string>
@@ -260,6 +261,15 @@
     <string name="profiles_import_ok_full">%1$d profiles and %2$d app settings applied</string>
     <string name="profiles_import_ok_global">%1$d profiles imported</string>
     <string name="profiles_import_ok_with_errors">%1$d profiles applied – %2$d app settings the device did not apply</string>
+    <string name="quarantine_card_text">In quarantine since %1$s: no background data, no clipboard, no background running. Release it once you trust the app.</string>
+    <string name="quarantine_enable_action">Enable</string>
+    <string name="quarantine_enable_msg">Apps installed from now on get no background data, no clipboard access and may not run in the background until you release them (Permissions tab).\n\nChecked whenever you open this app, and immediately while the screen watcher is running. Requires Shizuku.</string>
+    <string name="quarantine_enable_title">Quarantine new apps?</string>
+    <string name="quarantine_off">Quarantine for new apps is off. Apps already in quarantine stay there until released.</string>
+    <string name="quarantine_release">Release</string>
+    <string name="quarantine_release_failed">Not everything could be undone (Shizuku connected?). The app stays marked.</string>
+    <string name="quarantine_released">Released from quarantine</string>
+    <string name="quarantine_report">Quarantine: %1$d new app(s), %2$d not fully applied</string>
     <string name="restore_all_action">To default</string>
     <string name="restore_all_confirm_msg">Pure entries go back to default. For permissions the permission is revoked — the app will ask again itself on next start. A permission is never granted automatically.</string>
     <string name="restore_all_confirm_title">All to default?</string>
@@ -453,4 +463,7 @@
     <string name="ondemand_report_left">Left</string>
     <string name="ondemand_report_locked">%1$s: %2$s closed and locked</string>
     <string name="ondemand_report_lock_failed">%1$s: %2$s NOT locked (%3$s)</string>
+    <string name="while_in_use_on">%1$s: only while in use. Granted while the app is in front, revoked 10 s after leaving or when the screen turns off (Android then ends the app in the background).</string>
+    <string name="while_in_use_report_failed">Only while in use: %1$s – %2$d permission(s) not changed</string>
+    <string name="while_in_use_service_failed">Could not start the watcher: %1$s. Open this app again in the foreground.</string>
 </resources>

@@ -454,4 +454,17 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="overview_state_unknown">Estado no legible</string>
     <string name="overview_system_app">App del sistema</string>
     <string name="overview_switch_desc">%1$s para %2$s</string>
+    <string name="menu_quarantine">Cuarentena para apps nuevas</string>
+    <string name="quarantine_enable_title">¿Poner en cuarentena las apps nuevas?</string>
+    <string name="quarantine_enable_msg">Las apps instaladas a partir de ahora no tendrán datos en segundo plano, ni acceso al portapapeles, ni podrán ejecutarse en segundo plano hasta que las liberes (pestaña Permisos).\n\nSe comprueba cada vez que abres esta app y al instante mientras el vigilante de pantalla está activo. Requiere Shizuku.</string>
+    <string name="quarantine_enable_action">Activar</string>
+    <string name="quarantine_off">La cuarentena para apps nuevas está desactivada. Las apps ya en cuarentena siguen así hasta liberarlas.</string>
+    <string name="quarantine_report">Cuarentena: %1$d app(s) nueva(s), %2$d no aplicada(s) del todo</string>
+    <string name="quarantine_card_text">En cuarentena desde %1$s: sin datos en segundo plano, sin portapapeles, sin ejecución en segundo plano. Libérala cuando confíes en la app.</string>
+    <string name="quarantine_release">Liberar</string>
+    <string name="quarantine_released">Liberada de la cuarentena</string>
+    <string name="quarantine_release_failed">No se pudo deshacer todo (¿Shizuku conectado?). La app sigue marcada.</string>
+    <string name="while_in_use_on">%1$s: solo mientras se usa. Se concede mientras la app está en primer plano y se revoca 10 s después de salir o al apagar la pantalla (Android cierra entonces la app en segundo plano).</string>
+    <string name="while_in_use_service_failed">No se pudo iniciar el vigilante: %1$s. Vuelve a abrir esta app en primer plano.</string>
+    <string name="while_in_use_report_failed">Solo mientras se usa: %1$s – %2$d permiso(s) sin cambiar</string>
 </resources>

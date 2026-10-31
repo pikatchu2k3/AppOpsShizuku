@@ -452,4 +452,17 @@
     <string name="overview_state_unknown">无法读取状态</string>
     <string name="overview_system_app">系统应用</string>
     <string name="overview_switch_desc">%2$s 的%1$s</string>
+    <string name="menu_quarantine">新应用隔离</string>
+    <string name="quarantine_enable_title">要隔离新应用吗？</string>
+    <string name="quarantine_enable_msg">从现在起安装的应用在你解除隔离（权限标签页）之前，将无法使用后台数据、剪贴板，也不能在后台运行。\n\n每次打开本应用时检查；屏幕监视服务运行时会立即检查。需要 Shizuku。</string>
+    <string name="quarantine_enable_action">启用</string>
+    <string name="quarantine_off">新应用隔离已关闭。已隔离的应用会保持隔离，直到解除。</string>
+    <string name="quarantine_report">隔离：%1$d 个新应用，%2$d 个未完全生效</string>
+    <string name="quarantine_card_text">自 %1$s 起处于隔离中：无后台数据、无剪贴板、不能后台运行。信任该应用后即可解除。</string>
+    <string name="quarantine_release">解除</string>
+    <string name="quarantine_released">已解除隔离</string>
+    <string name="quarantine_release_failed">未能全部撤销（Shizuku 是否已连接？）。该应用仍保持标记。</string>
+    <string name="while_in_use_on">%1$s：仅在使用期间。应用位于前台时授予，离开 10 秒后或熄屏时撤销（届时 Android 会结束后台应用）。</string>
+    <string name="while_in_use_service_failed">无法启动监视服务：%1$s。请再次在前台打开本应用。</string>
+    <string name="while_in_use_report_failed">仅在使用期间：%1$s – %2$d 项权限未更改</string>
 </resources>
