@@ -1,18 +1,21 @@
-.gradle/
-app/build/
-build/
-local.properties
-*.apk
-*.aab
-vaultcalc/build/
-spooftest/build/
-app/build/
-spooftest/build/
-build/
+# Build
 .gradle/
 .kotlin/
-local.properties
+build/
+app/build/
+spooftest/build/
+vaultcalc/build/
+captures/
 *.apk
 *.aab
 *.idsig
-captures/
+
+# Lokale Maschine
+local.properties
+
+# Fremde Werkzeuge (Real-ESRGAN), gehoeren nicht zum Projekt
+models/
+realesrgan-ncnn-vulkan
+README_ubuntu.md
+onepiece_demo.mp4
+input*.jpg
