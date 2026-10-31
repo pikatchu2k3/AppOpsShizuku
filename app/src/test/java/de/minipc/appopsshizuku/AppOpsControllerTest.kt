@@ -205,7 +205,7 @@ class AppOpsControllerTest {
         )
         assertEquals(
             listOf("cmd", "appops", "set", "com.example.app", "READ_CLIPBOARD", "default"),
-            backend.commands[1]
+            backend.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }[1]
         )
     }
 
@@ -223,5 +223,39 @@ class AppOpsControllerTest {
         val controller = AppOpsController(backend)
 
         assertTrue(!controller.probe("com.example.app", cameraOp))
+    }
+
+    // ---------- user-fixed: App darf nach Blockieren nicht sofort neu fragen ----------
+
+    @Test
+    fun `deny setzt nach revoke user-fixed`() {
+        val backend = FakeBackend()
+        AppOpsController(backend).setMode("com.example.app", cameraOp, "deny")
+        assertEquals(
+            listOf("pm", "set-permission-flags", "com.example.app", "android.permission.CAMERA", "user-set", "user-fixed"),
+            backend.commands[1]
+        )
+    }
+
+    @Test
+    fun `reset ohne userFixed loescht das Flag`() {
+        val backend = FakeBackend()
+        AppOpsController(backend).setMode("com.example.app", cameraOp, "deny", userFixed = false)
+        assertEquals("clear-permission-flags", backend.commands[1][1])
+    }
+
+    @Test
+    fun `grant loescht das Flag`() {
+        val backend = FakeBackend()
+        AppOpsController(backend).setMode("com.example.app", cameraOp, "allow")
+        assertEquals("clear-permission-flags", backend.commands[1][1])
+    }
+
+    @Test
+    fun `fehlgeschlagenes revoke setzt kein Flag`() {
+        val backend = FakeBackend()
+        backend.result = ShellResult(255, "", "Unknown permission")
+        AppOpsController(backend).setMode("com.example.app", cameraOp, "deny")
+        assertEquals(1, backend.commands.size)
     }
 }

@@ -64,6 +64,34 @@ object OnDemandSupport {
         return if (dump.exitCode == 0) OnDemand.foregroundFromDumpsys(dump.stdout, packageName) else null
     }
 
+    /**
+     * Vordergrund-Zustand mehrerer Apps mit EINER Abfrage (Nutzungsereignisse seit [sinceMs]),
+     * sonst ein einziges `dumpsys activity activities`. null je App = keine Aussage.
+     */
+    fun foregroundMap(
+        context: Context,
+        backend: ShellBackend?,
+        packages: Set<String>,
+        sinceMs: Long
+    ): Map<String, Boolean?> {
+        if (packages.isEmpty()) return emptyMap()
+        if (hasUsageAccess(context)) {
+            val usm = context.getSystemService(UsageStatsManager::class.java)
+            val events = usm.queryEvents(sinceMs, System.currentTimeMillis())
+            val types = HashMap<String, ArrayList<Int>>()
+            val e = UsageEvents.Event()
+            while (events.hasNextEvent()) {
+                events.getNextEvent(e)
+                if (e.packageName in packages) types.getOrPut(e.packageName) { ArrayList() }.add(e.eventType)
+            }
+            return packages.associateWith { p -> types[p]?.let { OnDemand.foregroundFromEvents(it) } }
+        }
+        if (backend == null) return packages.associateWith { null }
+        val dump = backend.exec("dumpsys", "activity", "activities")
+        if (dump.exitCode != 0) return packages.associateWith { null }
+        return packages.associateWith { OnDemand.foregroundFromDumpsys(dump.stdout, it) }
+    }
+
     fun canPinShortcut(context: Context): Boolean = ShortcutManagerCompat.isRequestPinShortcutSupported(context)
 
     /**

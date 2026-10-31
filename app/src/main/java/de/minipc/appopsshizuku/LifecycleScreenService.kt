@@ -27,6 +27,10 @@ import de.minipc.appopsshizuku.appops.installedOnly
 import de.minipc.appopsshizuku.appops.screenActions
 import de.minipc.appopsshizuku.appops.screenOffServiceNeeded
 import de.minipc.appopsshizuku.appops.updateSuspendedByUs
+import de.minipc.appopsshizuku.appops.AppOpsController
+import de.minipc.appopsshizuku.appops.PrivacyOps
+import de.minipc.appopsshizuku.appops.WhileInUse
+import de.minipc.appopsshizuku.appops.WhileInUseStore
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -72,8 +76,7 @@ class LifecycleScreenService : Service() {
          */
         fun sync(context: Context): String? {
             val app = context.applicationContext
-            val entries = installedEntries(app, LifecycleStore(app))
-            val needed = screenOffServiceNeeded(entries, app.packageName, systemPackagesOf(app, entries.keys))
+            val needed = serviceNeeded(app)
             val intent = Intent(app, LifecycleScreenService::class.java)
             if (!needed) {
                 app.stopService(intent)
@@ -89,6 +92,22 @@ class LifecycleScreenService : Service() {
                     it.message ?: it.javaClass.simpleName
                 }
         }
+
+        /**
+         * Laeuft der Dienst? Bildschirm-Aus / Nur bei Bedarf ODER "Nur waehrend Nutzung" (auch solange
+         * noch eine von uns erteilte Berechtigung zurueckzunehmen ist).
+         */
+        fun serviceNeeded(context: Context): Boolean {
+            val app = context.applicationContext
+            val entries = installedEntries(app, LifecycleStore(app))
+            if (screenOffServiceNeeded(entries, app.packageName, systemPackagesOf(app, entries.keys))) return true
+            val wiu = WhileInUseStore(app)
+            return whileInUseApps(app, wiu).isNotEmpty() || wiu.grantedByUs.isNotEmpty()
+        }
+
+        /** Installierte Apps im Modus "Nur waehrend Nutzung" (eigene App nie). */
+        fun whileInUseApps(context: Context, store: WhileInUseStore): Map<String, Set<String>> =
+            store.all().filterKeys { it != context.packageName && isInstalled(context, it) }
 
         /** Eintraege nur fuer installierte Apps (deinstallierte zaehlen nicht). */
         fun installedEntries(context: Context, store: LifecycleStore) =
@@ -117,6 +136,13 @@ class LifecycleScreenService : Service() {
     /** "Shizuku fehlt" pro Abfrage-Serie nur einmal melden. */
     private var pollShizukuReported = false
     private lateinit var store: LifecycleStore
+    private lateinit var wiuStore: WhileInUseStore
+    /** "Nur waehrend Nutzung": eigene Abfrage, Vordergrund-Zustand, Verlassen-Zeitpunkte. */
+    private var wiuPoll: ScheduledFuture<*>? = null
+    private val wiuForeground = HashMap<String, Boolean>()
+    private val wiuLeftAt = HashMap<String, Long>()
+    private var wiuLastPoll = 0L
+    @Volatile private var screenOn = true
     private var registered = false
     /** Nutzer hat die Benachrichtigung weggewischt: nicht bei jedem Bildschirm-Wechsel neu zeigen. */
     @Volatile private var notificationDismissed = false
@@ -128,15 +154,32 @@ class LifecycleScreenService : Service() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_NOTIF_DISMISSED -> notificationDismissed = true
+                Intent.ACTION_PACKAGE_ADDED -> {
+                    // Neu installiert (kein Update): sofort Quarantaene pruefen
+                    if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) return
+                    val pending = goAsync()
+                    executor.execute {
+                        try {
+                            QuarantineManager.check(context)?.let { r ->
+                                if (r.applied.isNotEmpty() || r.failed.isNotEmpty()) {
+                                    report(getString(R.string.quarantine_report, r.applied.size + r.failed.size, r.failed.size))
+                                }
+                            }
+                        } finally {
+                            pending.finish()
+                        }
+                    }
+                }
                 Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                     val pkg = intent.data?.schemeSpecificPart ?: return
-                    if (pkg !in store.all() && pkg !in store.suspendedByUs) return
+                    if (pkg !in store.all() && pkg !in store.suspendedByUs && wiuStore.ops(pkg).isEmpty()) return
                     store.remove(pkg)
+                    wiuStore.remove(pkg)
+                    wiuStore.grantedByUs = wiuStore.grantedByUs - pkg
                     Log.i(TAG, "$pkg deinstalliert - Eintrag entfernt")
                     // Letzte App weg -> Dienst und Benachrichtigung enden; sonst Zaehler aktualisieren.
                     // NICHT erst stoppen und danach notify(): das hinterliesse eine verwaiste Meldung.
-                    val entries = installedEntries(context, store)
-                    if (!screenOffServiceNeeded(entries, packageName, systemPackagesOf(context, entries.keys))) {
+                    if (!serviceNeeded(context)) {
                         stopSelf()
                     } else if (!notificationDismissed) {
                         refreshNotification()
@@ -167,6 +210,8 @@ class LifecycleScreenService : Service() {
     override fun onCreate() {
         super.onCreate()
         store = LifecycleStore(this)
+        wiuStore = WhileInUseStore(this)
+        screenOn = runCatching { getSystemService(android.os.PowerManager::class.java).isInteractive }.getOrDefault(true)
         val channel = NotificationChannel(
             CHANNEL_ID,
             getString(R.string.lifecycle_notif_channel),
@@ -197,9 +242,8 @@ class LifecycleScreenService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        val entries = installedEntries(this, store)
-        if (!screenOffServiceNeeded(entries, packageName, systemPackagesOf(this, entries.keys))) {
-            Log.i(TAG, "Keine App mit Screen-Off-Exit - Dienst endet")
+        if (!serviceNeeded(this)) {
+            Log.i(TAG, "Keine App mit Screen-Off-Exit / Nur waehrend Nutzung - Dienst endet")
             stopSelf()
             return START_NOT_STICKY
         }
@@ -209,9 +253,14 @@ class LifecycleScreenService : Service() {
                 addAction(Intent.ACTION_SCREEN_ON)
             }
             ContextCompat.registerReceiver(this, screenReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+            // Paket-Broadcasts kommen vom System (das erreicht auch nicht exportierte Empfaenger);
+            // als Laufzeit-Empfaenger ist PACKAGE_ADDED trotz Manifest-Verbot fuer implizite Broadcasts erlaubt.
             ContextCompat.registerReceiver(
                 this, otherReceiver,
-                IntentFilter(Intent.ACTION_PACKAGE_FULLY_REMOVED).apply { addDataScheme("package") },
+                IntentFilter(Intent.ACTION_PACKAGE_FULLY_REMOVED).apply {
+                    addAction(Intent.ACTION_PACKAGE_ADDED)
+                    addDataScheme("package")
+                },
                 ContextCompat.RECEIVER_NOT_EXPORTED
             )
             ContextCompat.registerReceiver(
@@ -222,12 +271,14 @@ class LifecycleScreenService : Service() {
         }
         // Bedarfs-Apps: offene ueberwachen, alle anderen sicher gesperrt halten
         executor.execute { onDemandSweep() }
+        executor.execute { whileInUseSweep() }
         return START_STICKY
     }
 
     override fun onDestroy() {
         destroyed = true
         poll?.cancel(false)
+        wiuPoll?.cancel(false)
         if (registered) {
             runCatching { unregisterReceiver(screenReceiver) }
             runCatching { unregisterReceiver(otherReceiver) }
@@ -238,6 +289,13 @@ class LifecycleScreenService : Service() {
     }
 
     private fun handleScreen(screenOn: Boolean) {
+        this.screenOn = screenOn
+        // Nach dem Bildschirm-An gilt keine App als vorne, bis ein neues Ereignis das sagt
+        // (sonst wuerde schon auf dem Sperrbildschirm wieder erteilt)
+        if (!screenOn) wiuForeground.clear()
+        // "Nur waehrend Nutzung": beim Bildschirm-Aus sofort zuruecknehmen, beim An wieder beobachten
+        runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
+        updateWiuPoll()
         val label = if (screenOn) "Bildschirm an" else "Bildschirm aus"
         val entries = installedEntries(this, store)
         // Von uns eingefrorene Apps, die inzwischen deinstalliert sind: vergessen statt freigeben
@@ -406,9 +464,76 @@ class LifecycleScreenService : Service() {
         packageManager.getApplicationInfo(pkg, 0).loadLabel(packageManager).toString()
     }.getOrDefault(pkg)
 
+    // ------------------------------------------------------------------ Nur waehrend Nutzung
+
+    private fun whileInUseSweep() {
+        runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
+        updateWiuPoll()
+    }
+
+    private fun updateWiuPoll() {
+        val needed = screenOn && (whileInUseApps(this, wiuStore).isNotEmpty() || wiuStore.grantedByUs.isNotEmpty())
+        if (needed && wiuPoll == null) {
+            wiuPoll = executor.scheduleWithFixedDelay({
+                runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
+            }, POLL_SECONDS, POLL_SECONDS, TimeUnit.SECONDS)
+        } else if (!needed) {
+            wiuPoll?.cancel(false)
+            wiuPoll = null
+        }
+    }
+
+    /** Ein Durchlauf: Vordergrund lesen, erteilen/entziehen, Ergebnis merken. */
+    private fun whileInUseTick() {
+        val apps = whileInUseApps(this, wiuStore)
+        val granted = wiuStore.grantedByUs
+        if (apps.isEmpty() && granted.isEmpty()) {
+            updateWiuPoll()
+            return
+        }
+        val backend = ShizukuBackend()
+        if (!runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)) return
+        val now = System.currentTimeMillis()
+        // Erstes Fenster: letzte halbe Stunde, danach nur seit der letzten Abfrage (mit Ueberlappung)
+        val since = if (wiuLastPoll == 0L) now - TimeUnit.MINUTES.toMillis(30) else wiuLastPoll - 1_000
+        val fresh = OnDemandSupport.foregroundMap(this, backend, apps.keys, since)
+        // Ohne neue Ereignisse bleibt der letzte bekannte Zustand gueltig
+        for ((pkg, fg) in fresh) if (fg != null) wiuForeground[pkg] = fg
+        wiuForeground.keys.retainAll(apps.keys)
+        wiuLastPoll = now
+        val actions = WhileInUse.decide(now, apps.keys, wiuForeground.toMap(), granted, wiuLeftAt, screenOn)
+        if (actions.isEmpty()) return
+        val controller = AppOpsController(backend)
+        var next = granted
+        for ((pkg, action) in actions) {
+            val names = apps[pkg]
+            if (names == null) {
+                // Modus fuer die App ausgeschaltet: den Zustand hat die Oberflaeche dabei selbst gesetzt
+                next = next - pkg
+                continue
+            }
+            val ops = PrivacyOps.PRIVACY_OPS.filter {
+                it.opName in names && it.permissionName != null &&
+                    // Lockdown hat Vorrang: waehrenddessen nichts davon erteilen
+                    !(action == WhileInUse.Action.GRANT && LockdownManager.blocksGrant(this, it.opName))
+            }
+            val mode = if (action == WhileInUse.Action.GRANT) "allow" else "deny"
+            val failed = ops.count { op -> controller.setMode(pkg, op, mode).exitCode != 0 }
+            next = if (action == WhileInUse.Action.GRANT) next + pkg else next - pkg
+            Log.i(TAG, "Nur waehrend Nutzung: $action $pkg (${ops.size} Ops, $failed fehlgeschlagen)")
+            if (failed > 0) {
+                report(getString(R.string.while_in_use_report_failed, appLabel(pkg), failed))
+            }
+        }
+        wiuStore.grantedByUs = next
+        if (next.isEmpty() && apps.isEmpty()) updateWiuPoll()
+    }
+
     private fun buildNotification(): Notification {
         val count = runCatching {
-            installedEntries(this, store).count { it.value.screenOffExit == true || it.value.onDemand == true }
+            val lifecycle = installedEntries(this, store)
+                .filterValues { it.screenOffExit == true || it.onDemand == true }.keys
+            (lifecycle + whileInUseApps(this, wiuStore).keys).size
         }.getOrDefault(0)
         val last = runCatching { store.lastReport }.getOrDefault("")
         val contentIntent = PendingIntent.getActivity(

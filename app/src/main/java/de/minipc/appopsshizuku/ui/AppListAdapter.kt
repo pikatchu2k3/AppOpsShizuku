@@ -16,7 +16,9 @@ data class AppItem(
     val label: String,
     val icon: Drawable?,
     val firstInstallTime: Long,
-    val lastUpdateTime: Long
+    val lastUpdateTime: Long,
+    /** Fertiger Text der Status-Symbole (leer = nichts von uns geaendert). */
+    val badges: String = ""
 )
 
 class AppListAdapter(
@@ -27,6 +29,7 @@ class AppListAdapter(
         val icon: ImageView = view.findViewById(R.id.itemIcon)
         val label: TextView = view.findViewById(R.id.itemLabel)
         val packageName: TextView = view.findViewById(R.id.itemPackage)
+        val badges: TextView = view.findViewById(R.id.itemBadges)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,6 +42,8 @@ class AppListAdapter(
         holder.icon.setImageDrawable(item.icon)
         holder.label.text = item.label
         holder.packageName.text = item.packageName
+        holder.badges.text = item.badges
+        holder.badges.visibility = if (item.badges.isEmpty()) View.GONE else View.VISIBLE
         holder.itemView.setOnClickListener { onItemClick(item) }
     }
 
@@ -52,6 +57,7 @@ class AppListAdapter(
         override fun areContentsTheSame(oldItem: AppItem, newItem: AppItem): Boolean =
             oldItem.packageName == newItem.packageName &&
                 oldItem.label == newItem.label &&
-                oldItem.lastUpdateTime == newItem.lastUpdateTime
+                oldItem.lastUpdateTime == newItem.lastUpdateTime &&
+                oldItem.badges == newItem.badges
     }
 }

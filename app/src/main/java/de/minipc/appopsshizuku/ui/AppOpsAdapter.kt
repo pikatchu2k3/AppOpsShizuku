@@ -15,7 +15,16 @@ import de.minipc.appopsshizuku.appops.AppOp
 /** Typsichere Listen-Items: Kategorie-Header ODER Op-Zeile. */
 sealed class OpsListItem {
     data class CategoryHeader(val title: String) : OpsListItem()
-    data class OpItem(val op: AppOp, val currentMode: String?) : OpsListItem()
+    /**
+     * [accessText] = fertig formulierte Zeile des Zugriffsprotokolls (null = keine anzeigen),
+     * [suggested] = Empfehlung "kann entzogen werden" (Zeile wird hervorgehoben).
+     */
+    data class OpItem(
+        val op: AppOp,
+        val currentMode: String?,
+        val accessText: CharSequence? = null,
+        val suggested: Boolean = false
+    ) : OpsListItem()
 }
 
 class AppOpsAdapter(
@@ -33,6 +42,7 @@ class AppOpsAdapter(
 
     class OpHolder(view: View) : RecyclerView.ViewHolder(view) {
         val label: TextView = view.findViewById(R.id.opLabel)
+        val access: TextView = view.findViewById(R.id.opAccess)
         val spinner: AutoCompleteTextView = view.findViewById(R.id.opModeSpinner)
     }
 
@@ -59,11 +69,21 @@ class AppOpsAdapter(
             is OpsListItem.OpItem -> {
                 val h = holder as OpHolder
                 h.label.text = item.op.label
+                h.access.visibility = if (item.accessText.isNullOrEmpty()) View.GONE else View.VISIBLE
+                h.access.text = item.accessText
+                h.access.setTextColor(
+                    com.google.android.material.color.MaterialColors.getColor(
+                        h.access,
+                        if (item.suggested) com.google.android.material.R.attr.colorTertiary
+                        else com.google.android.material.R.attr.colorOnSurfaceVariant
+                    )
+                )
                 // Permission-Ops (Kamera, Mic, Kontakte...): ignore ist wie deny (pm revoke)
                 // und wird deshalb nicht als eigene Option angeboten. Ist der aktuelle
                 // Zustand trotzdem ignore (z.B. Permission nicht granted), bleibt er sichtbar.
+                // "in-use" = nur waehrend Nutzung (erteilt, solange die App vorne ist)
                 val baseModes = if (item.op.permissionName != null) {
-                    listOf("default", "allow", "deny")
+                    listOf("default", "allow", "deny", de.minipc.appopsshizuku.appops.WhileInUse.MODE)
                 } else {
                     listOf("default", "allow", "ignore", "deny")
                 }

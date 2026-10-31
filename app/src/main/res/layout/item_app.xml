@@ -54,6 +54,20 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 tools:text="com.example.app" />
+
+            <!-- Status-Symbole: was diese App an der Ziel-App geaendert hat (aus eigenen Speichern) -->
+            <TextView
+                android:id="@+id/itemBadges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorTertiary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone"
+                tools:text="3 blockiert · Offline · Nur bei Bedarf"
+                tools:visibility="visible" />
         </LinearLayout>
 
         <ImageView

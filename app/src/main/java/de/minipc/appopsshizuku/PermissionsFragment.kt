@@ -18,8 +18,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.minipc.appopsshizuku.appops.AppOpsController
+import de.minipc.appopsshizuku.appops.AccessLog
 import de.minipc.appopsshizuku.appops.AppOp
+import de.minipc.appopsshizuku.appops.OpAccess
 import de.minipc.appopsshizuku.appops.OpEffect
+import de.minipc.appopsshizuku.appops.Recommendations
+import de.minipc.appopsshizuku.appops.WhileInUse
 import de.minipc.appopsshizuku.appops.OpReset
 import de.minipc.appopsshizuku.appops.PrivacyOps
 import de.minipc.appopsshizuku.appops.PrivacyProfileStore
@@ -79,12 +83,15 @@ class PermissionsFragment : Fragment() {
     private lateinit var backend: de.minipc.appopsshizuku.shizuku.ShellBackend
     private lateinit var controller: AppOpsController
     private lateinit var profileStore: PrivacyProfileStore
+    private lateinit var wiuStore: de.minipc.appopsshizuku.appops.WhileInUseStore
+    private lateinit var quarantineStore: de.minipc.appopsshizuku.appops.QuarantineStore
     private lateinit var packageName: String
     private var adapter: AppOpsAdapter? = null
 
     /** opName -> aktueller Mode (null = noch nicht geladen) */
     private val opStates = mutableMapOf<String, String?>()
-    private val ops: List<AppOp> = PrivacyOps.PRIVACY_OPS
+    /** Katalog mit lokalisierten Namen (in onCreate gesetzt, sobald ein Context da ist). */
+    private var ops: List<AppOp> = PrivacyOps.PRIVACY_OPS
     private var loaded = false
     private var loading = false
 
@@ -95,10 +102,21 @@ class PermissionsFragment : Fragment() {
     /** Zwischenspeicher fuer `pm list permissions` (Geraetewissen), ebenfalls einmal pro Ladevorgang. */
     private var permissionsCache: String? = null
 
+    /** Zugriffsprotokoll (opName -> letzte Nutzung/Ablehnung), aus EINEM `cmd appops get <pkg>`. */
+    private var access: Map<String, OpAccess> = emptyMap()
+
+    /** Aktuelle Empfehlungen (erteilt, aber offenbar nicht gebraucht). */
+    private var suggestions: List<Recommendations.Suggestion> = emptyList()
+
+    /** App-Kategorie und Installationsalter fuer die Empfehlungen (einmal gelesen). */
+    private var appCategory: Int = -1
+    private var installedAgoMs: Long = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appContext = requireContext().applicationContext
         packageName = requireArguments().getString(ARG_PACKAGE).orEmpty()
+        ops = de.minipc.appopsshizuku.ui.OpLabels.localized(appContext)
 
         val shizukuOn = runCatching {
             de.minipc.appopsshizuku.shizuku.ShizukuBackend().let {
@@ -108,6 +126,8 @@ class PermissionsFragment : Fragment() {
         backend = if (shizukuOn) de.minipc.appopsshizuku.shizuku.ShizukuBackend() else NoopBackend()
         controller = AppOpsController(backend)
         profileStore = PrivacyProfileStore(appContext)
+        wiuStore = de.minipc.appopsshizuku.appops.WhileInUseStore(appContext)
+        quarantineStore = de.minipc.appopsshizuku.appops.QuarantineStore(appContext)
     }
 
     override fun onCreateView(
@@ -126,6 +146,9 @@ class PermissionsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = opsAdapter
         }
+
+        view.findViewById<MaterialButton>(R.id.suggestionApply).setOnClickListener { applySuggestions() }
+        view.findViewById<MaterialButton>(R.id.quarantineRelease).setOnClickListener { releaseQuarantine() }
 
         view.findViewById<MaterialButton>(R.id.restoreAllButton).setOnClickListener {
             confirmRestoreAll()
@@ -180,8 +203,11 @@ class PermissionsFragment : Fragment() {
     /** Liste + Statistik aus opStates neu zeichnen (no-op ohne View). */
     private fun refreshList() {
         if (view == null) return
+        recomputeSuggestions()
         adapter?.submitList(buildItems())
         updateStats()
+        updateSuggestionCard()
+        updateQuarantineCard()
     }
 
     private fun loadAllModes() {
@@ -197,6 +223,8 @@ class PermissionsFragment : Fragment() {
                     null
                 }
             }
+            readAccessLog()
+            readAppMeta()
             handler.post {
                 loading = false
                 loaded = true
@@ -212,6 +240,8 @@ class PermissionsFragment : Fragment() {
      * - NOT_REQUESTED   = die App deklariert diese Berechtigung gar nicht (gegenstandslos, NICHT "nicht setzbar")
      */
     private fun readMode(op: AppOp, useCache: Boolean = true): String? {
+        // "Nur waehrend Nutzung" ist ein Modus dieser App, kein Systemzustand: so anzeigen
+        if (op.permissionName != null && wiuStore.has(packageName, op.opName)) return WhileInUse.MODE
         if (!op.readViaPermission) return controller.getMode(packageName, op)
         val perm = op.permissionName ?: return null
         val dump = if (useCache) (dumpsysCache ?: readPackageDump()) else readPackageDump()
@@ -243,6 +273,116 @@ class PermissionsFragment : Fragment() {
         if (res.exitCode != 0) return null
         dumpsysCache = res.stdout
         return res.stdout
+    }
+
+    /** Zugriffszeiten aller Ops dieser App mit EINER Shell-Abfrage (nur lesen, bleibt auf dem Geraet). */
+    private fun readAccessLog() {
+        val res = runCatching { backend.exec("cmd", "appops", "get", packageName) }.getOrNull()
+        access = if (res != null && res.exitCode == 0) AccessLog.parse(res.stdout) else emptyMap()
+    }
+
+    private fun readAppMeta() {
+        runCatching {
+            val pm = appContext.packageManager
+            val info = pm.getPackageInfo(packageName, 0)
+            installedAgoMs = System.currentTimeMillis() - info.firstInstallTime
+            appCategory = info.applicationInfo?.category ?: -1
+        }
+    }
+
+    private fun recomputeSuggestions() {
+        if (packageName == appContext.packageName) {
+            suggestions = emptyList()
+            return
+        }
+        suggestions = Recommendations.suggest(
+            states = opStates.toMap(),
+            access = access,
+            permissionOps = ops.filter { it.permissionName != null }.map { it.opName }.toSet(),
+            category = appCategory,
+            installedAgoMs = installedAgoMs
+        )
+    }
+
+    private fun relative(agoMs: Long): CharSequence {
+        val now = System.currentTimeMillis()
+        return android.text.format.DateUtils.getRelativeTimeSpanString(
+            now - agoMs, now, android.text.format.DateUtils.MINUTE_IN_MILLIS
+        )
+    }
+
+    private fun reasonText(reason: Recommendations.Reason): String = when (reason) {
+        Recommendations.Reason.UNUSED ->
+            appContext.getString(R.string.suggest_reason_unused, Recommendations.UNUSED_DAYS)
+        Recommendations.Reason.CATEGORY -> appContext.getString(R.string.suggest_reason_category)
+    }
+
+    /** Zeile unter dem Op-Namen: zuletzt benutzt / abgelehnt / gerade aktiv (+ Empfehlungsgrund). */
+    private fun accessLine(op: AppOp, state: String?): CharSequence? {
+        val a = access[op.opName]
+        val parts = mutableListOf<CharSequence>()
+        when {
+            a?.running == true -> parts += appContext.getString(R.string.access_running)
+            a?.lastAccessAgoMs != null ->
+                parts += appContext.getString(R.string.access_last_used, relative(a.lastAccessAgoMs))
+            state == "allow" -> parts += appContext.getString(R.string.access_never)
+        }
+        a?.lastRejectAgoMs?.let { parts += appContext.getString(R.string.access_last_rejected, relative(it)) }
+        suggestions.firstOrNull { it.opName == op.opName }?.let { parts += reasonText(it.reason) }
+        return if (parts.isEmpty()) null else parts.joinToString(" · ")
+    }
+
+    private fun updateSuggestionCard() {
+        val root = view ?: return
+        val card = root.findViewById<View>(R.id.suggestionCard)
+        if (suggestions.isEmpty()) {
+            card.visibility = View.GONE
+            return
+        }
+        val byName = ops.associateBy { it.opName }
+        card.visibility = View.VISIBLE
+        root.findViewById<TextView>(R.id.suggestionTitle).text =
+            appContext.getString(R.string.suggest_card_title, suggestions.size)
+        root.findViewById<TextView>(R.id.suggestionText).text = appContext.getString(
+            R.string.suggest_card_text,
+            suggestions.joinToString(", ") { s ->
+                "${byName[s.opName]?.label ?: s.opName} (${reasonText(s.reason)})"
+            }
+        )
+    }
+
+    /** Empfehlungen umsetzen: entziehen, danach den echten Zustand zuruecklesen (nie raten). */
+    private fun applySuggestions() {
+        val todo = suggestions.mapNotNull { s -> ops.firstOrNull { it.opName == s.opName } }
+        if (todo.isEmpty()) return
+        setLoading(true)
+        executor.execute {
+            var ok = 0
+            var failed = 0
+            dumpsysCache = null
+            for (op in todo) {
+                val res = controller.setMode(packageName, op, "deny")
+                dumpsysCache = null
+                val actual = if (res.exitCode == 0) runCatching { readMode(op, useCache = false) }.getOrNull() else null
+                if (res.exitCode == 0 && OpEffect.isSetEffective(op.permissionName, "deny", actual)) {
+                    ok++
+                    opStates[op.opName] = actual
+                    runCatching { profileStore.setOpMode(packageName, op.opName, "deny") }
+                } else {
+                    failed++
+                }
+            }
+            handler.post {
+                setLoading(false)
+                refreshList()
+                Toast.makeText(
+                    appContext,
+                    if (failed == 0) appContext.getString(R.string.suggest_done, ok)
+                    else appContext.getString(R.string.suggest_partial, ok, failed),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     private fun buildItems(): List<OpsListItem> {
@@ -288,7 +428,11 @@ class PermissionsFragment : Fragment() {
             OpEffect.NOT_REQUESTED -> OpsListItem.OpItem(
                 op.copy(label = appContext.getString(R.string.op_label_not_requested, op.label)), "default"
             )
-            else -> OpsListItem.OpItem(op, state)
+            else -> OpsListItem.OpItem(
+                op, state,
+                accessText = accessLine(op, state),
+                suggested = suggestions.any { it.opName == op.opName }
+            )
         }
     }
 
@@ -296,6 +440,15 @@ class PermissionsFragment : Fragment() {
         // Die Liste kann eine beschriftete Kopie liefern ("nicht setzbar"/"nicht angefordert")
         // -> Original aus dem Katalog nehmen, sonst landet der Zusatz im gespeicherten Profil.
         val op = ops.firstOrNull { it.opName == selected.opName } ?: selected
+        if (mode == WhileInUse.MODE) {
+            enableWhileInUse(op)
+            return
+        }
+        // Anderer Modus gewaehlt: "Nur waehrend Nutzung" fuer diese Op beenden
+        if (wiuStore.has(packageName, op.opName)) {
+            wiuStore.set(packageName, op.opName, false)
+            LifecycleScreenService.sync(appContext)
+        }
         // Nicht angeforderte Berechtigung: nicht erst setzen (waere ein wirkungsloser Shell-Aufruf)
         if (opStates[op.opName] == OpEffect.NOT_REQUESTED) {
             Toast.makeText(
@@ -358,6 +511,87 @@ class PermissionsFragment : Fragment() {
         }
     }
 
+    /**
+     * "Nur waehrend Nutzung" einschalten: jetzt entziehen (die App ist gerade nicht vorne), merken,
+     * Nutzungszugriff fuer die eigene App sichern und den Waechter starten. Erteilt wird erst, wenn die
+     * App geoeffnet wird.
+     */
+    private fun enableWhileInUse(op: AppOp) {
+        if (packageName == appContext.packageName || opStates[op.opName] == OpEffect.NOT_REQUESTED || opStates[op.opName] == null) {
+            Toast.makeText(appContext, appContext.getString(R.string.op_not_settable, op.label), Toast.LENGTH_LONG).show()
+            handler.post { refreshList() }
+            return
+        }
+        executor.execute {
+            val res = controller.setMode(packageName, op, "deny")
+            dumpsysCache = null
+            val revoked = res.exitCode == 0 && run {
+                wiuStore.set(packageName, op.opName, false) // fuer das Zuruecklesen kurz ohne Modus
+                val actual = runCatching { readMode(op, useCache = false) }.getOrNull()
+                OpEffect.isSetEffective(op.permissionName, "deny", actual)
+            }
+            if (revoked) {
+                wiuStore.set(packageName, op.opName, true)
+                runCatching { OnDemandSupport.grantUsageAccess(appContext, backend) }
+                opStates[op.opName] = WhileInUse.MODE
+                runCatching { profileStore.setOpMode(packageName, op.opName, "deny") }
+            }
+            handler.post {
+                val err = if (revoked) LifecycleScreenService.sync(appContext) else null
+                Toast.makeText(
+                    appContext,
+                    when {
+                        !revoked -> appContext.getString(R.string.op_not_settable, op.label)
+                        err != null -> appContext.getString(R.string.while_in_use_service_failed, err)
+                        else -> appContext.getString(R.string.while_in_use_on, op.label)
+                    },
+                    Toast.LENGTH_LONG
+                ).show()
+                refreshList()
+            }
+        }
+    }
+
+    /** Sammelaktionen setzen jede Op explizit: "Nur waehrend Nutzung" darf danach nichts mehr erteilen. */
+    private fun endWhileInUse() {
+        if (wiuStore.ops(packageName).isEmpty()) return
+        wiuStore.remove(packageName)
+        handler.post { LifecycleScreenService.sync(appContext) }
+    }
+
+    private fun updateQuarantineCard() {
+        val root = view ?: return
+        val since = quarantineStore.since(packageName)
+        val card = root.findViewById<View>(R.id.quarantineCard)
+        if (since == null) {
+            card.visibility = View.GONE
+            return
+        }
+        card.visibility = View.VISIBLE
+        val when_ = android.text.format.DateUtils.getRelativeTimeSpanString(
+            since, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS
+        )
+        root.findViewById<TextView>(R.id.quarantineText).text =
+            appContext.getString(R.string.quarantine_card_text, when_)
+    }
+
+    private fun releaseQuarantine() {
+        setLoading(true)
+        executor.execute {
+            val ok = de.minipc.appopsshizuku.QuarantineManager.release(appContext, packageName)
+            for (op in ops) if (op.permissionName == null) opStates[op.opName] = runCatching { readMode(op) }.getOrNull()
+            handler.post {
+                setLoading(false)
+                refreshList()
+                Toast.makeText(
+                    appContext,
+                    if (ok) R.string.quarantine_released else R.string.quarantine_release_failed,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     /** Rueckfrage vor dem Lockdown - erst danach werden alle Ops gesetzt. */
     private fun confirmBlockAll() {
         // requireContext() (Activity-Kontext) ist Pflicht: mit dem Application-Kontext
@@ -377,6 +611,7 @@ class PermissionsFragment : Fragment() {
     private fun blockAll() {
         setLoading(true)
         executor.execute {
+            endWhileInUse()
             var failed = 0
             for (op in ops) {
                 val res = controller.setMode(packageName, op, "ignore")
@@ -418,12 +653,14 @@ class PermissionsFragment : Fragment() {
     private fun restoreAll() {
         setLoading(true)
         executor.execute {
+            endWhileInUse()
             var failed = 0
             for (op in ops) {
                 // Ops, die dieses Geraet nicht kennt (Zustand null), gar nicht erst anfassen:
                 // der Versuch wuerde nur als Fehler gezaehlt und die Rueckmeldung verwaessern.
                 if (opStates[op.opName] == null) continue
-                val res = controller.setMode(packageName, op, OpReset.modeFor(op))
+                // userFixed = false: "Standard" heisst "die App darf wieder fragen"
+                val res = controller.setMode(packageName, op, OpReset.modeFor(op), userFixed = false)
                 if (res.exitCode != 0) failed++
                 // Berechtigungs-Ops zusaetzlich auf AppOp-Ebene auf Standard setzen (siehe OpReset)
                 for (extra in OpReset.extraResetCommands(packageName, op)) {

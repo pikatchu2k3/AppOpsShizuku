@@ -36,7 +36,7 @@ class OpResetTest {
         AppOpsController(rec).setMode("pkg", camera, OpReset.modeFor(camera))
         assertEquals(
             listOf("pm", "revoke", "pkg", "android.permission.CAMERA"),
-            rec.commands.single()
+            rec.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }.single()
         )
     }
 
@@ -47,7 +47,7 @@ class OpResetTest {
         AppOpsController(rec).setMode("pkg", fine, OpReset.modeFor(fine))
         assertEquals(
             listOf("pm", "revoke", "pkg", "android.permission.ACCESS_FINE_LOCATION"),
-            rec.commands.single()
+            rec.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }.single()
         )
     }
 
@@ -59,7 +59,7 @@ class OpResetTest {
         AppOpsController(rec).setMode("pkg", clip, OpReset.modeFor(clip))
         assertEquals(
             listOf("cmd", "appops", "set", "pkg", "READ_CLIPBOARD", "default"),
-            rec.commands.single()
+            rec.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }.single()
         )
     }
 
@@ -71,7 +71,7 @@ class OpResetTest {
         AppOpsController(rec).setMode("pkg", alle, OpReset.modeFor(alle))
         assertEquals(
             listOf("cmd", "appops", "set", "pkg", "MANAGE_EXTERNAL_STORAGE", "default"),
-            rec.commands.single()
+            rec.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }.single()
         )
     }
 

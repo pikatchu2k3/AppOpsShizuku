@@ -19,14 +19,32 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/opLabel"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
-            android:textColor="?attr/colorOnSurface"
-            tools:text="Kamera" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/opLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface"
+                tools:text="Kamera" />
+
+            <!-- Zugriffsprotokoll: zuletzt benutzt / zuletzt abgelehnt (aus cmd appops get) -->
+            <TextView
+                android:id="@+id/opAccess"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone"
+                tools:text="Zuletzt benutzt: vor 3 Std. · abgelehnt: vor 5 Min."
+                tools:visibility="visible" />
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/opModeLayout"

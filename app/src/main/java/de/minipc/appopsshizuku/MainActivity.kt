@@ -68,6 +68,10 @@ class MainActivity : AppCompatActivity() {
         const val SORT_UPDATE = 2
         const val FILTER_ALL = 0
         const val FILTER_BLOCKED = 1
+        const val FILTER_CHANGED = 2
+
+        /** Gleichzeitige Shell-Aufrufe beim Blockiert-Scan. */
+        private const val SCAN_THREADS = 4
     }
 
     private lateinit var manager: ShizukuManager
@@ -175,7 +179,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<ChipGroup>(R.id.filterChipGroup).setOnCheckedStateChangeListener { _, checkedIds ->
-            filterMode = if (R.id.chipBlocked in checkedIds) FILTER_BLOCKED else FILTER_ALL
+            filterMode = when {
+                R.id.chipBlocked in checkedIds -> FILTER_BLOCKED
+                R.id.chipChanged in checkedIds -> FILTER_CHANGED
+                else -> FILTER_ALL
+            }
             if (filterMode == FILTER_BLOCKED && blockedCache.isEmpty()) {
                 scanBlockedState()
             } else {
@@ -306,13 +314,84 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
+            // Status-Symbole aus den eigenen Speichern (kein Shell-Aufruf)
+            val withBadges = loaded.map { it.copy(badges = badgeText(it.packageName)) }
+
             handler.post {
                 // Atomare Zuweisung: keine Mutation, kein Datenrennen mit
                 // scanBlockedState()/applyFilterAndSort()
-                allApps = loaded
+                allApps = withBadges
                 applyFilterAndSort()
             }
         }
+    }
+
+    private val profileStoreForBadges by lazy { de.minipc.appopsshizuku.appops.PrivacyProfileStore(this) }
+    private val netStoreForBadges by lazy { de.minipc.appopsshizuku.appops.NetStore(this) }
+    private val lifecycleStoreForBadges by lazy { de.minipc.appopsshizuku.appops.LifecycleStore(this) }
+
+    /** Status-Symbole als kurzer Text ("3 blockiert · Offline · Nur bei Bedarf"). */
+    private fun badgeText(pkg: String): String {
+        val set = runCatching {
+            de.minipc.appopsshizuku.appops.AppBadges.compute(
+                profile = profileStoreForBadges.getProfile(pkg),
+                net = netStoreForBadges.get(pkg),
+                lifecycle = lifecycleStoreForBadges.get(pkg),
+                whileInUse = badgeWhileInUse(pkg),
+                quarantined = badgeQuarantined(pkg)
+            )
+        }.getOrNull() ?: return ""
+        return set.badges.joinToString(" · ") { b ->
+            when (b) {
+                de.minipc.appopsshizuku.appops.AppBadge.BLOCKED -> getString(R.string.badge_blocked, set.blockedCount)
+                de.minipc.appopsshizuku.appops.AppBadge.OFFLINE -> getString(R.string.badge_offline)
+                de.minipc.appopsshizuku.appops.AppBadge.BG_NET -> getString(R.string.badge_bg_net)
+                de.minipc.appopsshizuku.appops.AppBadge.ON_DEMAND -> getString(R.string.badge_on_demand)
+                de.minipc.appopsshizuku.appops.AppBadge.SCREEN_OFF -> getString(R.string.badge_screen_off)
+                de.minipc.appopsshizuku.appops.AppBadge.WHILE_IN_USE -> getString(R.string.badge_while_in_use)
+                de.minipc.appopsshizuku.appops.AppBadge.QUARANTINE -> getString(R.string.badge_quarantine)
+            }
+        }
+    }
+
+    private val wiuStoreForBadges by lazy { de.minipc.appopsshizuku.appops.WhileInUseStore(this) }
+    private val quarantineStoreForBadges by lazy { de.minipc.appopsshizuku.appops.QuarantineStore(this) }
+
+    private fun badgeWhileInUse(pkg: String): Boolean = wiuStoreForBadges.ops(pkg).isNotEmpty()
+    private fun badgeQuarantined(pkg: String): Boolean = quarantineStoreForBadges.isQuarantined(pkg)
+
+    /** Quarantaene: neue Apps seit dem letzten Oeffnen erfassen (im Hintergrund, mit Rueckmeldung). */
+    private fun checkQuarantine() {
+        executor.execute {
+            val r = runCatching { QuarantineManager.check(this) }.getOrNull() ?: return@execute
+            val total = r.applied.size + r.failed.size
+            if (total == 0) return@execute
+            handler.post {
+                setBackupStatus(getString(R.string.quarantine_report, total, r.failed.size), r.failed.isNotEmpty())
+                loadApps()
+            }
+        }
+    }
+
+    private fun toggleQuarantine(item: MenuItem) {
+        val store = quarantineStoreForBadges
+        if (store.enabled) {
+            store.enabled = false
+            item.isChecked = false
+            Toast.makeText(this, R.string.quarantine_off, Toast.LENGTH_LONG).show()
+            return
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.quarantine_enable_title)
+            .setMessage(R.string.quarantine_enable_msg)
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.quarantine_enable_action) { _, _ ->
+                // Ab jetzt: nur Apps, die NACH dem Einschalten installiert werden
+                store.checkedUntil = System.currentTimeMillis()
+                store.enabled = true
+                item.isChecked = true
+            }
+            .show()
     }
 
     /** Live-Filter (Query) + Filter-Chip + Sortierung auf allApps. */
@@ -322,6 +401,7 @@ class MainActivity : AppCompatActivity() {
             when {
                 q.isNotEmpty() && !app.label.lowercase().contains(q) && !app.packageName.lowercase().contains(q) -> false
                 filterMode == FILTER_BLOCKED -> blockedCache[app.packageName] == true
+                filterMode == FILTER_CHANGED -> app.badges.isNotEmpty()
                 else -> true
             }
         }
@@ -348,13 +428,20 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, R.string.scanning_apps, Toast.LENGTH_SHORT).show()
         val list = allApps
         executor.execute {
-            for (app in list) {
-                val res = backend.exec("cmd", "appops", "get", app.packageName)
-                val blocked = res.exitCode == 0 &&
-                    Regex("Uid mode: [^:]*: (ignore|deny)").containsMatchIn(res.stdout)
-                synchronized(blockedCache) {
-                    blockedCache[app.packageName] = blocked
-                }
+            // Parallel statt nacheinander: ein Shell-Aufruf je App, 4 gleichzeitig. Bei 200 Apps
+            // war der serielle Scan deutlich spuerbar; die Binder-Aufrufe vertragen das problemlos.
+            val pool = Executors.newFixedThreadPool(SCAN_THREADS)
+            try {
+                pool.invokeAll(list.map { app ->
+                    java.util.concurrent.Callable {
+                        val res = backend.exec("cmd", "appops", "get", app.packageName)
+                        val blocked = res.exitCode == 0 &&
+                            de.minipc.appopsshizuku.appops.BlockedScan.hasBlockedOp(res.stdout)
+                        synchronized(blockedCache) { blockedCache[app.packageName] = blocked }
+                    }
+                })
+            } finally {
+                pool.shutdown()
             }
             handler.post { applyFilterAndSort() }
         }
@@ -398,10 +485,12 @@ class MainActivity : AppCompatActivity() {
         // Liste neu laden: nach Rueckkehr aus Komponenten-Ansicht koennen Apps
         // deaktiviert/aktiviert worden sein
         loadApps()
+        checkQuarantine()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        menu.findItem(R.id.action_quarantine)?.isChecked = quarantineStoreForBadges.enabled
         menu.findItem(R.id.action_dynamic_color).apply {
             if (DynamicColors.isDynamicColorAvailable()) {
                 isChecked = DesignSettings.isDynamicColorEnabled(this@MainActivity)
@@ -416,6 +505,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_quarantine -> {
+                toggleQuarantine(item)
+                true
+            }
+            R.id.action_system -> {
+                startActivity(Intent(this, SystemActivity::class.java))
+                true
+            }
+            R.id.action_by_permission -> {
+                startActivity(Intent(this, PermissionOverviewActivity::class.java))
+                true
+            }
             R.id.action_export_profiles -> {
                 exportProfiles()
                 true
