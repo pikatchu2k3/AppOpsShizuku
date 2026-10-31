@@ -74,7 +74,7 @@ class AppOpsActivity : AppCompatActivity() {
 
     /** opName -> aktueller Mode (null = noch nicht geladen) */
     private val opStates = mutableMapOf<String, String?>()
-    private val ops: List<AppOp> = PrivacyOps.PRIVACY_OPS
+    private val ops: List<AppOp> by lazy { de.minipc.appopsshizuku.ui.OpLabels.localized(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()

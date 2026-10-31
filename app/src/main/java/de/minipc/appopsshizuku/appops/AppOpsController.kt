@@ -15,17 +15,43 @@ import de.minipc.appopsshizuku.shizuku.ShellResult
  */
 class AppOpsController(private val backend: ShellBackend) {
 
-    /** "default" = nicht blockiert (grant + appops default). Zugriff wieder normal. */
-    fun setMode(packageName: String, op: AppOp, mode: String): ShellResult {
+    /**
+     * "default" = nicht blockiert (grant + appops default). Zugriff wieder normal.
+     *
+     * [userFixed]: Ein reines `pm revoke` laesst die App sofort wieder nach der Berechtigung fragen
+     * (kein USER_FIXED-Flag). Beim Blockieren wird deshalb zusaetzlich `user-fixed` gesetzt - wie
+     * "Nicht mehr fragen" im System-Dialog. Beim Erteilen und beim Zuruecksetzen ([userFixed] = false)
+     * wird das Flag entfernt, damit "Standard" wieder "die App darf fragen" heisst.
+     * Die Flag-Befehle sind Best-Effort (nicht jedes Android kennt `set-permission-flags`); massgeblich
+     * bleibt das Ergebnis von grant/revoke, das zurueckgegeben wird.
+     */
+    fun setMode(packageName: String, op: AppOp, mode: String, userFixed: Boolean = true): ShellResult {
         val perm = op.permissionName
         return if (perm != null) {
             when (mode) {
-                "deny", "ignore" -> backend.exec("pm", "revoke", packageName, perm)
-                else -> backend.exec("pm", "grant", packageName, perm) // allow + default
+                "deny", "ignore" -> backend.exec("pm", "revoke", packageName, perm).also {
+                    if (it.exitCode == 0) {
+                        val verb = if (userFixed) "set-permission-flags" else "clear-permission-flags"
+                        backend.exec("pm", verb, packageName, perm, *USER_CHOICE_FLAGS)
+                    }
+                }
+                else -> {
+                    // allow + default: danach das Flag loesen, sonst bleibt "nicht mehr fragen" stehen
+                    val res = backend.exec("pm", "grant", packageName, perm)
+                    if (res.exitCode == 0) {
+                        backend.exec("pm", "clear-permission-flags", packageName, perm, *USER_CHOICE_FLAGS)
+                    }
+                    res
+                }
             }
         } else {
             backend.exec("cmd", "appops", "set", packageName, op.opName, mode)
         }
+    }
+
+    companion object {
+        /** Flags fuer "Nutzer hat entschieden, nicht erneut fragen". */
+        val USER_CHOICE_FLAGS = arrayOf("user-set", "user-fixed")
     }
 
     /**

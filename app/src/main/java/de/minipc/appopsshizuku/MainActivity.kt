@@ -68,6 +68,9 @@ class MainActivity : AppCompatActivity() {
         const val SORT_UPDATE = 2
         const val FILTER_ALL = 0
         const val FILTER_BLOCKED = 1
+
+        /** Gleichzeitige Shell-Aufrufe beim Blockiert-Scan. */
+        private const val SCAN_THREADS = 4
     }
 
     private lateinit var manager: ShizukuManager
@@ -348,13 +351,20 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, R.string.scanning_apps, Toast.LENGTH_SHORT).show()
         val list = allApps
         executor.execute {
-            for (app in list) {
-                val res = backend.exec("cmd", "appops", "get", app.packageName)
-                val blocked = res.exitCode == 0 &&
-                    Regex("Uid mode: [^:]*: (ignore|deny)").containsMatchIn(res.stdout)
-                synchronized(blockedCache) {
-                    blockedCache[app.packageName] = blocked
-                }
+            // Parallel statt nacheinander: ein Shell-Aufruf je App, 4 gleichzeitig. Bei 200 Apps
+            // war der serielle Scan deutlich spuerbar; die Binder-Aufrufe vertragen das problemlos.
+            val pool = Executors.newFixedThreadPool(SCAN_THREADS)
+            try {
+                pool.invokeAll(list.map { app ->
+                    java.util.concurrent.Callable {
+                        val res = backend.exec("cmd", "appops", "get", app.packageName)
+                        val blocked = res.exitCode == 0 &&
+                            de.minipc.appopsshizuku.appops.BlockedScan.hasBlockedOp(res.stdout)
+                        synchronized(blockedCache) { blockedCache[app.packageName] = blocked }
+                    }
+                })
+            } finally {
+                pool.shutdown()
             }
             handler.post { applyFilterAndSort() }
         }

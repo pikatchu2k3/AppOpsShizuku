@@ -87,7 +87,8 @@ class PrivacyOpsCatalogTest {
         for (o in ops) {
             val rec = Recorder()
             AppOpsController(rec).setMode("pkg", o, "deny")
-            val cmd = rec.commands.single()
+            // Flag-Befehle (user-fixed) sind Zusatz, der Hebel bleibt genau ein Befehl
+            val cmd = rec.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }.single()
             if (o.permissionName != null) {
                 assertEquals(listOf("pm", "revoke", "pkg", o.permissionName), cmd)
             } else {
@@ -101,8 +102,9 @@ class PrivacyOpsCatalogTest {
         val c = AppOpsController(rec)
         c.setMode("pkg", op("FINE_LOCATION"), "deny")
         c.setMode("pkg", op("FINE_LOCATION"), "default")
-        assertEquals(listOf("pm", "revoke", "pkg", "android.permission.ACCESS_FINE_LOCATION"), rec.commands[0])
-        assertEquals(listOf("pm", "grant", "pkg", "android.permission.ACCESS_FINE_LOCATION"), rec.commands[1])
+        val levers = rec.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }
+        assertEquals(listOf("pm", "revoke", "pkg", "android.permission.ACCESS_FINE_LOCATION"), levers[0])
+        assertEquals(listOf("pm", "grant", "pkg", "android.permission.ACCESS_FINE_LOCATION"), levers[1])
     }
 
     @Test fun leseUeberPermission_nurFuerOpsDieDemAppOpRueckleseNichtTrauen() {

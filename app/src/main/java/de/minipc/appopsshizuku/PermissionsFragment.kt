@@ -18,8 +18,11 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.minipc.appopsshizuku.appops.AppOpsController
+import de.minipc.appopsshizuku.appops.AccessLog
 import de.minipc.appopsshizuku.appops.AppOp
+import de.minipc.appopsshizuku.appops.OpAccess
 import de.minipc.appopsshizuku.appops.OpEffect
+import de.minipc.appopsshizuku.appops.Recommendations
 import de.minipc.appopsshizuku.appops.OpReset
 import de.minipc.appopsshizuku.appops.PrivacyOps
 import de.minipc.appopsshizuku.appops.PrivacyProfileStore
@@ -84,7 +87,8 @@ class PermissionsFragment : Fragment() {
 
     /** opName -> aktueller Mode (null = noch nicht geladen) */
     private val opStates = mutableMapOf<String, String?>()
-    private val ops: List<AppOp> = PrivacyOps.PRIVACY_OPS
+    /** Katalog mit lokalisierten Namen (in onCreate gesetzt, sobald ein Context da ist). */
+    private var ops: List<AppOp> = PrivacyOps.PRIVACY_OPS
     private var loaded = false
     private var loading = false
 
@@ -95,10 +99,21 @@ class PermissionsFragment : Fragment() {
     /** Zwischenspeicher fuer `pm list permissions` (Geraetewissen), ebenfalls einmal pro Ladevorgang. */
     private var permissionsCache: String? = null
 
+    /** Zugriffsprotokoll (opName -> letzte Nutzung/Ablehnung), aus EINEM `cmd appops get <pkg>`. */
+    private var access: Map<String, OpAccess> = emptyMap()
+
+    /** Aktuelle Empfehlungen (erteilt, aber offenbar nicht gebraucht). */
+    private var suggestions: List<Recommendations.Suggestion> = emptyList()
+
+    /** App-Kategorie und Installationsalter fuer die Empfehlungen (einmal gelesen). */
+    private var appCategory: Int = -1
+    private var installedAgoMs: Long = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appContext = requireContext().applicationContext
         packageName = requireArguments().getString(ARG_PACKAGE).orEmpty()
+        ops = de.minipc.appopsshizuku.ui.OpLabels.localized(appContext)
 
         val shizukuOn = runCatching {
             de.minipc.appopsshizuku.shizuku.ShizukuBackend().let {
@@ -126,6 +141,8 @@ class PermissionsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = opsAdapter
         }
+
+        view.findViewById<MaterialButton>(R.id.suggestionApply).setOnClickListener { applySuggestions() }
 
         view.findViewById<MaterialButton>(R.id.restoreAllButton).setOnClickListener {
             confirmRestoreAll()
@@ -180,8 +197,10 @@ class PermissionsFragment : Fragment() {
     /** Liste + Statistik aus opStates neu zeichnen (no-op ohne View). */
     private fun refreshList() {
         if (view == null) return
+        recomputeSuggestions()
         adapter?.submitList(buildItems())
         updateStats()
+        updateSuggestionCard()
     }
 
     private fun loadAllModes() {
@@ -197,6 +216,8 @@ class PermissionsFragment : Fragment() {
                     null
                 }
             }
+            readAccessLog()
+            readAppMeta()
             handler.post {
                 loading = false
                 loaded = true
@@ -245,6 +266,118 @@ class PermissionsFragment : Fragment() {
         return res.stdout
     }
 
+    /** Zugriffszeiten aller Ops dieser App mit EINER Shell-Abfrage (nur lesen, bleibt auf dem Geraet). */
+    private fun readAccessLog() {
+        val res = runCatching { backend.exec("cmd", "appops", "get", packageName) }.getOrNull()
+        access = if (res != null && res.exitCode == 0) AccessLog.parse(res.stdout) else emptyMap()
+    }
+
+    private fun readAppMeta() {
+        runCatching {
+            val pm = appContext.packageManager
+            val info = pm.getPackageInfo(packageName, 0)
+            installedAgoMs = System.currentTimeMillis() - info.firstInstallTime
+            appCategory = if (android.os.Build.VERSION.SDK_INT >= 26) {
+                info.applicationInfo?.category ?: -1
+            } else -1
+        }
+    }
+
+    private fun recomputeSuggestions() {
+        if (packageName == appContext.packageName) {
+            suggestions = emptyList()
+            return
+        }
+        suggestions = Recommendations.suggest(
+            states = opStates.toMap(),
+            access = access,
+            permissionOps = ops.filter { it.permissionName != null }.map { it.opName }.toSet(),
+            category = appCategory,
+            installedAgoMs = installedAgoMs
+        )
+    }
+
+    private fun relative(agoMs: Long): CharSequence {
+        val now = System.currentTimeMillis()
+        return android.text.format.DateUtils.getRelativeTimeSpanString(
+            now - agoMs, now, android.text.format.DateUtils.MINUTE_IN_MILLIS
+        )
+    }
+
+    private fun reasonText(reason: Recommendations.Reason): String = when (reason) {
+        Recommendations.Reason.UNUSED ->
+            appContext.getString(R.string.suggest_reason_unused, Recommendations.UNUSED_DAYS)
+        Recommendations.Reason.CATEGORY -> appContext.getString(R.string.suggest_reason_category)
+    }
+
+    /** Zeile unter dem Op-Namen: zuletzt benutzt / abgelehnt / gerade aktiv (+ Empfehlungsgrund). */
+    private fun accessLine(op: AppOp, state: String?): CharSequence? {
+        val a = access[op.opName]
+        val parts = mutableListOf<CharSequence>()
+        when {
+            a?.running == true -> parts += appContext.getString(R.string.access_running)
+            a?.lastAccessAgoMs != null ->
+                parts += appContext.getString(R.string.access_last_used, relative(a.lastAccessAgoMs))
+            state == "allow" -> parts += appContext.getString(R.string.access_never)
+        }
+        a?.lastRejectAgoMs?.let { parts += appContext.getString(R.string.access_last_rejected, relative(it)) }
+        suggestions.firstOrNull { it.opName == op.opName }?.let { parts += reasonText(it.reason) }
+        return if (parts.isEmpty()) null else parts.joinToString(" · ")
+    }
+
+    private fun updateSuggestionCard() {
+        val root = view ?: return
+        val card = root.findViewById<View>(R.id.suggestionCard)
+        if (suggestions.isEmpty()) {
+            card.visibility = View.GONE
+            return
+        }
+        val byName = ops.associateBy { it.opName }
+        card.visibility = View.VISIBLE
+        root.findViewById<TextView>(R.id.suggestionTitle).text =
+            appContext.getString(R.string.suggest_card_title, suggestions.size)
+        root.findViewById<TextView>(R.id.suggestionText).text = appContext.getString(
+            R.string.suggest_card_text,
+            suggestions.joinToString(", ") { s ->
+                "${byName[s.opName]?.label ?: s.opName} (${reasonText(s.reason)})"
+            }
+        )
+    }
+
+    /** Empfehlungen umsetzen: entziehen, danach den echten Zustand zuruecklesen (nie raten). */
+    private fun applySuggestions() {
+        val todo = suggestions.mapNotNull { s -> ops.firstOrNull { it.opName == s.opName } }
+        if (todo.isEmpty()) return
+        setLoading(true)
+        executor.execute {
+            var ok = 0
+            var failed = 0
+            dumpsysCache = null
+            for (op in todo) {
+                val res = controller.setMode(packageName, op, "deny")
+                dumpsysCache = null
+                val actual = if (res.exitCode == 0) runCatching { readMode(op, useCache = false) }.getOrNull() else null
+                if (res.exitCode == 0 && OpEffect.isSetEffective(op.permissionName, "deny", actual)) {
+                    ok++
+                    opStates[op.opName] = actual
+                    runCatching { profileStore.setOpMode(packageName, op.opName, "deny") }
+                } else {
+                    failed++
+                }
+            }
+            handler.post {
+                setLoading(false)
+                refreshList()
+                Toast.makeText(
+                    appContext,
+                    if (failed == 0) appContext.getString(R.string.suggest_done, ok)
+                    else appContext.getString(R.string.suggest_partial, ok, failed),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     private fun buildItems(): List<OpsListItem> {
         val items = mutableListOf<OpsListItem>()
         val byName = ops.associateBy { it.opName }
@@ -288,7 +421,11 @@ class PermissionsFragment : Fragment() {
             OpEffect.NOT_REQUESTED -> OpsListItem.OpItem(
                 op.copy(label = appContext.getString(R.string.op_label_not_requested, op.label)), "default"
             )
-            else -> OpsListItem.OpItem(op, state)
+            else -> OpsListItem.OpItem(
+                op, state,
+                accessText = accessLine(op, state),
+                suggested = suggestions.any { it.opName == op.opName }
+            )
         }
     }
 
@@ -423,7 +560,8 @@ class PermissionsFragment : Fragment() {
                 // Ops, die dieses Geraet nicht kennt (Zustand null), gar nicht erst anfassen:
                 // der Versuch wuerde nur als Fehler gezaehlt und die Rueckmeldung verwaessern.
                 if (opStates[op.opName] == null) continue
-                val res = controller.setMode(packageName, op, OpReset.modeFor(op))
+                // userFixed = false: "Standard" heisst "die App darf wieder fragen"
+                val res = controller.setMode(packageName, op, OpReset.modeFor(op), userFixed = false)
                 if (res.exitCode != 0) failed++
                 // Berechtigungs-Ops zusaetzlich auf AppOp-Ebene auf Standard setzen (siehe OpReset)
                 for (extra in OpReset.extraResetCommands(packageName, op)) {
