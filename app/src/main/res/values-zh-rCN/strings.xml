@@ -607,4 +607,21 @@
     <string name="netusage_background">后台 %1$s</string>
     <string name="netusage_block_bg">禁后台</string>
     <string name="netusage_unblock_bg">允许后台</string>
+    <plurals name="activity_wakeups">
+        <item quantity="other">唤醒 %d 次</item>
+    </plurals>
+    <plurals name="activity_job_count">
+        <item quantity="other">%d 个任务</item>
+    </plurals>
+    <string name="menu_activity">活动</string>
+    <string name="activity_title">活动</string>
+    <string name="activity_intro">哪些应用唤醒设备、安排任务或读取传感器。数值来自 dumpsys，为启发式结果。</string>
+    <string name="activity_no_shizuku">这需要 Shizuku。请连接后重新打开。</string>
+    <string name="activity_not_recognized">在此设备上无法识别格式。</string>
+    <string name="activity_section">%1$s（%2$d）</string>
+    <string name="activity_alarms">设备唤醒</string>
+    <string name="activity_jobs">计划任务</string>
+    <string name="activity_sensors">传感器访问</string>
+    <string name="activity_sensor_used">已读取传感器</string>
+    <string name="activity_open_behavior">行为</string>
 </resources>

@@ -588,6 +588,10 @@ class MainActivity : AppCompatActivity() {
                 toggleQuarantine(item)
                 true
             }
+            R.id.action_activity -> {
+                startActivity(Intent(this, ActivityScanActivity::class.java))
+                true
+            }
             R.id.action_net_usage -> {
                 startActivity(Intent(this, NetUsageActivity::class.java))
                 true

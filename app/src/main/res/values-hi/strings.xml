@@ -608,4 +608,23 @@
     <string name="netusage_background">%1$s बैकग्राउंड</string>
     <string name="netusage_block_bg">बैकग्राउंड रोकें</string>
     <string name="netusage_unblock_bg">बैकग्राउंड अनुमति</string>
+    <plurals name="activity_wakeups">
+        <item quantity="one">%d बार जगाया</item>
+        <item quantity="other">%d बार जगाया</item>
+    </plurals>
+    <plurals name="activity_job_count">
+        <item quantity="one">%d जॉब</item>
+        <item quantity="other">%d जॉब</item>
+    </plurals>
+    <string name="menu_activity">गतिविधि</string>
+    <string name="activity_title">गतिविधि</string>
+    <string name="activity_intro">कौन से ऐप्स डिवाइस जगाते हैं, जॉब शेड्यूल करते हैं या सेंसर पढ़ते हैं। मान dumpsys से हैं और अनुमानित हैं।</string>
+    <string name="activity_no_shizuku">इसके लिए Shizuku चाहिए। कनेक्ट करें और फिर खोलें।</string>
+    <string name="activity_not_recognized">इस डिवाइस पर प्रारूप पहचाना नहीं गया।</string>
+    <string name="activity_section">%1$s (%2$d)</string>
+    <string name="activity_alarms">डिवाइस जगाना</string>
+    <string name="activity_jobs">शेड्यूल किए गए जॉब</string>
+    <string name="activity_sensors">सेंसर एक्सेस</string>
+    <string name="activity_sensor_used">सेंसर पढ़े</string>
+    <string name="activity_open_behavior">व्यवहार</string>
 </resources>
