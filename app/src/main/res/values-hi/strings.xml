@@ -595,4 +595,17 @@
     <string name="rule_delete">हटाएं</string>
     <string name="log_info_rule_on">नियम \'%1$s\': शर्त पूरी</string>
     <string name="log_info_rule_off">नियम \'%1$s\': शर्त समाप्त</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="one">%d दिन से बंद</item>
+        <item quantity="other">%d दिनों से बंद</item>
+    </plurals>
+    <string name="menu_net_usage">नेटवर्क उपयोग</string>
+    <string name="netusage_title">नेटवर्क उपयोग (7 दिन)</string>
+    <string name="netusage_info">जिन ऐप्स का बैकग्राउंड ट्रैफ़िक ज़्यादा है और जिन्हें आप कम खोलते हैं, वे ऊपर हैं।</string>
+    <string name="netusage_no_access">उपयोग एक्सेस चाहिए (Shizuku से दिया जाता है)। Shizuku कनेक्ट करें और फिर खोलें।</string>
+    <string name="netusage_empty">पिछले 7 दिनों में कोई नेटवर्क ट्रैफ़िक दर्ज नहीं।</string>
+    <string name="netusage_total">%1$s कुल</string>
+    <string name="netusage_background">%1$s बैकग्राउंड</string>
+    <string name="netusage_block_bg">बैकग्राउंड रोकें</string>
+    <string name="netusage_unblock_bg">बैकग्राउंड अनुमति</string>
 </resources>

@@ -595,4 +595,16 @@
     <string name="rule_delete">删除</string>
     <string name="log_info_rule_on">规则“%1$s”：条件满足</string>
     <string name="log_info_rule_off">规则“%1$s”：条件结束</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="other">%d 天未打开</item>
+    </plurals>
+    <string name="menu_net_usage">网络用量</string>
+    <string name="netusage_title">网络用量（7 天）</string>
+    <string name="netusage_info">后台流量大且很少打开的应用排在前面。</string>
+    <string name="netusage_no_access">需要使用情况访问权限（通过 Shizuku 授予）。请连接 Shizuku 后重新打开。</string>
+    <string name="netusage_empty">过去 7 天没有网络流量记录。</string>
+    <string name="netusage_total">共 %1$s</string>
+    <string name="netusage_background">后台 %1$s</string>
+    <string name="netusage_block_bg">禁后台</string>
+    <string name="netusage_unblock_bg">允许后台</string>
 </resources>

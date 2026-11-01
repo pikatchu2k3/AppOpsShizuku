@@ -597,4 +597,17 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="rule_delete">Eliminar</string>
     <string name="log_info_rule_on">Regla «%1$s»: condición cumplida</string>
     <string name="log_info_rule_off">Regla «%1$s»: condición finalizada</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="one">%d día sin abrir</item>
+        <item quantity="other">%d días sin abrir</item>
+    </plurals>
+    <string name="menu_net_usage">Uso de red</string>
+    <string name="netusage_title">Uso de red (7 días)</string>
+    <string name="netusage_info">Las apps con mucho tráfico en segundo plano que abres poco aparecen primero.</string>
+    <string name="netusage_no_access">Requiere acceso de uso (concedido vía Shizuku). Conecta Shizuku y vuelve a abrir.</string>
+    <string name="netusage_empty">No se registró tráfico de red en los últimos 7 días.</string>
+    <string name="netusage_total">%1$s en total</string>
+    <string name="netusage_background">%1$s en segundo plano</string>
+    <string name="netusage_block_bg">Bloquear 2.º plano</string>
+    <string name="netusage_unblock_bg">Permitir 2.º plano</string>
 </resources>

@@ -595,4 +595,17 @@
     <string name="rule_delete">Excluir</string>
     <string name="log_info_rule_on">Regra \'%1$s\': condição atendida</string>
     <string name="log_info_rule_off">Regra \'%1$s\': condição encerrada</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="one">%d dia sem abrir</item>
+        <item quantity="other">%d dias sem abrir</item>
+    </plurals>
+    <string name="menu_net_usage">Uso de rede</string>
+    <string name="netusage_title">Uso de rede (7 dias)</string>
+    <string name="netusage_info">Apps com muito tráfego em segundo plano que você abre raramente aparecem primeiro.</string>
+    <string name="netusage_no_access">Requer acesso de uso (concedido via Shizuku). Conecte o Shizuku e reabra.</string>
+    <string name="netusage_empty">Nenhum tráfego de rede registrado nos últimos 7 dias.</string>
+    <string name="netusage_total">%1$s no total</string>
+    <string name="netusage_background">%1$s em segundo plano</string>
+    <string name="netusage_block_bg">Bloquear 2º plano</string>
+    <string name="netusage_unblock_bg">Permitir 2º plano</string>
 </resources>

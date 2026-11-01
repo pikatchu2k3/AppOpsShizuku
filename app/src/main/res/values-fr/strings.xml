@@ -595,4 +595,17 @@
     <string name="rule_delete">Supprimer</string>
     <string name="log_info_rule_on">Règle « %1$s » : condition remplie</string>
     <string name="log_info_rule_off">Règle « %1$s » : condition terminée</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="one">%d jour sans ouverture</item>
+        <item quantity="other">%d jours sans ouverture</item>
+    </plurals>
+    <string name="menu_net_usage">Utilisation du réseau</string>
+    <string name="netusage_title">Utilisation du réseau (7 jours)</string>
+    <string name="netusage_info">Les applis avec beaucoup de trafic en arrière-plan que vous ouvrez rarement sont en tête.</string>
+    <string name="netusage_no_access">Nécessite l\'accès à l\'utilisation (accordé via Shizuku). Connectez Shizuku et rouvrez.</string>
+    <string name="netusage_empty">Aucun trafic réseau enregistré ces 7 derniers jours.</string>
+    <string name="netusage_total">%1$s au total</string>
+    <string name="netusage_background">%1$s en arrière-plan</string>
+    <string name="netusage_block_bg">Bloquer arr.-plan</string>
+    <string name="netusage_unblock_bg">Autoriser arr.-plan</string>
 </resources>

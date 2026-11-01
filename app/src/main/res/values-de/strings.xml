@@ -618,4 +618,17 @@
     <string name="rule_delete">Löschen</string>
     <string name="log_info_rule_on">Regel „%1$s“: Bedingung erfüllt</string>
     <string name="log_info_rule_off">Regel „%1$s“: Bedingung beendet</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="one">seit %d Tag nicht offen</item>
+        <item quantity="other">seit %d Tagen nicht offen</item>
+    </plurals>
+    <string name="menu_net_usage">Netzverkehr</string>
+    <string name="netusage_title">Netzverkehr (7 Tage)</string>
+    <string name="netusage_info">Apps mit viel Hintergrundverkehr, die du selten öffnest, stehen oben.</string>
+    <string name="netusage_no_access">Braucht Nutzungszugriff (per Shizuku erteilt). Shizuku verbinden und erneut öffnen.</string>
+    <string name="netusage_empty">Kein Netzverkehr in den letzten 7 Tagen aufgezeichnet.</string>
+    <string name="netusage_total">%1$s gesamt</string>
+    <string name="netusage_background">%1$s Hintergrund</string>
+    <string name="netusage_block_bg">Hintergrund sperren</string>
+    <string name="netusage_unblock_bg">Hintergrund erlauben</string>
 </resources>

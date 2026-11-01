@@ -595,4 +595,16 @@
     <string name="rule_delete">削除</string>
     <string name="log_info_rule_on">ルール「%1$s」: 条件成立</string>
     <string name="log_info_rule_off">ルール「%1$s」: 条件終了</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="other">%d日間未使用</item>
+    </plurals>
+    <string name="menu_net_usage">ネットワーク使用量</string>
+    <string name="netusage_title">ネットワーク使用量（7日間）</string>
+    <string name="netusage_info">バックグラウンド通信が多く、めったに開かないアプリが上に表示されます。</string>
+    <string name="netusage_no_access">使用状況へのアクセスが必要です（Shizukuで付与）。Shizukuを接続して開き直してください。</string>
+    <string name="netusage_empty">過去7日間のネットワーク通信は記録されていません。</string>
+    <string name="netusage_total">合計 %1$s</string>
+    <string name="netusage_background">バックグラウンド %1$s</string>
+    <string name="netusage_block_bg">背景を遮断</string>
+    <string name="netusage_unblock_bg">背景を許可</string>
 </resources>
