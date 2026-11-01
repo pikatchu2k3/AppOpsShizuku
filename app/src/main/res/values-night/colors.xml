@@ -104,4 +104,20 @@
     <color name="on_warning">@color/md_warning_20</color>
     <color name="warning_container">@color/md_warning_30</color>
     <color name="on_warning_container">@color/md_warning_90</color>
+
+    <!-- ===== Design "Sternenhimmel" (eigene Tokens, unabhaengig von der M3-Palette) ===== -->
+    <color name="space_bg">#03060C</color>
+    <color name="space_glow">#40206A86</color>
+    <color name="space_star">#B3C8DCF0</color>
+    <color name="glass_fill">#D9141C28</color>
+    <color name="glass_stroke">#33FFFFFF</color>
+    <color name="on_glass">#F2F6FA</color>
+    <color name="on_glass_dim">#B0BFCC</color>
+    <color name="pill_selected">#2F62B3</color>
+    <color name="on_pill_selected">#FFFFFF</color>
+    <color name="card_text">#FFFFFF</color>
+    <color name="card_text_dim">#D9FFFFFF</color>
+    <color name="card_stroke">#26FFFFFF</color>
+    <color name="card_icon_glass">#26FFFFFF</color>
+    <color name="card_icon_stroke">#40FFFFFF</color>
 </resources>

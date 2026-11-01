@@ -651,4 +651,25 @@
     <string name="workprofile_move_failed">डिवाइस ने ऐप नहीं हिलाया।</string>
     <string name="workprofile_admin_label">वर्क प्रोफ़ाइल स्वामी</string>
     <string name="workprofile_admin_desc">App Ops Shizuku को स्वयं बनाई वर्क प्रोफ़ाइल प्रबंधित करने देता है।</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · गोपनीयता नियंत्रण</string>
+    <string name="header_tune">क्रमबद्ध और फ़िल्टर करें</string>
+    <string name="tab_apps">ऐप्स</string>
+    <string name="tab_tools">टूल</string>
+    <string name="tab_settings">सेटिंग्स</string>
+    <string name="filter_active">फ़िल्टर: %1$s  ✕</string>
+    <string name="app_unchanged">अपरिवर्तित</string>
+    <string name="shizuku_hint_pill">Shizuku कनेक्ट नहीं है – कुछ नहीं बदला जा सकता। सेटिंग्स के लिए टैप करें।</string>
+    <string name="settings_quarantine_hint">नए इंस्टॉल ऐप्स को रिलीज़ करने तक बैकग्राउंड डेटा, क्लिपबोर्ड और बैकग्राउंड रन नहीं मिलता।</string>
+    <string name="settings_dynamic_hint">बटन और कार्ड के लिए सिस्टम रंग (Material You) उपयोग करें।</string>
+    <string name="settings_backup_title">बैकअप</string>
+    <string name="settings_backup_hint">गोपनीयता प्रोफ़ाइल और व्यवहार सेटिंग्स JSON के रूप में निर्यात/आयात करें।</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · नेटवर्क एक्सेस नहीं</string>
+    <string name="tool_desc_by_permission">कौन से ऐप कैमरा, स्थान … उपयोग कर सकते हैं?</string>
+    <string name="tool_desc_net_usage">बैकग्राउंड में कौन डेटा भेजता है?</string>
+    <string name="tool_desc_activity">जगाना, जॉब और सेंसर एक्सेस</string>
+    <string name="tool_desc_auto_rules">समय या वाई-फ़ाई से कार्रवाई</string>
+    <string name="tool_desc_system">लॉकडाउन, निजी DNS, शक्तिशाली एक्सेस</string>
+    <string name="tool_desc_work_profile">ऐप्स को दूसरी प्रोफ़ाइल में अलग करें</string>
+    <string name="tool_desc_change_log">इस ऐप ने जो बदला – पूर्ववत करें</string>
 </resources>

@@ -651,4 +651,25 @@
     <string name="workprofile_move_failed">L\'appareil n\'a pas déplacé l\'appli.</string>
     <string name="workprofile_admin_label">Propriétaire du profil professionnel</string>
     <string name="workprofile_admin_desc">Permet à App Ops Shizuku de gérer un profil professionnel qu\'elle a créé.</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · contrôle de la vie privée</string>
+    <string name="header_tune">Trier et filtrer</string>
+    <string name="tab_apps">Applis</string>
+    <string name="tab_tools">Outils</string>
+    <string name="tab_settings">Réglages</string>
+    <string name="filter_active">Filtre : %1$s  ✕</string>
+    <string name="app_unchanged">Inchangée</string>
+    <string name="shizuku_hint_pill">Shizuku n\'est pas connecté – rien ne peut être modifié. Touchez pour ouvrir les réglages.</string>
+    <string name="settings_quarantine_hint">Les applis nouvellement installées n\'ont ni données en arrière-plan, ni presse-papiers, ni exécution en arrière-plan jusqu\'à leur libération.</string>
+    <string name="settings_dynamic_hint">Utiliser les couleurs du système (Material You) pour les boutons et cartes.</string>
+    <string name="settings_backup_title">Sauvegarde</string>
+    <string name="settings_backup_hint">Exporter ou importer les profils de confidentialité et réglages de comportement en JSON.</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · sans accès réseau</string>
+    <string name="tool_desc_by_permission">Quelles applis peuvent utiliser caméra, position… ?</string>
+    <string name="tool_desc_net_usage">Qui envoie des données en arrière-plan ?</string>
+    <string name="tool_desc_activity">Réveils, tâches et accès aux capteurs</string>
+    <string name="tool_desc_auto_rules">Agir selon l\'heure ou le Wi-Fi</string>
+    <string name="tool_desc_system">Verrouillage, DNS privé, accès puissants</string>
+    <string name="tool_desc_work_profile">Isoler des applis dans un second profil</string>
+    <string name="tool_desc_change_log">Tout ce que l\'appli a modifié – annuler</string>
 </resources>

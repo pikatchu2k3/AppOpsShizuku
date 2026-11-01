@@ -674,4 +674,25 @@
     <string name="workprofile_move_failed">Das Gerät hat die App nicht verschoben.</string>
     <string name="workprofile_admin_label">Arbeitsprofil-Besitzer</string>
     <string name="workprofile_admin_desc">Erlaubt App Ops Shizuku, ein selbst angelegtes Arbeitsprofil zu verwalten.</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · Datenschutz-Steuerung</string>
+    <string name="header_tune">Sortieren und filtern</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_tools">Werkzeuge</string>
+    <string name="tab_settings">Einstellungen</string>
+    <string name="filter_active">Filter: %1$s  ✕</string>
+    <string name="app_unchanged">Unverändert</string>
+    <string name="shizuku_hint_pill">Shizuku ist nicht verbunden – es lässt sich nichts ändern. Tippen für die Einstellungen.</string>
+    <string name="settings_quarantine_hint">Neu installierte Apps bekommen keine Hintergrunddaten, keine Zwischenablage und keinen Hintergrund-Lauf, bis du sie freigibst.</string>
+    <string name="settings_dynamic_hint">Systemfarben (Material You) für Knöpfe und Karten in den Ansichten verwenden.</string>
+    <string name="settings_backup_title">Sicherung</string>
+    <string name="settings_backup_hint">Privacy-Profile und Verhaltens-Einstellungen als JSON exportieren oder importieren.</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · ohne Netzzugriff</string>
+    <string name="tool_desc_by_permission">Welche Apps dürfen Kamera, Standort … nutzen?</string>
+    <string name="tool_desc_net_usage">Wer sendet im Hintergrund Daten?</string>
+    <string name="tool_desc_activity">Weckvorgänge, Jobs und Sensorzugriffe</string>
+    <string name="tool_desc_auto_rules">Nach Zeit oder WLAN handeln</string>
+    <string name="tool_desc_system">Lockdown, privates DNS, mächtige Rechte</string>
+    <string name="tool_desc_work_profile">Apps in ein zweites Profil abschotten</string>
+    <string name="tool_desc_change_log">Alles, was diese App geändert hat – rückgängig</string>
 </resources>

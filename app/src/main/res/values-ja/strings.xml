@@ -648,4 +648,25 @@
     <string name="workprofile_move_failed">端末がアプリを移動しませんでした。</string>
     <string name="workprofile_admin_label">仕事用プロファイル所有者</string>
     <string name="workprofile_admin_desc">App Ops Shizukuが自ら作成した仕事用プロファイルを管理できるようにします。</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · プライバシー管理</string>
+    <string name="header_tune">並べ替えとフィルター</string>
+    <string name="tab_apps">アプリ</string>
+    <string name="tab_tools">ツール</string>
+    <string name="tab_settings">設定</string>
+    <string name="filter_active">フィルター: %1$s  ✕</string>
+    <string name="app_unchanged">変更なし</string>
+    <string name="shizuku_hint_pill">Shizukuが未接続のため変更できません。タップして設定を開きます。</string>
+    <string name="settings_quarantine_hint">新しくインストールしたアプリは、解除するまでバックグラウンドデータ・クリップボード・バックグラウンド実行が使えません。</string>
+    <string name="settings_dynamic_hint">画面内のボタンとカードにシステムカラー（Material You）を使います。</string>
+    <string name="settings_backup_title">バックアップ</string>
+    <string name="settings_backup_hint">プライバシープロファイルと動作設定をJSONでエクスポート/インポートします。</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · ネットワークアクセスなし</string>
+    <string name="tool_desc_by_permission">カメラや位置情報などを使えるアプリは？</string>
+    <string name="tool_desc_net_usage">バックグラウンドで送信しているのは？</string>
+    <string name="tool_desc_activity">起動・ジョブ・センサーアクセス</string>
+    <string name="tool_desc_auto_rules">時刻やWi-Fiで自動実行</string>
+    <string name="tool_desc_system">ロックダウン・プライベートDNS・強力な権限</string>
+    <string name="tool_desc_work_profile">アプリを2つ目のプロファイルに隔離</string>
+    <string name="tool_desc_change_log">このアプリの変更履歴と取り消し</string>
 </resources>

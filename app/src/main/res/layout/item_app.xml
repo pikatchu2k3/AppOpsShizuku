@@ -1,79 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<!-- Verlaufskarte einer App: Hintergrund (Icon-Farbe -> Nachtblau -> Petrol) setzt der Adapter. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="7dp"
     android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="?attr/colorOutlineVariant"
-    app:cardBackgroundColor="?attr/colorSurface">
+    android:gravity="center_vertical"
+    android:minHeight="96dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="18dp"
+    android:paddingVertical="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/bg_card_icon"
+        android:padding="10dp">
 
         <ImageView
             android:id="@+id/itemIcon"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
             tools:src="@android:drawable/sym_def_app_icon" />
+    </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/itemLabel"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/card_text"
+            android:textSize="21sp"
+            tools:text="Beispiel App" />
 
-            <TextView
-                android:id="@+id/itemLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:text="Beispiel App" />
+        <TextView
+            android:id="@+id/itemBadges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/card_text_dim"
+            android:textSize="15sp"
+            tools:text="3 blockiert · Offline" />
 
-            <TextView
-                android:id="@+id/itemPackage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:text="com.example.app" />
-
-            <!-- Status-Symbole: was diese App an der Ziel-App geaendert hat (aus eigenen Speichern) -->
-            <TextView
-                android:id="@+id/itemBadges"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textAppearance="?attr/textAppearanceLabelSmall"
-                android:textColor="?attr/colorTertiary"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:visibility="gone"
-                tools:text="3 blockiert · Offline · Nur bei Bedarf"
-                tools:visibility="visible" />
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_chevron"
-            app:tint="?attr/colorOutline" />
+        <TextView
+            android:id="@+id/itemPackage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:alpha="0.7"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/card_text_dim"
+            android:textSize="12sp"
+            tools:text="com.example.app" />
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>

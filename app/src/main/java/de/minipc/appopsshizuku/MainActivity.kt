@@ -71,6 +71,10 @@ class MainActivity : AppCompatActivity() {
         const val FILTER_BLOCKED = 1
         const val FILTER_CHANGED = 2
 
+        private const val PANEL_APPS = 0
+        private const val PANEL_TOOLS = 1
+        private const val PANEL_SETTINGS = 2
+
         /** Gleichzeitige Shell-Aufrufe beim Blockiert-Scan. */
         private const val SCAN_THREADS = 4
     }
@@ -97,6 +101,9 @@ class MainActivity : AppCompatActivity() {
     /** Cache: Paketname -> hat mind. eine blockierte Op (ignore/deny auf UID-Ebene) */
     private val blockedCache = mutableMapOf<String, Boolean>()
 
+    /** Cache: Paketname -> Kartenfarbe (Icon-Analyse nur einmal je App). */
+    private val cardColorCache = java.util.concurrent.ConcurrentHashMap<String, Int>()
+
     /** Cache: Paketname -> Icon (max. 100 Eintraege, sonst Icon-Neuladen bei jedem onResume) */
     private val iconCache = LruCache<String, Drawable>(100)
 
@@ -114,17 +121,28 @@ class MainActivity : AppCompatActivity() {
         DesignSettings.applyDynamicColorsIfEnabled(this)
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
-        supportActionBar?.title = getString(R.string.app_name)
-
-        // Edge-to-Edge: Systemleisten-Abstaende auf das Wurzel-Layout legen,
-        // damit die Toolbar unter der Statusleiste und die Liste ueber der
-        // Navigationsleiste bleiben (kein Inhalt/Tap geht verloren).
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { v, insets ->
+        // Edge-to-Edge: der Sternenhimmel laeuft hinter die Systemleisten; Inhalt und die
+        // schwebende Navigation bekommen die Abstaende, damit nichts verdeckt wird.
+        val density = resources.displayMetrics.density
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
+            findViewById<View>(R.id.contentColumn)
+                .updatePadding(left = bars.left, top = bars.top, right = bars.right)
+            findViewById<View>(R.id.pillNav).let { nav ->
+                (nav.layoutParams as android.view.ViewGroup.MarginLayoutParams).bottomMargin =
+                    bars.bottom + (16 * density).toInt()
+                nav.requestLayout()
+            }
+            val listBottom = bars.bottom + (120 * density).toInt()
+            listOf(R.id.appList, R.id.panelTools, R.id.panelSettings).forEach {
+                findViewById<View>(it).updatePadding(bottom = listBottom)
+            }
             insets
         }
+        setupHeader()
+        setupNavigation()
+        setupTools()
+        setupSettings()
 
         profileBackup = ProfileBackup(this)
 
@@ -166,8 +184,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        setupSearchAndSort()
-
         adapter = AppListAdapter { app ->
             startActivity(
                 Intent(this, AppDetailActivity::class.java)
@@ -179,32 +195,34 @@ class MainActivity : AppCompatActivity() {
             this.adapter = this@MainActivity.adapter
         }
 
-        findViewById<ChipGroup>(R.id.filterChipGroup).setOnCheckedStateChangeListener { _, checkedIds ->
-            filterMode = when {
-                R.id.chipBlocked in checkedIds -> FILTER_BLOCKED
-                R.id.chipChanged in checkedIds -> FILTER_CHANGED
-                else -> FILTER_ALL
-            }
-            if (filterMode == FILTER_BLOCKED && blockedCache.isEmpty()) {
-                scanBlockedState()
-            } else {
-                applyFilterAndSort()
-            }
-        }
-
         findViewById<MaterialButton>(R.id.driftRestore).setOnClickListener { restoreDrift() }
-
-        findViewById<FloatingActionButton>(R.id.fabRefresh).setOnClickListener {
-            blockedCache.clear()
-            loadApps()
-        }
 
         // KEIN loadApps() hier: onResume laedt direkt nach onCreate — doppeltes
         // Laden wuerde parallel laufen (race auf allApps)
         updateStatus()
     }
 
-    private fun setupSearchAndSort() {
+    // ------------------------------------------------------------------ Kopfzeile
+
+    private fun setupHeader() {
+        // Erster Buchstabe im Verlauf (Petrol -> Cyan), Rest in der Glas-Schriftfarbe
+        val title = findViewById<TextView>(R.id.headerTitle)
+        val text = android.text.SpannableString(title.text)
+        if (text.isNotEmpty()) {
+            text.setSpan(
+                de.minipc.appopsshizuku.ui.GradientSpan(0xFF1FB5C9.toInt(), 0xFF3D7BE0.toInt()),
+                0, 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        title.text = text
+
+        findViewById<View>(R.id.btnHistory).setOnClickListener {
+            startActivity(Intent(this, ChangeLogActivity::class.java))
+        }
+        findViewById<View>(R.id.btnTune).setOnClickListener { showTuneMenu(it) }
+        findViewById<View>(R.id.btnSearch).setOnClickListener { toggleSearch() }
+        findViewById<TextView>(R.id.filterPill).setOnClickListener { setFilter(FILTER_ALL) }
+
         findViewById<EditText>(R.id.searchInput).addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -213,23 +231,174 @@ class MainActivity : AppCompatActivity() {
                 applyFilterAndSort()
             }
         })
+    }
 
-        val spinner = findViewById<AutoCompleteTextView>(R.id.sortSpinner)
-        spinner.setAdapter(
-            ArrayAdapter(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                resources.getStringArray(R.array.sort_options)
-            )
-        )
-        spinner.setText(resources.getStringArray(R.array.sort_options)[sortMode], false)
-        spinner.setOnItemClickListener { _, _, pos, _ ->
-            sortMode = pos
-            applyFilterAndSort()
+    private fun toggleSearch() {
+        val layout = findViewById<View>(R.id.searchLayout)
+        val input = findViewById<EditText>(R.id.searchInput)
+        val imm = getSystemService(android.view.inputmethod.InputMethodManager::class.java)
+        if (layout.visibility == View.VISIBLE) {
+            input.setText("")
+            layout.visibility = View.GONE
+            imm?.hideSoftInputFromWindow(input.windowToken, 0)
+            setHeaderButtonActive(R.id.btnSearch, false)
+        } else {
+            showPanel(PANEL_APPS)
+            layout.visibility = View.VISIBLE
+            input.requestFocus()
+            imm?.showSoftInput(input, 0)
+            setHeaderButtonActive(R.id.btnSearch, true)
         }
-        // Tastatur unterdruecken (Exposed Dropdown zeigt nur die Liste)
-        spinner.inputType = android.text.InputType.TYPE_NULL
-        spinner.keyListener = null
+    }
+
+    private fun setHeaderButtonActive(id: Int, active: Boolean) {
+        val b = findViewById<android.widget.ImageButton>(id)
+        b.setBackgroundResource(if (active) R.drawable.bg_glass_circle_selected else R.drawable.bg_glass_circle)
+        b.imageTintList = android.content.res.ColorStateList.valueOf(
+            androidx.core.content.ContextCompat.getColor(this, if (active) R.color.on_pill_selected else R.color.on_glass)
+        )
+    }
+
+    /** Sortieren, Filtern und Neu laden in einem Menue (ersetzt Dropdown und Filter-Chips). */
+    private fun showTuneMenu(anchor: View) {
+        val popup = android.widget.PopupMenu(this, anchor)
+        val m = popup.menu
+        val sorts = resources.getStringArray(R.array.sort_options)
+        val sortGroup = 1
+        val filterGroup = 2
+        sorts.forEachIndexed { i, label -> m.add(sortGroup, 100 + i, i, label).isChecked = i == sortMode }
+        m.setGroupCheckable(sortGroup, true, true)
+        val filters = listOf(
+            FILTER_ALL to R.string.filter_all,
+            FILTER_BLOCKED to R.string.filter_blocked,
+            FILTER_CHANGED to R.string.filter_changed
+        )
+        filters.forEachIndexed { i, (mode, res) ->
+            m.add(filterGroup, 200 + mode, 10 + i, res).isChecked = mode == filterMode
+        }
+        m.setGroupCheckable(filterGroup, true, true)
+        m.add(3, 300, 20, R.string.btn_refresh)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                in 100..199 -> { sortMode = item.itemId - 100; applyFilterAndSort() }
+                in 200..299 -> setFilter(item.itemId - 200)
+                300 -> { blockedCache.clear(); loadApps() }
+            }
+            true
+        }
+        popup.show()
+    }
+
+    private fun setFilter(mode: Int) {
+        filterMode = mode
+        val pill = findViewById<TextView>(R.id.filterPill)
+        if (mode == FILTER_ALL) {
+            pill.visibility = View.GONE
+        } else {
+            val name = getString(if (mode == FILTER_BLOCKED) R.string.filter_blocked else R.string.filter_changed)
+            pill.text = getString(R.string.filter_active, name)
+            pill.visibility = View.VISIBLE
+        }
+        setHeaderButtonActive(R.id.btnTune, mode != FILTER_ALL)
+        if (mode == FILTER_BLOCKED && blockedCache.isEmpty()) scanBlockedState() else applyFilterAndSort()
+    }
+
+    // ------------------------------------------------------------------ Navigation
+
+    private var currentPanel = PANEL_APPS
+
+    private fun setupNavigation() {
+        findViewById<View>(R.id.navApps).setOnClickListener { showPanel(PANEL_APPS) }
+        findViewById<View>(R.id.navTools).setOnClickListener { showPanel(PANEL_TOOLS) }
+        findViewById<View>(R.id.navSettings).setOnClickListener { showPanel(PANEL_SETTINGS) }
+        showPanel(PANEL_APPS)
+    }
+
+    private fun showPanel(panel: Int) {
+        currentPanel = panel
+        findViewById<View>(R.id.panelApps).visibility = if (panel == PANEL_APPS) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.panelTools).visibility = if (panel == PANEL_TOOLS) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.panelSettings).visibility = if (panel == PANEL_SETTINGS) View.VISIBLE else View.GONE
+        // Suche/Filter gehoeren nur zur App-Liste
+        if (panel != PANEL_APPS) findViewById<View>(R.id.searchLayout).visibility = View.GONE
+        findViewById<View>(R.id.filterPill).visibility =
+            if (panel == PANEL_APPS && filterMode != FILTER_ALL) View.VISIBLE else View.GONE
+        val items = listOf(
+            Triple(R.id.navApps, R.id.navAppsIcon, R.id.navAppsLabel),
+            Triple(R.id.navTools, R.id.navToolsIcon, R.id.navToolsLabel),
+            Triple(R.id.navSettings, R.id.navSettingsIcon, R.id.navSettingsLabel)
+        )
+        items.forEachIndexed { i, (box, icon, label) ->
+            val selected = i == panel
+            findViewById<View>(box).setBackgroundResource(if (selected) R.drawable.bg_pill_selected else 0)
+            findViewById<View>(box).isSelected = selected
+            val color = androidx.core.content.ContextCompat.getColor(
+                this, if (selected) R.color.on_pill_selected else R.color.on_glass
+            )
+            findViewById<android.widget.ImageView>(icon).imageTintList =
+                android.content.res.ColorStateList.valueOf(color)
+            findViewById<TextView>(label).setTextColor(color)
+        }
+    }
+
+    // ------------------------------------------------------------------ Werkzeuge
+
+    private data class Tool(val title: Int, val desc: Int, val icon: Int, val seed: Int, val target: Class<*>)
+
+    private fun setupTools() {
+        val tools = listOf(
+            Tool(R.string.menu_by_permission, R.string.tool_desc_by_permission, R.drawable.ic_list_check, 0xFF2F7DD6.toInt(), PermissionOverviewActivity::class.java),
+            Tool(R.string.menu_net_usage, R.string.tool_desc_net_usage, R.drawable.ic_network, 0xFF1F9E8F.toInt(), NetUsageActivity::class.java),
+            Tool(R.string.menu_activity, R.string.tool_desc_activity, R.drawable.ic_pulse, 0xFFD9822B.toInt(), ActivityScanActivity::class.java),
+            Tool(R.string.menu_auto_rules, R.string.tool_desc_auto_rules, R.drawable.ic_rule, 0xFF7B5CD6.toInt(), AutoRulesActivity::class.java),
+            Tool(R.string.menu_system, R.string.tool_desc_system, R.drawable.ic_shield, 0xFFC0392B.toInt(), SystemActivity::class.java),
+            Tool(R.string.menu_work_profile, R.string.tool_desc_work_profile, R.drawable.ic_work, 0xFF3E8E41.toInt(), WorkProfileActivity::class.java),
+            Tool(R.string.menu_change_log, R.string.tool_desc_change_log, R.drawable.ic_history, 0xFF2E6FA0.toInt(), ChangeLogActivity::class.java)
+        )
+        val container = findViewById<android.widget.LinearLayout>(R.id.toolsContainer)
+        val inflater = layoutInflater
+        for (t in tools) {
+            val v = inflater.inflate(R.layout.item_tool, container, false)
+            v.background = AppListAdapter.gradient(v, de.minipc.appopsshizuku.ui.CardColors.cardStart(t.seed))
+            v.findViewById<android.widget.ImageView>(R.id.toolIcon).setImageResource(t.icon)
+            v.findViewById<TextView>(R.id.toolTitle).setText(t.title)
+            v.findViewById<TextView>(R.id.toolDesc).setText(t.desc)
+            v.setOnClickListener { startActivity(Intent(this, t.target)) }
+            container.addView(v)
+        }
+    }
+
+    // ------------------------------------------------------------------ Einstellungen
+
+    private fun setupSettings() {
+        val quarantine = findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.settingQuarantine)
+        quarantine.isChecked = de.minipc.appopsshizuku.appops.QuarantineStore(this).enabled
+        quarantine.setOnClickListener { toggleQuarantine(quarantine) }
+
+        val dynamic = findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.settingDynamicColor)
+        if (DynamicColors.isDynamicColorAvailable()) {
+            dynamic.isChecked = DesignSettings.isDynamicColorEnabled(this)
+            dynamic.setOnClickListener {
+                DesignSettings.setDynamicColorEnabled(this, dynamic.isChecked)
+                Toast.makeText(
+                    this,
+                    if (dynamic.isChecked) R.string.dynamic_color_on else R.string.dynamic_color_off,
+                    Toast.LENGTH_SHORT
+                ).show()
+                recreate() // Theme wird nur beim Erzeugen der Activity gesetzt
+            }
+        } else {
+            dynamic.isEnabled = false
+            dynamic.isChecked = false
+            dynamic.setText(R.string.menu_dynamic_color_unavailable)
+        }
+        findViewById<View>(R.id.settingExport).setOnClickListener { exportProfiles() }
+        findViewById<View>(R.id.settingImport).setOnClickListener {
+            importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
+        }
+        val version = runCatching { packageManager.getPackageInfo(packageName, 0).versionName }.getOrNull()
+        findViewById<TextView>(R.id.settingsAbout).text = getString(R.string.settings_about, version ?: "?")
+        findViewById<View>(R.id.shizukuHint).setOnClickListener { showPanel(PANEL_SETTINGS) }
     }
 
     private fun loadApps() {
@@ -318,7 +487,14 @@ class MainActivity : AppCompatActivity() {
             }
 
             // Status-Symbole aus den eigenen Speichern (kein Shell-Aufruf)
-            val withBadges = loaded.map { it.copy(badges = badgeText(it.packageName)) }
+            val withBadges = loaded.map {
+                it.copy(
+                    badges = badgeText(it.packageName),
+                    cardColor = cardColorCache.getOrPut(it.packageName) {
+                        de.minipc.appopsshizuku.ui.CardColors.cardStart(de.minipc.appopsshizuku.ui.IconColor.of(it.icon))
+                    }
+                )
+            }
 
             handler.post {
                 // Atomare Zuweisung: keine Mutation, kein Datenrennen mit
@@ -376,7 +552,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleQuarantine(item: MenuItem) {
+    private fun toggleQuarantine(item: com.google.android.material.materialswitch.MaterialSwitch) {
         val store = quarantineStoreForBadges
         if (store.enabled) {
             store.enabled = false
@@ -387,7 +563,8 @@ class MainActivity : AppCompatActivity() {
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle(R.string.quarantine_enable_title)
             .setMessage(R.string.quarantine_enable_msg)
-            .setNegativeButton(R.string.btn_cancel, null)
+            .setNegativeButton(R.string.btn_cancel) { _, _ -> item.isChecked = false }
+            .setOnCancelListener { item.isChecked = store.enabled }
             .setPositiveButton(R.string.quarantine_enable_action) { _, _ ->
                 // Ab jetzt: nur Apps, die NACH dem Einschalten installiert werden
                 store.checkedUntil = System.currentTimeMillis()
@@ -424,8 +601,7 @@ class MainActivity : AppCompatActivity() {
         val backend = if (manager.isConnected && manager.hasPermission) ShizukuBackend() else NoopBackend()
         if (backend is NoopBackend) {
             Toast.makeText(this, R.string.status_no_permission, Toast.LENGTH_LONG).show()
-            filterMode = FILTER_ALL
-            findViewById<ChipGroup>(R.id.filterChipGroup).check(R.id.chipAll)
+            setFilter(FILTER_ALL)
             return
         }
         Toast.makeText(this, R.string.scanning_apps, Toast.LENGTH_SHORT).show()
@@ -564,79 +740,6 @@ class MainActivity : AppCompatActivity() {
                 checkDrift()
                 loadApps()
             }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        menu.findItem(R.id.action_quarantine)?.isChecked = quarantineStoreForBadges.enabled
-        menu.findItem(R.id.action_dynamic_color).apply {
-            if (DynamicColors.isDynamicColorAvailable()) {
-                isChecked = DesignSettings.isDynamicColorEnabled(this@MainActivity)
-            } else {
-                isEnabled = false
-                isChecked = false
-                setTitle(R.string.menu_dynamic_color_unavailable)
-            }
-        }
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_quarantine -> {
-                toggleQuarantine(item)
-                true
-            }
-            R.id.action_work_profile -> {
-                startActivity(Intent(this, WorkProfileActivity::class.java))
-                true
-            }
-            R.id.action_activity -> {
-                startActivity(Intent(this, ActivityScanActivity::class.java))
-                true
-            }
-            R.id.action_net_usage -> {
-                startActivity(Intent(this, NetUsageActivity::class.java))
-                true
-            }
-            R.id.action_auto_rules -> {
-                startActivity(Intent(this, AutoRulesActivity::class.java))
-                true
-            }
-            R.id.action_change_log -> {
-                startActivity(Intent(this, ChangeLogActivity::class.java))
-                true
-            }
-            R.id.action_system -> {
-                startActivity(Intent(this, SystemActivity::class.java))
-                true
-            }
-            R.id.action_by_permission -> {
-                startActivity(Intent(this, PermissionOverviewActivity::class.java))
-                true
-            }
-            R.id.action_export_profiles -> {
-                exportProfiles()
-                true
-            }
-            R.id.action_import_profiles -> {
-                importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
-                true
-            }
-            R.id.action_dynamic_color -> {
-                val enabled = !DesignSettings.isDynamicColorEnabled(this)
-                DesignSettings.setDynamicColorEnabled(this, enabled)
-                item.isChecked = enabled
-                Toast.makeText(
-                    this,
-                    if (enabled) R.string.dynamic_color_on else R.string.dynamic_color_off,
-                    Toast.LENGTH_SHORT
-                ).show()
-                recreate() // Theme wird nur beim Erzeugen der Activity gesetzt
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -820,6 +923,12 @@ class MainActivity : AppCompatActivity() {
                 bgAttr = com.google.android.material.R.attr.colorPrimaryContainer
                 fgAttr = com.google.android.material.R.attr.colorOnPrimaryContainer
             }
+        }
+        // Hinweis oben in der App-Liste, solange Shizuku nicht nutzbar ist
+        findViewById<TextView>(R.id.shizukuHint).apply {
+            val ok = manager.isConnected && manager.hasPermission
+            visibility = if (ok) View.GONE else View.VISIBLE
+            if (!ok) setText(R.string.shizuku_hint_pill)
         }
         val fg = themeColor(fgAttr)
         card.setCardBackgroundColor(themeColor(bgAttr))
