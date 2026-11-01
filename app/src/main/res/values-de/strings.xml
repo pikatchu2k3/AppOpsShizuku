@@ -562,4 +562,16 @@
     <string name="log_info_block_all">%1$s: alle Berechtigungen blockiert</string>
     <string name="log_info_lockdown_on">Lockdown an: %1$d Berechtigungen entzogen</string>
     <string name="log_info_lockdown_off">Lockdown aus: %1$d Berechtigungen zurückgegeben</string>
+    <string name="template_button">Vorlage anwenden …</string>
+    <string name="template_title">Profil-Vorlage</string>
+    <string name="template_game">Spiel</string>
+    <string name="template_messenger">Messenger</string>
+    <string name="template_banking">Banking</string>
+    <string name="template_confirm">Setzt %1$d Berechtigungen für diese App. Nicht enthaltene Berechtigungen bleiben unverändert; es wird nichts erteilt, das mehr preisgibt.</string>
+    <string name="template_apply">Anwenden</string>
+    <string name="template_done">Vorlage angewendet: %1$d Berechtigungen</string>
+    <string name="template_partial">%1$d gesetzt, %2$d ließen sich nicht ändern</string>
+    <string name="template_share">Aktuelles Profil teilen</string>
+    <string name="template_share_empty">Für diese App ist noch kein Profil gespeichert.</string>
+    <string name="log_info_template">%1$s: Vorlage angewendet (%2$d Berechtigungen)</string>
 </resources>

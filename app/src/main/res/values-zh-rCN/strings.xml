@@ -539,4 +539,16 @@
     <string name="log_info_block_all">%1$s：已阻止所有权限</string>
     <string name="log_info_lockdown_on">锁定开启：撤销 %1$d 项权限</string>
     <string name="log_info_lockdown_off">锁定关闭：归还 %1$d 项权限</string>
+    <string name="template_button">应用模板 …</string>
+    <string name="template_title">配置模板</string>
+    <string name="template_game">游戏</string>
+    <string name="template_messenger">即时通讯</string>
+    <string name="template_banking">银行</string>
+    <string name="template_confirm">为此应用设置 %1$d 项权限。模板之外的权限保持不变；不会授予任何泄露更多信息的权限。</string>
+    <string name="template_apply">应用</string>
+    <string name="template_done">已应用模板：%1$d 项权限</string>
+    <string name="template_partial">已设置 %1$d 项，%2$d 项无法更改</string>
+    <string name="template_share">分享当前配置</string>
+    <string name="template_share_empty">此应用尚无已保存的配置。</string>
+    <string name="log_info_template">%1$s：已应用模板（%2$d 项权限）</string>
 </resources>

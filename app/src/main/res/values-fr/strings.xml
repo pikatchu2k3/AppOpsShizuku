@@ -539,4 +539,16 @@
     <string name="log_info_block_all">%1$s : toutes les autorisations bloquées</string>
     <string name="log_info_lockdown_on">Verrouillage activé : %1$d autorisations retirées</string>
     <string name="log_info_lockdown_off">Verrouillage désactivé : %1$d autorisations rendues</string>
+    <string name="template_button">Appliquer un modèle …</string>
+    <string name="template_title">Modèle de profil</string>
+    <string name="template_game">Jeu</string>
+    <string name="template_messenger">Messagerie</string>
+    <string name="template_banking">Banque</string>
+    <string name="template_confirm">Définit %1$d autorisations pour cette appli. Les autorisations absentes du modèle restent inchangées ; rien n\'est accordé qui en révèle davantage.</string>
+    <string name="template_apply">Appliquer</string>
+    <string name="template_done">Modèle appliqué : %1$d autorisations</string>
+    <string name="template_partial">%1$d définies, %2$d non modifiables</string>
+    <string name="template_share">Partager le profil actuel</string>
+    <string name="template_share_empty">Cette appli n\'a pas encore de profil enregistré.</string>
+    <string name="log_info_template">%1$s : modèle appliqué (%2$d autorisations)</string>
 </resources>

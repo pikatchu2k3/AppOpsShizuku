@@ -260,6 +260,17 @@
         android:padding="12dp"
         android:text="@string/block_all_button" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/templateButton"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:padding="12dp"
+        android:text="@string/template_button" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/opList"
         android:layout_width="match_parent"

@@ -539,4 +539,16 @@
     <string name="log_info_block_all">%1$s: todas as permissões bloqueadas</string>
     <string name="log_info_lockdown_on">Bloqueio ativado: %1$d permissões revogadas</string>
     <string name="log_info_lockdown_off">Bloqueio desativado: %1$d permissões devolvidas</string>
+    <string name="template_button">Aplicar modelo …</string>
+    <string name="template_title">Modelo de perfil</string>
+    <string name="template_game">Jogo</string>
+    <string name="template_messenger">Mensageiro</string>
+    <string name="template_banking">Banco</string>
+    <string name="template_confirm">Define %1$d permissões para este app. Permissões fora do modelo não são alteradas; nada é concedido que revele mais.</string>
+    <string name="template_apply">Aplicar</string>
+    <string name="template_done">Modelo aplicado: %1$d permissões</string>
+    <string name="template_partial">%1$d definidas, %2$d não puderam ser alteradas</string>
+    <string name="template_share">Compartilhar perfil atual</string>
+    <string name="template_share_empty">Este app ainda não tem um perfil salvo.</string>
+    <string name="log_info_template">%1$s: modelo aplicado (%2$d permissões)</string>
 </resources>
