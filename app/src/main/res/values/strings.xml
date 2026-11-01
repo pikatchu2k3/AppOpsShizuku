@@ -179,6 +179,8 @@
     <string name="log_info_block_all">%1$s: all permissions blocked</string>
     <string name="log_info_lockdown_off">Lockdown off: %1$d permissions given back</string>
     <string name="log_info_lockdown_on">Lockdown on: %1$d permissions revoked</string>
+    <string name="log_info_rule_off">Rule \'%1$s\': condition ended</string>
+    <string name="log_info_rule_on">Rule \'%1$s\': condition met</string>
     <string name="log_info_suggest">%1$s: %2$d recommended permissions revoked</string>
     <string name="log_info_template">%1$s: template applied (%2$d permissions)</string>
     <string name="log_net_off">%1$s · %2$s off</string>
@@ -188,6 +190,7 @@
     <string name="log_undo">Undo</string>
     <string name="log_undo_failed">The device did not take it back.</string>
     <string name="log_undone">Change undone</string>
+    <string name="menu_auto_rules">Automatic rules</string>
     <string name="menu_by_permission">By permission</string>
     <string name="menu_change_log">Change log</string>
     <string name="menu_components">Components</string>
@@ -348,6 +351,38 @@
     <string name="restore_all_confirm_title">All to default?</string>
     <string name="restore_done">All entries set to default</string>
     <string name="restore_partial">Set to default, %1$d entries not applied.</string>
+    <string name="rule_action">Action</string>
+    <string name="rule_action_lockdown">Lockdown (camera/mic for all apps)</string>
+    <string name="rule_action_offline">Take selected apps offline</string>
+    <string name="rule_apps_required">Choose at least one app.</string>
+    <string name="rule_day_required">Select at least one day.</string>
+    <string name="rule_days_all">Every day</string>
+    <string name="rule_delete">Delete</string>
+    <string name="rule_edit_title">Rule</string>
+    <string name="rule_from">From %1$s</string>
+    <string name="rule_name_hint">Name</string>
+    <string name="rule_name_required">Please enter a name.</string>
+    <string name="rule_pick_apps">Choose apps</string>
+    <string name="rule_pick_apps_n">Choose apps (%1$d)</string>
+    <string name="rule_save">Save</string>
+    <string name="rule_to">To %1$s</string>
+    <string name="rule_trigger">Trigger</string>
+    <string name="rule_trigger_time">Time</string>
+    <string name="rule_trigger_wifi">Wi-Fi</string>
+    <string name="rule_wifi_connected">Active when connected to it</string>
+    <string name="rule_wifi_connected_short">Wi-Fi: %1$s connected</string>
+    <string name="rule_wifi_current">Use current network</string>
+    <string name="rule_wifi_disconnected">Active when NOT connected to it</string>
+    <string name="rule_wifi_disconnected_short">Wi-Fi: not %1$s</string>
+    <string name="rule_wifi_needs_location">Reading the Wi-Fi name needs the location permission for this app (the app has no network access of its own).</string>
+    <string name="rule_wifi_required">Please enter a network name.</string>
+    <string name="rule_wifi_ssid">Network name (SSID)</string>
+    <string name="rule_wifi_unreadable">Network name not readable (connected to Wi-Fi? location on?).</string>
+    <string name="rule_window_required">Start and end must differ.</string>
+    <string name="rules_add">Add rule</string>
+    <string name="rules_empty">No rules yet.</string>
+    <string name="rules_intro">Rules run by time or Wi-Fi and need Shizuku to take effect. Wi-Fi rules may lag up to ~15 min (no always-on service).</string>
+    <string name="rules_title">Automatic rules</string>
     <string name="scanning_apps">Checking permissions…</string>
     <string name="screen_off_effect_force_stop">Close (force stop) – the app is ended and gets no alarms or push messages until it is opened again; opening it stays possible</string>
     <string name="screen_off_effect_suspend">Freeze – the app cannot start at all until the screen is on again; data is kept</string>
@@ -552,4 +587,13 @@
     <string name="while_in_use_on">%1$s: only while in use. Granted while the app is in front, revoked 10 s after leaving or when the screen turns off (Android then ends the app in the background).</string>
     <string name="while_in_use_report_failed">Only while in use: %1$s – %2$d permission(s) not changed</string>
     <string name="while_in_use_service_failed">Could not start the watcher: %1$s. Open this app again in the foreground.</string>
+    <string-array name="weekday_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
 </resources>

@@ -489,6 +489,8 @@ class MainActivity : AppCompatActivity() {
         // deaktiviert/aktiviert worden sein
         loadApps()
         checkQuarantine()
+        // Automatik-Regeln bei jedem Oeffnen auswerten (WLAN-Regeln sonst nur im ~15-min-Takt)
+        executor.execute { runCatching { AutoRuleManager.evaluate(this) } }
         if (manager.isConnected && manager.hasPermission) {
             BootReceiver.clear(this)
             checkDrift()
@@ -584,6 +586,10 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_quarantine -> {
                 toggleQuarantine(item)
+                true
+            }
+            R.id.action_auto_rules -> {
+                startActivity(Intent(this, AutoRulesActivity::class.java))
                 true
             }
             R.id.action_change_log -> {

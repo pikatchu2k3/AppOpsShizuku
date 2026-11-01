@@ -17,6 +17,12 @@
          dataSync ist ab Android 15 auf 6 h/Tag begrenzt und passt inhaltlich nicht;
          "specialUse" ist der einzige passende Typ ohne Zeitlimit und braucht genau dieses Recht. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- WLAN-Name (SSID) fuer Automatik-Regeln lesen. Android verlangt dafuer den Standort FUER
+         DIESE App; die App hat selbst keinen Netzzugriff. Wird erst bei der ersten WLAN-Regel
+         zur Laufzeit abgefragt, nicht beim Start. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Automatik-Regeln: ungefaehre Weckrufe planen (keine Exact-Alarm-Berechtigung noetig). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />
     <!-- Neustart erkennen, um auf still inaktiven Schutz hinzuweisen (Shizuku laeuft nach dem
          Neustart noch nicht). Erlaubt ohne Nutzerfreigabe. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -83,6 +89,13 @@
             android:name=".ChangeLogActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".AutoRulesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AutoRuleEditActivity"
+            android:exported="false" />
+
         <!-- Schnellstart-Kachel "Lockdown" (Kamera/Mikrofon fuer alle Nutzer-Apps). Nur das System
              darf sich binden (BIND_QUICK_SETTINGS_TILE). -->
         <service
@@ -95,6 +108,16 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
+        <!-- Automatik-Regeln: Weckruf (AlarmManager, explizit adressiert) + Neustart. -->
+        <receiver
+            android:name=".AutoRuleReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Hinweis nach Neustart: Schutz inaktiv, solange Shizuku nicht laeuft. -->
         <receiver

@@ -551,4 +551,48 @@
     <string name="template_share">分享当前配置</string>
     <string name="template_share_empty">此应用尚无已保存的配置。</string>
     <string name="log_info_template">%1$s：已应用模板（%2$d 项权限）</string>
+    <string-array name="weekday_short">
+        <item>一</item>
+        <item>二</item>
+        <item>三</item>
+        <item>四</item>
+        <item>五</item>
+        <item>六</item>
+        <item>日</item>
+    </string-array>
+    <string name="menu_auto_rules">自动规则</string>
+    <string name="rules_title">自动规则</string>
+    <string name="rules_intro">规则按时间或 Wi-Fi 触发，需要 Shizuku 才能生效。Wi-Fi 规则可能最多延迟约 15 分钟（无常驻服务）。</string>
+    <string name="rules_empty">暂无规则。</string>
+    <string name="rules_add">添加规则</string>
+    <string name="rule_edit_title">规则</string>
+    <string name="rule_name_hint">名称</string>
+    <string name="rule_name_required">请输入名称。</string>
+    <string name="rule_trigger">触发条件</string>
+    <string name="rule_trigger_time">时间</string>
+    <string name="rule_trigger_wifi">Wi-Fi</string>
+    <string name="rule_from">从 %1$s</string>
+    <string name="rule_to">到 %1$s</string>
+    <string name="rule_days_all">每天</string>
+    <string name="rule_day_required">请至少选择一天。</string>
+    <string name="rule_window_required">开始和结束时间必须不同。</string>
+    <string name="rule_wifi_ssid">网络名称 (SSID)</string>
+    <string name="rule_wifi_current">使用当前网络</string>
+    <string name="rule_wifi_connected">连接到该网络时启用</string>
+    <string name="rule_wifi_disconnected">未连接到该网络时启用</string>
+    <string name="rule_wifi_connected_short">Wi-Fi：%1$s 已连接</string>
+    <string name="rule_wifi_disconnected_short">Wi-Fi：非 %1$s</string>
+    <string name="rule_wifi_required">请输入网络名称。</string>
+    <string name="rule_wifi_needs_location">读取 Wi-Fi 名称需要本应用的定位权限（本应用自身无网络访问）。</string>
+    <string name="rule_wifi_unreadable">无法读取网络名称（已连接 Wi-Fi？定位已开启？）。</string>
+    <string name="rule_action">操作</string>
+    <string name="rule_action_lockdown">锁定（所有应用的相机/麦克风）</string>
+    <string name="rule_action_offline">让所选应用离线</string>
+    <string name="rule_pick_apps">选择应用</string>
+    <string name="rule_pick_apps_n">选择应用（%1$d）</string>
+    <string name="rule_apps_required">请至少选择一个应用。</string>
+    <string name="rule_save">保存</string>
+    <string name="rule_delete">删除</string>
+    <string name="log_info_rule_on">规则“%1$s”：条件满足</string>
+    <string name="log_info_rule_off">规则“%1$s”：条件结束</string>
 </resources>

@@ -551,4 +551,48 @@
     <string name="template_share">現在のプロフィールを共有</string>
     <string name="template_share_empty">このアプリにはまだ保存されたプロフィールがありません。</string>
     <string name="log_info_template">%1$s: テンプレート適用（%2$d 件の権限）</string>
+    <string-array name="weekday_short">
+        <item>月</item>
+        <item>火</item>
+        <item>水</item>
+        <item>木</item>
+        <item>金</item>
+        <item>土</item>
+        <item>日</item>
+    </string-array>
+    <string name="menu_auto_rules">自動ルール</string>
+    <string name="rules_title">自動ルール</string>
+    <string name="rules_intro">ルールは時刻またはWi-Fiで実行され、有効化にはShizukuが必要です。Wi-Fiルールは最大約15分遅れることがあります（常駐サービスなし）。</string>
+    <string name="rules_empty">まだルールがありません。</string>
+    <string name="rules_add">ルールを追加</string>
+    <string name="rule_edit_title">ルール</string>
+    <string name="rule_name_hint">名前</string>
+    <string name="rule_name_required">名前を入力してください。</string>
+    <string name="rule_trigger">トリガー</string>
+    <string name="rule_trigger_time">時刻</string>
+    <string name="rule_trigger_wifi">Wi-Fi</string>
+    <string name="rule_from">%1$s から</string>
+    <string name="rule_to">%1$s まで</string>
+    <string name="rule_days_all">毎日</string>
+    <string name="rule_day_required">少なくとも1日を選んでください。</string>
+    <string name="rule_window_required">開始と終了は異なる必要があります。</string>
+    <string name="rule_wifi_ssid">ネットワーク名 (SSID)</string>
+    <string name="rule_wifi_current">現在のネットワークを使う</string>
+    <string name="rule_wifi_connected">接続中に有効</string>
+    <string name="rule_wifi_disconnected">未接続のときに有効</string>
+    <string name="rule_wifi_connected_short">Wi-Fi: %1$s 接続中</string>
+    <string name="rule_wifi_disconnected_short">Wi-Fi: %1$s 以外</string>
+    <string name="rule_wifi_required">ネットワーク名を入力してください。</string>
+    <string name="rule_wifi_needs_location">Wi-Fi名の読み取りにはこのアプリの位置情報権限が必要です（アプリ自体はネットワークにアクセスしません）。</string>
+    <string name="rule_wifi_unreadable">ネットワーク名を読み取れません（Wi-Fi接続中？位置情報オン？）。</string>
+    <string name="rule_action">アクション</string>
+    <string name="rule_action_lockdown">ロックダウン（全アプリのカメラ/マイク）</string>
+    <string name="rule_action_offline">選択したアプリをオフラインに</string>
+    <string name="rule_pick_apps">アプリを選択</string>
+    <string name="rule_pick_apps_n">アプリを選択（%1$d）</string>
+    <string name="rule_apps_required">少なくとも1つのアプリを選んでください。</string>
+    <string name="rule_save">保存</string>
+    <string name="rule_delete">削除</string>
+    <string name="log_info_rule_on">ルール「%1$s」: 条件成立</string>
+    <string name="log_info_rule_off">ルール「%1$s」: 条件終了</string>
 </resources>
