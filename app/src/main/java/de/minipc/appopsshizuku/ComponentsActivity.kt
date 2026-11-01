@@ -93,6 +93,7 @@ class ComponentsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         DesignSettings.applyDynamicColorsIfEnabled(this)
         setContentView(R.layout.activity_components)
+        de.minipc.appopsshizuku.ui.SpaceScreen.apply(this)
 
         // Edge-to-Edge (siehe MainActivity): Systemleisten-Abstaende als Padding,
         // damit Toolbar/Inhalt nicht unter den Systemleisten verschwinden.
