@@ -652,4 +652,26 @@
     <string name="activity_open_behavior">Verhalten</string>
     <string name="stealth_spoof_adid">Werbe-ID: Null-ID liefern (Beta)</string>
     <string name="stealth_spoof_location">Standort: festen Ort auf Stadtebene liefern (Beta)</string>
+    <string name="menu_work_profile">Arbeitsprofil</string>
+    <string name="workprofile_title">Arbeitsprofil</string>
+    <string name="workprofile_hint">In das Profil verschobene Apps sehen weder die Kontakte noch die Dateien des Hauptprofils. Sie starten mit eigenen Daten (kein Login/Verlauf wird übernommen).</string>
+    <string name="workprofile_no_shizuku">Dafür wird Shizuku gebraucht. Verbinden und erneut öffnen.</string>
+    <string name="workprofile_none">Noch kein Arbeitsprofil.</string>
+    <string name="workprofile_exists_ours">Arbeitsprofil #%1$d (hier angelegt).</string>
+    <string name="workprofile_exists_foreign">Arbeitsprofil #%1$d (von einer anderen App angelegt). Apps lassen sich trotzdem verschieben.</string>
+    <string name="workprofile_create">Anlegen</string>
+    <string name="workprofile_create_msg">App Ops Shizuku legt ein verwaltetes Profil an und wird dessen Profilbesitzer. Kann auf manchen Geräten/ROMs abgelehnt werden. Nicht am Gerät getestet.</string>
+    <string name="workprofile_default_name">Arbeit</string>
+    <string name="workprofile_create_ok">Arbeitsprofil angelegt.</string>
+    <string name="workprofile_create_no_owner">Profil angelegt, aber diese App konnte nicht Profilbesitzer werden. Apps lassen sich trotzdem verschieben.</string>
+    <string name="workprofile_create_failed">Das Gerät hat das Anlegen eines Arbeitsprofils abgelehnt.</string>
+    <string name="workprofile_remove">Profil entfernen</string>
+    <string name="workprofile_remove_msg">Entfernt das ganze Arbeitsprofil. Alle Daten der darin liegenden Apps gehen verloren.</string>
+    <string name="workprofile_removed">Arbeitsprofil entfernt.</string>
+    <string name="workprofile_remove_failed">Das Gerät hat das Profil nicht entfernt.</string>
+    <string name="workprofile_in">Im Arbeitsprofil</string>
+    <string name="workprofile_out">Nur Hauptprofil</string>
+    <string name="workprofile_move_failed">Das Gerät hat die App nicht verschoben.</string>
+    <string name="workprofile_admin_label">Arbeitsprofil-Besitzer</string>
+    <string name="workprofile_admin_desc">Erlaubt App Ops Shizuku, ein selbst angelegtes Arbeitsprofil zu verwalten.</string>
 </resources>

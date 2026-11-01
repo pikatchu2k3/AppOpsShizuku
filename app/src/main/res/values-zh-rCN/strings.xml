@@ -626,4 +626,26 @@
     <string name="activity_open_behavior">行为</string>
     <string name="stealth_spoof_adid">广告 ID：返回全零 ID（测试版）</string>
     <string name="stealth_spoof_location">位置：返回固定的城市级地点（测试版）</string>
+    <string name="menu_work_profile">工作资料</string>
+    <string name="workprofile_title">工作资料</string>
+    <string name="workprofile_hint">移入该资料的应用既看不到主资料的联系人，也看不到其文件。它们以各自的数据启动（不转移登录/历史）。</string>
+    <string name="workprofile_no_shizuku">这需要 Shizuku。请连接后重新打开。</string>
+    <string name="workprofile_none">尚无工作资料。</string>
+    <string name="workprofile_exists_ours">工作资料 #%1$d（在此创建）。</string>
+    <string name="workprofile_exists_foreign">工作资料 #%1$d（由其他应用创建）。仍可移动应用。</string>
+    <string name="workprofile_create">创建</string>
+    <string name="workprofile_create_msg">App Ops Shizuku 会创建一个受管资料并成为其所有者。部分设备/ROM 可能拒绝。未在设备上测试。</string>
+    <string name="workprofile_default_name">工作</string>
+    <string name="workprofile_create_ok">已创建工作资料。</string>
+    <string name="workprofile_create_no_owner">已创建资料，但本应用未能成为所有者。仍可移动应用。</string>
+    <string name="workprofile_create_failed">设备拒绝创建工作资料。</string>
+    <string name="workprofile_remove">移除资料</string>
+    <string name="workprofile_remove_msg">移除整个工作资料。其中应用的所有数据都会丢失。</string>
+    <string name="workprofile_removed">已移除工作资料。</string>
+    <string name="workprofile_remove_failed">设备未移除该资料。</string>
+    <string name="workprofile_in">在工作资料中</string>
+    <string name="workprofile_out">仅主资料</string>
+    <string name="workprofile_move_failed">设备未移动该应用。</string>
+    <string name="workprofile_admin_label">工作资料所有者</string>
+    <string name="workprofile_admin_desc">允许 App Ops Shizuku 管理其创建的工作资料。</string>
 </resources>

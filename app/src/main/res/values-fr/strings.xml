@@ -629,4 +629,26 @@
     <string name="activity_open_behavior">Comportement</string>
     <string name="stealth_spoof_adid">ID publicitaire : renvoyer une ID nulle (bêta)</string>
     <string name="stealth_spoof_location">Position : renvoyer un lieu fixe au niveau ville (bêta)</string>
+    <string name="menu_work_profile">Profil professionnel</string>
+    <string name="workprofile_title">Profil professionnel</string>
+    <string name="workprofile_hint">Les applis déplacées dans le profil ne voient ni les contacts ni les fichiers du profil principal. Elles démarrent avec leurs propres données (pas de transfert de connexion/historique).</string>
+    <string name="workprofile_no_shizuku">Nécessite Shizuku. Connectez-le et rouvrez.</string>
+    <string name="workprofile_none">Aucun profil professionnel pour l\'instant.</string>
+    <string name="workprofile_exists_ours">Profil professionnel n°%1$d (créé ici).</string>
+    <string name="workprofile_exists_foreign">Profil professionnel n°%1$d (créé par une autre appli). Les applis peuvent quand même être déplacées.</string>
+    <string name="workprofile_create">Créer</string>
+    <string name="workprofile_create_msg">App Ops Shizuku crée un profil géré et en devient le propriétaire. Peut être refusé par certains appareils/ROM. Non testé sur un appareil.</string>
+    <string name="workprofile_default_name">Travail</string>
+    <string name="workprofile_create_ok">Profil professionnel créé.</string>
+    <string name="workprofile_create_no_owner">Profil créé, mais cette appli n\'a pas pu en devenir propriétaire. Vous pouvez quand même déplacer des applis.</string>
+    <string name="workprofile_create_failed">L\'appareil a refusé de créer un profil professionnel.</string>
+    <string name="workprofile_remove">Supprimer le profil</string>
+    <string name="workprofile_remove_msg">Supprime tout le profil professionnel. Toutes les données des applis qu\'il contient sont perdues.</string>
+    <string name="workprofile_removed">Profil professionnel supprimé.</string>
+    <string name="workprofile_remove_failed">L\'appareil n\'a pas supprimé le profil.</string>
+    <string name="workprofile_in">Dans le profil professionnel</string>
+    <string name="workprofile_out">Profil principal seulement</string>
+    <string name="workprofile_move_failed">L\'appareil n\'a pas déplacé l\'appli.</string>
+    <string name="workprofile_admin_label">Propriétaire du profil professionnel</string>
+    <string name="workprofile_admin_desc">Permet à App Ops Shizuku de gérer un profil professionnel qu\'elle a créé.</string>
 </resources>
