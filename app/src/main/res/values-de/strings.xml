@@ -650,4 +650,6 @@
     <string name="activity_sensors">Sensorzugriff</string>
     <string name="activity_sensor_used">Hat Sensoren abgefragt</string>
     <string name="activity_open_behavior">Verhalten</string>
+    <string name="stealth_spoof_adid">Werbe-ID: Null-ID liefern (Beta)</string>
+    <string name="stealth_spoof_location">Standort: festen Ort auf Stadtebene liefern (Beta)</string>
 </resources>

@@ -627,4 +627,6 @@
     <string name="activity_sensors">Acesso a sensores</string>
     <string name="activity_sensor_used">Consultou sensores</string>
     <string name="activity_open_behavior">Comportamento</string>
+    <string name="stealth_spoof_adid">ID de publicidade: retornar ID nula (beta)</string>
+    <string name="stealth_spoof_location">Local: retornar um ponto fixo em nível de cidade (beta)</string>
 </resources>

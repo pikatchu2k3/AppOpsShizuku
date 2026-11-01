@@ -624,4 +624,6 @@
     <string name="activity_sensors">传感器访问</string>
     <string name="activity_sensor_used">已读取传感器</string>
     <string name="activity_open_behavior">行为</string>
+    <string name="stealth_spoof_adid">广告 ID：返回全零 ID（测试版）</string>
+    <string name="stealth_spoof_location">位置：返回固定的城市级地点（测试版）</string>
 </resources>

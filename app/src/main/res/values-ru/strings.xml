@@ -633,4 +633,6 @@
     <string name="activity_sensors">Доступ к датчикам</string>
     <string name="activity_sensor_used">Обращалось к датчикам</string>
     <string name="activity_open_behavior">Поведение</string>
+    <string name="stealth_spoof_adid">Рекламный ID: отдавать нулевой ID (бета)</string>
+    <string name="stealth_spoof_location">Местоположение: отдавать фиксированную точку уровня города (бета)</string>
 </resources>

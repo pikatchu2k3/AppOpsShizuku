@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.stealth
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -94,6 +95,32 @@ class DeviceSpoofSmaliTest {
     }
 
     @Test
+    fun werbeIdUndStandortWerdenUmgebogen() {
+        val smali = """
+            .method public t(Lcom/google/android/gms/ads/identifier/AdvertisingIdClient${'$'}Info;Landroid/location/LocationManager;)V
+                .locals 2
+                invoke-virtual {p1}, Lcom/google/android/gms/ads/identifier/AdvertisingIdClient${'$'}Info;->getId()Ljava/lang/String;
+                move-result-object v0
+                invoke-virtual {p1}, Lcom/google/android/gms/ads/identifier/AdvertisingIdClient${'$'}Info;->isLimitAdTrackingEnabled()Z
+                move-result v1
+                const-string v1, "gps"
+                invoke-virtual {p2, v1}, Landroid/location/LocationManager;->getLastKnownLocation(Ljava/lang/String;)Landroid/location/Location;
+                move-result-object v0
+                return-void
+            .end method
+        """.trimIndent()
+        val ad = DeviceSpoofPatch.patchSmali(smali, DeviceSpoofOptions(fakeAdId = true))
+        assertTrue(ad.contains("Lde/minipc/spoof/DeviceSpoof;->adId(Ljava/lang/Object;)Ljava/lang/String;"))
+        assertTrue(ad.contains("Lde/minipc/spoof/DeviceSpoof;->adLimit(Ljava/lang/Object;)Z"))
+        assertFalse(ad.contains("AdvertisingIdClient${'$'}Info;->getId"))
+        val loc = DeviceSpoofPatch.patchSmali(smali, DeviceSpoofOptions(fakeLocation = true))
+        assertTrue(loc.contains("Lde/minipc/spoof/DeviceSpoof;->lastKnownLocation(Landroid/location/LocationManager;Ljava/lang/String;)Landroid/location/Location;"))
+        assertFalse(loc.contains("LocationManager;->getLastKnownLocation"))
+        // ohne Flag unveraendert
+        assertEquals(smali, DeviceSpoofPatch.patchSmali(smali, DeviceSpoofOptions()))
+    }
+
+    @Test
     fun deviceSpoofSmaliAssembliert() {
         // Die injizierte Helferklasse muss fehlerfrei assemblieren (Register/Labels)
         val dir = createTempDir()
@@ -121,6 +148,8 @@ class DeviceSpoofSmaliTest {
                 .replace("@@ANDROID_ID@@", "deadbeef-dead-beef-dead-beefdeadbeef")
                 .replace("@@IMEI@@", "000000000000000")
                 .replace("@@IMSI@@", "000000000000000")
+                .replace("@@LAT@@", "0x404a428f5c28f5c3L")
+                .replace("@@LON@@", "0x402acf5c28f5c28fL")
             spoofFile.writeText(rendered)
             val outDex = File(dir, "spoof.dex")
             val assembled = DexPatcherTestHelper.assemble(dir, outDex)

@@ -185,7 +185,13 @@ object DexPatcher {
             .replace("@@ANDROID_ID@@", androidId)
             .replace("@@IMEI@@", imei)
             .replace("@@IMSI@@", imsi)
+            .replace("@@LAT@@", doubleBits(if (options.fakeLat == 0.0 && options.fakeLon == 0.0) 52.52 else options.fakeLat))
+            .replace("@@LON@@", doubleBits(if (options.fakeLat == 0.0 && options.fakeLon == 0.0) 13.405 else options.fakeLon))
     }
+
+    /** Double als rohe 64-Bit-Smali-Literal-Form (const-wide ... 0x...L) - assembler-sicher. */
+    private fun doubleBits(value: Double): String =
+        "0x%016xL".format(java.lang.Double.doubleToRawLongBits(value))
 
     /** Escaped einen String fuer die Verwendung in einer Smali-const-string-Anweisung. */
     private fun String.smaliEscape(): String {
@@ -460,6 +466,29 @@ object DexPatcher {
     .locals 0
     sput-object p0, Lde/minipc/spoof/DeviceSpoof;->IMSI:Ljava/lang/String;
     return-void
+.end method
+
+.method public static adId(Ljava/lang/Object;)Ljava/lang/String;
+    .locals 1
+    const-string v0, "00000000-0000-0000-0000-000000000000"
+    return-object v0
+.end method
+
+.method public static adLimit(Ljava/lang/Object;)Z
+    .locals 1
+    const/4 v0, 0x1
+    return v0
+.end method
+
+.method public static lastKnownLocation(Landroid/location/LocationManager;Ljava/lang/String;)Landroid/location/Location;
+    .locals 3
+    new-instance v0, Landroid/location/Location;
+    invoke-direct {v0, p1}, Landroid/location/Location;-><init>(Ljava/lang/String;)V
+    const-wide v1, @@LAT@@
+    invoke-virtual {v0, v1, v2}, Landroid/location/Location;->setLatitude(D)V
+    const-wide v1, @@LON@@
+    invoke-virtual {v0, v1, v2}, Landroid/location/Location;->setLongitude(D)V
+    return-object v0
 .end method
 """
 

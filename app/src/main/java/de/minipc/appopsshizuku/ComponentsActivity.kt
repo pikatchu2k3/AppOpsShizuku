@@ -682,6 +682,8 @@ class ComponentsActivity : AppCompatActivity() {
         val spoofBuild = findViewById<SwitchMaterial>(R.id.stealthSpoofBuildSwitch).isChecked
         val spoofAndroidId = findViewById<SwitchMaterial>(R.id.stealthSpoofAndroidIdSwitch).isChecked
         val spoofTelephony = findViewById<SwitchMaterial>(R.id.stealthSpoofTelephonySwitch).isChecked
+        val fakeAdId = findViewById<SwitchMaterial>(R.id.stealthSpoofAdIdSwitch).isChecked
+        val fakeLocation = findViewById<SwitchMaterial>(R.id.stealthSpoofLocationSwitch).isChecked
         val modelInput = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.spoofModelInput)
         val manufacturerInput = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.spoofManufacturerInput)
         val fingerprintInput = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.spoofFingerprintInput)
@@ -698,7 +700,9 @@ class ComponentsActivity : AppCompatActivity() {
             fakeDevice = slashParts.getOrNull(2).orEmpty(),
             spoofBuild = spoofBuild,
             spoofAndroidId = spoofAndroidId,
-            spoofTelephony = spoofTelephony
+            spoofTelephony = spoofTelephony,
+            fakeAdId = fakeAdId,
+            fakeLocation = fakeLocation
         )
     }
 

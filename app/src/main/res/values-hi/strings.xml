@@ -627,4 +627,6 @@
     <string name="activity_sensors">सेंसर एक्सेस</string>
     <string name="activity_sensor_used">सेंसर पढ़े</string>
     <string name="activity_open_behavior">व्यवहार</string>
+    <string name="stealth_spoof_adid">विज्ञापन ID: शून्य ID लौटाएं (बीटा)</string>
+    <string name="stealth_spoof_location">स्थान: शहर-स्तर का स्थिर स्थान लौटाएं (बीटा)</string>
 </resources>
