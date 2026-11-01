@@ -128,4 +128,22 @@
     <color name="on_warning">@color/md_warning_100</color>
     <color name="warning_container">@color/md_warning_90</color>
     <color name="on_warning_container">@color/md_warning_10</color>
+
+    <!-- ===== Design "Sternenhimmel" (eigene Tokens, unabhaengig von der M3-Palette) ===== -->
+    <color name="space_bg">#EEF3F8</color>
+    <color name="space_glow">#3326A0C8</color>
+    <color name="space_star">#667F9BB5</color>
+    <!-- Glas-Flaechen (Kopfzeilen-Knoepfe, Navigation, Einstellungskarten) -->
+    <color name="glass_fill">#C8FFFFFF</color>
+    <color name="glass_stroke">#26203040</color>
+    <color name="on_glass">#10202A</color>
+    <color name="on_glass_dim">#4A5A66</color>
+    <color name="pill_selected">#2F62B3</color>
+    <color name="on_pill_selected">#FFFFFF</color>
+    <!-- Verlaufskarten: Text immer weiss (Kontrast per CardColors gesichert) -->
+    <color name="card_text">#FFFFFF</color>
+    <color name="card_text_dim">#D9FFFFFF</color>
+    <color name="card_stroke">#33FFFFFF</color>
+    <color name="card_icon_glass">#26FFFFFF</color>
+    <color name="card_icon_stroke">#40FFFFFF</color>
 </resources>

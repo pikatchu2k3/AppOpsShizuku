@@ -657,4 +657,25 @@
     <string name="workprofile_move_failed">Устройство не переместило приложение.</string>
     <string name="workprofile_admin_label">Владелец рабочего профиля</string>
     <string name="workprofile_admin_desc">Позволяет App Ops Shizuku управлять созданным им рабочим профилем.</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · контроль приватности</string>
+    <string name="header_tune">Сортировка и фильтр</string>
+    <string name="tab_apps">Приложения</string>
+    <string name="tab_tools">Инструменты</string>
+    <string name="tab_settings">Настройки</string>
+    <string name="filter_active">Фильтр: %1$s  ✕</string>
+    <string name="app_unchanged">Без изменений</string>
+    <string name="shizuku_hint_pill">Shizuku не подключён — изменить ничего нельзя. Нажмите, чтобы открыть настройки.</string>
+    <string name="settings_quarantine_hint">Новые приложения не получают фоновых данных, буфера обмена и работы в фоне, пока вы их не освободите.</string>
+    <string name="settings_dynamic_hint">Использовать системные цвета (Material You) для кнопок и карточек.</string>
+    <string name="settings_backup_title">Резервная копия</string>
+    <string name="settings_backup_hint">Экспорт и импорт профилей приватности и настроек поведения в JSON.</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · без доступа к сети</string>
+    <string name="tool_desc_by_permission">Каким приложениям доступны камера, местоположение…?</string>
+    <string name="tool_desc_net_usage">Кто передаёт данные в фоне?</string>
+    <string name="tool_desc_activity">Пробуждения, задачи и датчики</string>
+    <string name="tool_desc_auto_rules">Действия по времени или Wi-Fi</string>
+    <string name="tool_desc_system">Блокировка, частный DNS, мощные права</string>
+    <string name="tool_desc_work_profile">Изолировать приложения во втором профиле</string>
+    <string name="tool_desc_change_log">Все изменения приложения — с отменой</string>
 </resources>

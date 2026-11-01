@@ -651,4 +651,25 @@
     <string name="workprofile_move_failed">O dispositivo não moveu o app.</string>
     <string name="workprofile_admin_label">Proprietário do perfil de trabalho</string>
     <string name="workprofile_admin_desc">Permite que o App Ops Shizuku gerencie um perfil de trabalho que criou.</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · controle de privacidade</string>
+    <string name="header_tune">Ordenar e filtrar</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_tools">Ferramentas</string>
+    <string name="tab_settings">Configurações</string>
+    <string name="filter_active">Filtro: %1$s  ✕</string>
+    <string name="app_unchanged">Sem alterações</string>
+    <string name="shizuku_hint_pill">O Shizuku não está conectado – nada pode ser alterado. Toque para abrir as configurações.</string>
+    <string name="settings_quarantine_hint">Apps recém-instalados ficam sem dados em segundo plano, área de transferência e execução em segundo plano até você liberá-los.</string>
+    <string name="settings_dynamic_hint">Usar as cores do sistema (Material You) em botões e cartões.</string>
+    <string name="settings_backup_title">Backup</string>
+    <string name="settings_backup_hint">Exportar ou importar perfis de privacidade e configurações de comportamento como JSON.</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · sem acesso à rede</string>
+    <string name="tool_desc_by_permission">Quais apps podem usar câmera, local…?</string>
+    <string name="tool_desc_net_usage">Quem envia dados em segundo plano?</string>
+    <string name="tool_desc_activity">Despertares, tarefas e acesso a sensores</string>
+    <string name="tool_desc_auto_rules">Agir por horário ou Wi-Fi</string>
+    <string name="tool_desc_system">Bloqueio, DNS privado, acessos poderosos</string>
+    <string name="tool_desc_work_profile">Isolar apps em um segundo perfil</string>
+    <string name="tool_desc_change_log">Tudo o que este app alterou – desfazer</string>
 </resources>

@@ -653,4 +653,25 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="workprofile_move_failed">El dispositivo no movió la app.</string>
     <string name="workprofile_admin_label">Propietario del perfil de trabajo</string>
     <string name="workprofile_admin_desc">Permite a App Ops Shizuku gestionar un perfil de trabajo que creó.</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · control de privacidad</string>
+    <string name="header_tune">Ordenar y filtrar</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_tools">Herramientas</string>
+    <string name="tab_settings">Ajustes</string>
+    <string name="filter_active">Filtro: %1$s  ✕</string>
+    <string name="app_unchanged">Sin cambios</string>
+    <string name="shizuku_hint_pill">Shizuku no está conectado: no se puede cambiar nada. Toca para abrir los ajustes.</string>
+    <string name="settings_quarantine_hint">Las apps recién instaladas no tienen datos en segundo plano, portapapeles ni ejecución en segundo plano hasta que las liberes.</string>
+    <string name="settings_dynamic_hint">Usar los colores del sistema (Material You) en botones y tarjetas.</string>
+    <string name="settings_backup_title">Copia de seguridad</string>
+    <string name="settings_backup_hint">Exportar o importar perfiles de privacidad y ajustes de comportamiento como JSON.</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · sin acceso a la red</string>
+    <string name="tool_desc_by_permission">¿Qué apps pueden usar la cámara, la ubicación…?</string>
+    <string name="tool_desc_net_usage">¿Quién envía datos en segundo plano?</string>
+    <string name="tool_desc_activity">Activaciones, tareas y acceso a sensores</string>
+    <string name="tool_desc_auto_rules">Actuar según hora o Wi-Fi</string>
+    <string name="tool_desc_system">Bloqueo, DNS privado, accesos con poder</string>
+    <string name="tool_desc_work_profile">Aislar apps en un segundo perfil</string>
+    <string name="tool_desc_change_log">Todo lo que cambió esta app: deshacer</string>
 </resources>

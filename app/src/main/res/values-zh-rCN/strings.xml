@@ -648,4 +648,25 @@
     <string name="workprofile_move_failed">设备未移动该应用。</string>
     <string name="workprofile_admin_label">工作资料所有者</string>
     <string name="workprofile_admin_desc">允许 App Ops Shizuku 管理其创建的工作资料。</string>
+    <string name="header_title">App Ops</string>
+    <string name="header_subtitle">Shizuku · 隐私控制</string>
+    <string name="header_tune">排序和筛选</string>
+    <string name="tab_apps">应用</string>
+    <string name="tab_tools">工具</string>
+    <string name="tab_settings">设置</string>
+    <string name="filter_active">筛选：%1$s  ✕</string>
+    <string name="app_unchanged">未更改</string>
+    <string name="shizuku_hint_pill">Shizuku 未连接——无法更改任何内容。点按打开设置。</string>
+    <string name="settings_quarantine_hint">新安装的应用在你解除之前没有后台数据、剪贴板和后台运行。</string>
+    <string name="settings_dynamic_hint">在按钮和卡片中使用系统颜色（Material You）。</string>
+    <string name="settings_backup_title">备份</string>
+    <string name="settings_backup_hint">以 JSON 导出或导入隐私配置和行为设置。</string>
+    <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · 无网络访问</string>
+    <string name="tool_desc_by_permission">哪些应用可以使用相机、位置……？</string>
+    <string name="tool_desc_net_usage">谁在后台发送数据？</string>
+    <string name="tool_desc_activity">唤醒、任务和传感器访问</string>
+    <string name="tool_desc_auto_rules">按时间或 Wi-Fi 执行</string>
+    <string name="tool_desc_system">锁定、私人 DNS、高权限访问</string>
+    <string name="tool_desc_work_profile">将应用隔离到第二个资料</string>
+    <string name="tool_desc_change_log">本应用所做的所有更改——可撤销</string>
 </resources>
