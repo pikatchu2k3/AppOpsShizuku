@@ -551,4 +551,48 @@
     <string name="template_share">Compartilhar perfil atual</string>
     <string name="template_share_empty">Este app ainda não tem um perfil salvo.</string>
     <string name="log_info_template">%1$s: modelo aplicado (%2$d permissões)</string>
+    <string-array name="weekday_short">
+        <item>Seg</item>
+        <item>Ter</item>
+        <item>Qua</item>
+        <item>Qui</item>
+        <item>Sex</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+    <string name="menu_auto_rules">Regras automáticas</string>
+    <string name="rules_title">Regras automáticas</string>
+    <string name="rules_intro">As regras funcionam por horário ou Wi-Fi e precisam do Shizuku. Regras de Wi-Fi podem atrasar até ~15 min (sem serviço permanente).</string>
+    <string name="rules_empty">Nenhuma regra ainda.</string>
+    <string name="rules_add">Adicionar regra</string>
+    <string name="rule_edit_title">Regra</string>
+    <string name="rule_name_hint">Nome</string>
+    <string name="rule_name_required">Digite um nome.</string>
+    <string name="rule_trigger">Gatilho</string>
+    <string name="rule_trigger_time">Horário</string>
+    <string name="rule_trigger_wifi">Wi-Fi</string>
+    <string name="rule_from">De %1$s</string>
+    <string name="rule_to">Até %1$s</string>
+    <string name="rule_days_all">Todos os dias</string>
+    <string name="rule_day_required">Selecione ao menos um dia.</string>
+    <string name="rule_window_required">Início e fim devem ser diferentes.</string>
+    <string name="rule_wifi_ssid">Nome da rede (SSID)</string>
+    <string name="rule_wifi_current">Usar a rede atual</string>
+    <string name="rule_wifi_connected">Ativa quando conectado</string>
+    <string name="rule_wifi_disconnected">Ativa quando NÃO conectado</string>
+    <string name="rule_wifi_connected_short">Wi-Fi: %1$s conectado</string>
+    <string name="rule_wifi_disconnected_short">Wi-Fi: não %1$s</string>
+    <string name="rule_wifi_required">Digite um nome de rede.</string>
+    <string name="rule_wifi_needs_location">Ler o nome do Wi-Fi exige a permissão de localização deste app (o app não tem acesso à rede).</string>
+    <string name="rule_wifi_unreadable">Nome da rede ilegível (conectado ao Wi-Fi? localização ligada?).</string>
+    <string name="rule_action">Ação</string>
+    <string name="rule_action_lockdown">Bloqueio (câmera/micro para todos os apps)</string>
+    <string name="rule_action_offline">Deixar apps selecionados offline</string>
+    <string name="rule_pick_apps">Escolher apps</string>
+    <string name="rule_pick_apps_n">Escolher apps (%1$d)</string>
+    <string name="rule_apps_required">Escolha ao menos um app.</string>
+    <string name="rule_save">Salvar</string>
+    <string name="rule_delete">Excluir</string>
+    <string name="log_info_rule_on">Regra \'%1$s\': condição atendida</string>
+    <string name="log_info_rule_off">Regra \'%1$s\': condição encerrada</string>
 </resources>

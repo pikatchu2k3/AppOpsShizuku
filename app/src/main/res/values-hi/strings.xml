@@ -551,4 +551,48 @@
     <string name="template_share">वर्तमान प्रोफ़ाइल साझा करें</string>
     <string name="template_share_empty">इस ऐप के लिए अभी कोई प्रोफ़ाइल सहेजी नहीं गई।</string>
     <string name="log_info_template">%1$s: टेम्पलेट लागू (%2$d अनुमतियां)</string>
+    <string-array name="weekday_short">
+        <item>सोम</item>
+        <item>मंगल</item>
+        <item>बुध</item>
+        <item>गुरु</item>
+        <item>शुक्र</item>
+        <item>शनि</item>
+        <item>रवि</item>
+    </string-array>
+    <string name="menu_auto_rules">स्वचालित नियम</string>
+    <string name="rules_title">स्वचालित नियम</string>
+    <string name="rules_intro">नियम समय या वाई-फ़ाई से चलते हैं और प्रभावी होने के लिए Shizuku ज़रूरी है। वाई-फ़ाई नियम ~15 मिनट तक देर से चल सकते हैं (कोई स्थायी सेवा नहीं)।</string>
+    <string name="rules_empty">अभी कोई नियम नहीं।</string>
+    <string name="rules_add">नियम जोड़ें</string>
+    <string name="rule_edit_title">नियम</string>
+    <string name="rule_name_hint">नाम</string>
+    <string name="rule_name_required">कृपया नाम दर्ज करें।</string>
+    <string name="rule_trigger">ट्रिगर</string>
+    <string name="rule_trigger_time">समय</string>
+    <string name="rule_trigger_wifi">वाई-फ़ाई</string>
+    <string name="rule_from">%1$s से</string>
+    <string name="rule_to">%1$s तक</string>
+    <string name="rule_days_all">रोज़</string>
+    <string name="rule_day_required">कम से कम एक दिन चुनें।</string>
+    <string name="rule_window_required">आरंभ और अंत अलग होने चाहिए।</string>
+    <string name="rule_wifi_ssid">नेटवर्क नाम (SSID)</string>
+    <string name="rule_wifi_current">वर्तमान नेटवर्क का उपयोग करें</string>
+    <string name="rule_wifi_connected">जब इससे जुड़ा हो तब सक्रिय</string>
+    <string name="rule_wifi_disconnected">जब इससे न जुड़ा हो तब सक्रिय</string>
+    <string name="rule_wifi_connected_short">वाई-फ़ाई: %1$s जुड़ा</string>
+    <string name="rule_wifi_disconnected_short">वाई-फ़ाई: %1$s नहीं</string>
+    <string name="rule_wifi_required">कृपया नेटवर्क नाम दर्ज करें।</string>
+    <string name="rule_wifi_needs_location">वाई-फ़ाई नाम पढ़ने के लिए इस ऐप को स्थान अनुमति चाहिए (ऐप के पास स्वयं नेटवर्क एक्सेस नहीं है)।</string>
+    <string name="rule_wifi_unreadable">नेटवर्क नाम पढ़ा नहीं जा सका (वाई-फ़ाई से जुड़े हैं? स्थान चालू है?)।</string>
+    <string name="rule_action">क्रिया</string>
+    <string name="rule_action_lockdown">लॉकडाउन (सभी ऐप्स के लिए कैमरा/माइक)</string>
+    <string name="rule_action_offline">चयनित ऐप्स को ऑफ़लाइन करें</string>
+    <string name="rule_pick_apps">ऐप्स चुनें</string>
+    <string name="rule_pick_apps_n">ऐप्स चुनें (%1$d)</string>
+    <string name="rule_apps_required">कम से कम एक ऐप चुनें।</string>
+    <string name="rule_save">सहेजें</string>
+    <string name="rule_delete">हटाएं</string>
+    <string name="log_info_rule_on">नियम \'%1$s\': शर्त पूरी</string>
+    <string name="log_info_rule_off">नियम \'%1$s\': शर्त समाप्त</string>
 </resources>

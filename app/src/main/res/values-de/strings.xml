@@ -574,4 +574,48 @@
     <string name="template_share">Aktuelles Profil teilen</string>
     <string name="template_share_empty">Für diese App ist noch kein Profil gespeichert.</string>
     <string name="log_info_template">%1$s: Vorlage angewendet (%2$d Berechtigungen)</string>
+    <string-array name="weekday_short">
+        <item>Mo</item>
+        <item>Di</item>
+        <item>Mi</item>
+        <item>Do</item>
+        <item>Fr</item>
+        <item>Sa</item>
+        <item>So</item>
+    </string-array>
+    <string name="menu_auto_rules">Automatische Regeln</string>
+    <string name="rules_title">Automatische Regeln</string>
+    <string name="rules_intro">Regeln greifen nach Zeit oder WLAN und wirken nur mit Shizuku. WLAN-Regeln können bis zu ~15 min nachlaufen (kein Dauerdienst).</string>
+    <string name="rules_empty">Noch keine Regeln.</string>
+    <string name="rules_add">Regel hinzufügen</string>
+    <string name="rule_edit_title">Regel</string>
+    <string name="rule_name_hint">Name</string>
+    <string name="rule_name_required">Bitte einen Namen eingeben.</string>
+    <string name="rule_trigger">Auslöser</string>
+    <string name="rule_trigger_time">Zeit</string>
+    <string name="rule_trigger_wifi">WLAN</string>
+    <string name="rule_from">Von %1$s</string>
+    <string name="rule_to">Bis %1$s</string>
+    <string name="rule_days_all">Täglich</string>
+    <string name="rule_day_required">Mindestens einen Tag wählen.</string>
+    <string name="rule_window_required">Start und Ende müssen sich unterscheiden.</string>
+    <string name="rule_wifi_ssid">Netzname (SSID)</string>
+    <string name="rule_wifi_current">Aktuelles Netz übernehmen</string>
+    <string name="rule_wifi_connected">Aktiv, wenn damit verbunden</string>
+    <string name="rule_wifi_disconnected">Aktiv, wenn NICHT damit verbunden</string>
+    <string name="rule_wifi_connected_short">WLAN: %1$s verbunden</string>
+    <string name="rule_wifi_disconnected_short">WLAN: nicht %1$s</string>
+    <string name="rule_wifi_required">Bitte einen Netznamen eingeben.</string>
+    <string name="rule_wifi_needs_location">Den WLAN-Namen zu lesen braucht die Standortberechtigung dieser App (die App hat selbst keinen Netzzugriff).</string>
+    <string name="rule_wifi_unreadable">Netzname nicht lesbar (mit WLAN verbunden? Standort an?).</string>
+    <string name="rule_action">Aktion</string>
+    <string name="rule_action_lockdown">Lockdown (Kamera/Mikro für alle Apps)</string>
+    <string name="rule_action_offline">Ausgewählte Apps offline nehmen</string>
+    <string name="rule_pick_apps">Apps wählen</string>
+    <string name="rule_pick_apps_n">Apps wählen (%1$d)</string>
+    <string name="rule_apps_required">Mindestens eine App wählen.</string>
+    <string name="rule_save">Speichern</string>
+    <string name="rule_delete">Löschen</string>
+    <string name="log_info_rule_on">Regel „%1$s“: Bedingung erfüllt</string>
+    <string name="log_info_rule_off">Regel „%1$s“: Bedingung beendet</string>
 </resources>

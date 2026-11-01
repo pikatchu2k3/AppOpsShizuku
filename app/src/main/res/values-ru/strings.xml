@@ -551,4 +551,48 @@
     <string name="template_share">Поделиться текущим профилем</string>
     <string name="template_share_empty">Для этого приложения ещё нет сохранённого профиля.</string>
     <string name="log_info_template">%1$s: шаблон применён (%2$d разрешений)</string>
+    <string-array name="weekday_short">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+        <item>Сб</item>
+        <item>Вс</item>
+    </string-array>
+    <string name="menu_auto_rules">Автоматические правила</string>
+    <string name="rules_title">Автоматические правила</string>
+    <string name="rules_intro">Правила срабатывают по времени или Wi-Fi и действуют только с Shizuku. Wi-Fi-правила могут опаздывать до ~15 мин (без постоянной службы).</string>
+    <string name="rules_empty">Правил пока нет.</string>
+    <string name="rules_add">Добавить правило</string>
+    <string name="rule_edit_title">Правило</string>
+    <string name="rule_name_hint">Название</string>
+    <string name="rule_name_required">Введите название.</string>
+    <string name="rule_trigger">Условие</string>
+    <string name="rule_trigger_time">Время</string>
+    <string name="rule_trigger_wifi">Wi-Fi</string>
+    <string name="rule_from">С %1$s</string>
+    <string name="rule_to">До %1$s</string>
+    <string name="rule_days_all">Ежедневно</string>
+    <string name="rule_day_required">Выберите хотя бы один день.</string>
+    <string name="rule_window_required">Начало и конец должны отличаться.</string>
+    <string name="rule_wifi_ssid">Имя сети (SSID)</string>
+    <string name="rule_wifi_current">Использовать текущую сеть</string>
+    <string name="rule_wifi_connected">Активно при подключении</string>
+    <string name="rule_wifi_disconnected">Активно, когда НЕ подключено</string>
+    <string name="rule_wifi_connected_short">Wi-Fi: %1$s подключено</string>
+    <string name="rule_wifi_disconnected_short">Wi-Fi: не %1$s</string>
+    <string name="rule_wifi_required">Введите имя сети.</string>
+    <string name="rule_wifi_needs_location">Для чтения имени Wi-Fi нужно разрешение на геолокацию для этого приложения (у приложения нет доступа к сети).</string>
+    <string name="rule_wifi_unreadable">Имя сети не читается (подключено к Wi-Fi? геолокация включена?).</string>
+    <string name="rule_action">Действие</string>
+    <string name="rule_action_lockdown">Блокировка (камера/микрофон для всех)</string>
+    <string name="rule_action_offline">Отключить выбранные приложения от сети</string>
+    <string name="rule_pick_apps">Выбрать приложения</string>
+    <string name="rule_pick_apps_n">Выбрать приложения (%1$d)</string>
+    <string name="rule_apps_required">Выберите хотя бы одно приложение.</string>
+    <string name="rule_save">Сохранить</string>
+    <string name="rule_delete">Удалить</string>
+    <string name="log_info_rule_on">Правило «%1$s»: условие выполнено</string>
+    <string name="log_info_rule_off">Правило «%1$s»: условие завершено</string>
 </resources>
