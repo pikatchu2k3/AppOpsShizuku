@@ -629,4 +629,26 @@
     <string name="activity_open_behavior">व्यवहार</string>
     <string name="stealth_spoof_adid">विज्ञापन ID: शून्य ID लौटाएं (बीटा)</string>
     <string name="stealth_spoof_location">स्थान: शहर-स्तर का स्थिर स्थान लौटाएं (बीटा)</string>
+    <string name="menu_work_profile">वर्क प्रोफ़ाइल</string>
+    <string name="workprofile_title">वर्क प्रोफ़ाइल</string>
+    <string name="workprofile_hint">प्रोफ़ाइल में ले जाए गए ऐप्स मुख्य प्रोफ़ाइल के न संपर्क देखते हैं न फ़ाइलें। वे अपने डेटा से शुरू होते हैं (लॉगिन/इतिहास स्थानांतरित नहीं होता)।</string>
+    <string name="workprofile_no_shizuku">इसके लिए Shizuku चाहिए। कनेक्ट करें और फिर खोलें।</string>
+    <string name="workprofile_none">अभी कोई वर्क प्रोफ़ाइल नहीं।</string>
+    <string name="workprofile_exists_ours">वर्क प्रोफ़ाइल #%1$d (यहाँ बनाया गया)।</string>
+    <string name="workprofile_exists_foreign">वर्क प्रोफ़ाइल #%1$d (किसी अन्य ऐप द्वारा)। फिर भी ऐप्स स्थानांतरित किए जा सकते हैं।</string>
+    <string name="workprofile_create">बनाएं</string>
+    <string name="workprofile_create_msg">App Ops Shizuku एक प्रबंधित प्रोफ़ाइल बनाता है और उसका प्रोफ़ाइल स्वामी बनता है। कुछ डिवाइस/ROM इसे अस्वीकार कर सकते हैं। डिवाइस पर परीक्षण नहीं किया गया।</string>
+    <string name="workprofile_default_name">कार्य</string>
+    <string name="workprofile_create_ok">वर्क प्रोफ़ाइल बनाई गई।</string>
+    <string name="workprofile_create_no_owner">प्रोफ़ाइल बनी, पर यह ऐप स्वामी नहीं बन सका। फिर भी ऐप्स स्थानांतरित किए जा सकते हैं।</string>
+    <string name="workprofile_create_failed">डिवाइस ने वर्क प्रोफ़ाइल बनाने से इनकार किया।</string>
+    <string name="workprofile_remove">प्रोफ़ाइल हटाएं</string>
+    <string name="workprofile_remove_msg">पूरी वर्क प्रोफ़ाइल हटाता है। इसमें मौजूद ऐप्स का सारा डेटा खो जाता है।</string>
+    <string name="workprofile_removed">वर्क प्रोफ़ाइल हटाई गई।</string>
+    <string name="workprofile_remove_failed">डिवाइस ने प्रोफ़ाइल नहीं हटाई।</string>
+    <string name="workprofile_in">वर्क प्रोफ़ाइल में</string>
+    <string name="workprofile_out">केवल मुख्य प्रोफ़ाइल</string>
+    <string name="workprofile_move_failed">डिवाइस ने ऐप नहीं हिलाया।</string>
+    <string name="workprofile_admin_label">वर्क प्रोफ़ाइल स्वामी</string>
+    <string name="workprofile_admin_desc">App Ops Shizuku को स्वयं बनाई वर्क प्रोफ़ाइल प्रबंधित करने देता है।</string>
 </resources>

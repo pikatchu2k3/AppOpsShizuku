@@ -629,4 +629,26 @@
     <string name="activity_open_behavior">Comportamento</string>
     <string name="stealth_spoof_adid">ID de publicidade: retornar ID nula (beta)</string>
     <string name="stealth_spoof_location">Local: retornar um ponto fixo em nível de cidade (beta)</string>
+    <string name="menu_work_profile">Perfil de trabalho</string>
+    <string name="workprofile_title">Perfil de trabalho</string>
+    <string name="workprofile_hint">Apps movidos para o perfil não veem os contatos nem os arquivos do perfil principal. Começam com seus próprios dados (sem transferência de login/histórico).</string>
+    <string name="workprofile_no_shizuku">Isto precisa do Shizuku. Conecte e reabra.</string>
+    <string name="workprofile_none">Ainda não há perfil de trabalho.</string>
+    <string name="workprofile_exists_ours">Perfil de trabalho #%1$d (criado aqui).</string>
+    <string name="workprofile_exists_foreign">Perfil de trabalho #%1$d (criado por outro app). Ainda assim é possível mover apps.</string>
+    <string name="workprofile_create">Criar</string>
+    <string name="workprofile_create_msg">O App Ops Shizuku cria um perfil gerenciado e se torna o proprietário. Pode ser recusado por alguns dispositivos/ROMs. Não testado em dispositivo.</string>
+    <string name="workprofile_default_name">Trabalho</string>
+    <string name="workprofile_create_ok">Perfil de trabalho criado.</string>
+    <string name="workprofile_create_no_owner">Perfil criado, mas este app não conseguiu ser o proprietário. Ainda é possível mover apps.</string>
+    <string name="workprofile_create_failed">O dispositivo recusou criar um perfil de trabalho.</string>
+    <string name="workprofile_remove">Remover perfil</string>
+    <string name="workprofile_remove_msg">Remove todo o perfil de trabalho. Todos os dados dos apps nele são perdidos.</string>
+    <string name="workprofile_removed">Perfil de trabalho removido.</string>
+    <string name="workprofile_remove_failed">O dispositivo não removeu o perfil.</string>
+    <string name="workprofile_in">No perfil de trabalho</string>
+    <string name="workprofile_out">Somente perfil principal</string>
+    <string name="workprofile_move_failed">O dispositivo não moveu o app.</string>
+    <string name="workprofile_admin_label">Proprietário do perfil de trabalho</string>
+    <string name="workprofile_admin_desc">Permite que o App Ops Shizuku gerencie um perfil de trabalho que criou.</string>
 </resources>

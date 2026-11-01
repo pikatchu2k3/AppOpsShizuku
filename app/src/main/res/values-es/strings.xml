@@ -631,4 +631,26 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="activity_open_behavior">Comportamiento</string>
     <string name="stealth_spoof_adid">ID de publicidad: devolver ID nula (beta)</string>
     <string name="stealth_spoof_location">Ubicación: devolver un lugar fijo a nivel de ciudad (beta)</string>
+    <string name="menu_work_profile">Perfil de trabajo</string>
+    <string name="workprofile_title">Perfil de trabajo</string>
+    <string name="workprofile_hint">Las apps movidas al perfil no ven ni los contactos ni los archivos del perfil principal. Empiezan con sus propios datos (no se transfiere sesión/historial).</string>
+    <string name="workprofile_no_shizuku">Esto necesita Shizuku. Conéctalo y vuelve a abrir.</string>
+    <string name="workprofile_none">Aún no hay perfil de trabajo.</string>
+    <string name="workprofile_exists_ours">Perfil de trabajo #%1$d (creado aquí).</string>
+    <string name="workprofile_exists_foreign">Perfil de trabajo #%1$d (creado por otra app). Aun así se pueden mover apps.</string>
+    <string name="workprofile_create">Crear</string>
+    <string name="workprofile_create_msg">App Ops Shizuku crea un perfil gestionado y se convierte en su propietario. Algunos dispositivos/ROM pueden rechazarlo. Sin probar en un dispositivo.</string>
+    <string name="workprofile_default_name">Trabajo</string>
+    <string name="workprofile_create_ok">Perfil de trabajo creado.</string>
+    <string name="workprofile_create_no_owner">Perfil creado, pero esta app no pudo ser propietaria. Aun así puedes mover apps.</string>
+    <string name="workprofile_create_failed">El dispositivo rechazó crear un perfil de trabajo.</string>
+    <string name="workprofile_remove">Eliminar perfil</string>
+    <string name="workprofile_remove_msg">Elimina todo el perfil de trabajo. Se pierden todos los datos de las apps que contiene.</string>
+    <string name="workprofile_removed">Perfil de trabajo eliminado.</string>
+    <string name="workprofile_remove_failed">El dispositivo no eliminó el perfil.</string>
+    <string name="workprofile_in">En el perfil de trabajo</string>
+    <string name="workprofile_out">Solo perfil principal</string>
+    <string name="workprofile_move_failed">El dispositivo no movió la app.</string>
+    <string name="workprofile_admin_label">Propietario del perfil de trabajo</string>
+    <string name="workprofile_admin_desc">Permite a App Ops Shizuku gestionar un perfil de trabajo que creó.</string>
 </resources>

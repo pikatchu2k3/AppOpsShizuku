@@ -635,4 +635,26 @@
     <string name="activity_open_behavior">Поведение</string>
     <string name="stealth_spoof_adid">Рекламный ID: отдавать нулевой ID (бета)</string>
     <string name="stealth_spoof_location">Местоположение: отдавать фиксированную точку уровня города (бета)</string>
+    <string name="menu_work_profile">Рабочий профиль</string>
+    <string name="workprofile_title">Рабочий профиль</string>
+    <string name="workprofile_hint">Перенесённые в профиль приложения не видят ни контакты, ни файлы основного профиля. Они начинают с собственными данными (вход/история не переносятся).</string>
+    <string name="workprofile_no_shizuku">Нужен Shizuku. Подключите и откройте снова.</string>
+    <string name="workprofile_none">Рабочего профиля пока нет.</string>
+    <string name="workprofile_exists_ours">Рабочий профиль №%1$d (создан здесь).</string>
+    <string name="workprofile_exists_foreign">Рабочий профиль №%1$d (создан другим приложением). Приложения всё равно можно переносить.</string>
+    <string name="workprofile_create">Создать</string>
+    <string name="workprofile_create_msg">App Ops Shizuku создаёт управляемый профиль и становится его владельцем. Некоторые устройства/прошивки могут отказать. На устройстве не проверено.</string>
+    <string name="workprofile_default_name">Работа</string>
+    <string name="workprofile_create_ok">Рабочий профиль создан.</string>
+    <string name="workprofile_create_no_owner">Профиль создан, но приложение не стало владельцем. Переносить приложения всё равно можно.</string>
+    <string name="workprofile_create_failed">Устройство отказалось создавать рабочий профиль.</string>
+    <string name="workprofile_remove">Удалить профиль</string>
+    <string name="workprofile_remove_msg">Удаляет весь рабочий профиль. Все данные приложений в нём теряются.</string>
+    <string name="workprofile_removed">Рабочий профиль удалён.</string>
+    <string name="workprofile_remove_failed">Устройство не удалило профиль.</string>
+    <string name="workprofile_in">В рабочем профиле</string>
+    <string name="workprofile_out">Только основной профиль</string>
+    <string name="workprofile_move_failed">Устройство не переместило приложение.</string>
+    <string name="workprofile_admin_label">Владелец рабочего профиля</string>
+    <string name="workprofile_admin_desc">Позволяет App Ops Shizuku управлять созданным им рабочим профилем.</string>
 </resources>

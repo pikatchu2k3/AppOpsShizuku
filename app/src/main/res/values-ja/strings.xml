@@ -626,4 +626,26 @@
     <string name="activity_open_behavior">動作</string>
     <string name="stealth_spoof_adid">広告ID: ゼロIDを返す（ベータ）</string>
     <string name="stealth_spoof_location">位置情報: 都市レベルの固定地点を返す（ベータ）</string>
+    <string name="menu_work_profile">仕事用プロファイル</string>
+    <string name="workprofile_title">仕事用プロファイル</string>
+    <string name="workprofile_hint">プロファイルに移したアプリは、メインプロファイルの連絡先もファイルも見られません。独自のデータで起動します（ログイン/履歴は引き継がれません）。</string>
+    <string name="workprofile_no_shizuku">これにはShizukuが必要です。接続して開き直してください。</string>
+    <string name="workprofile_none">まだ仕事用プロファイルがありません。</string>
+    <string name="workprofile_exists_ours">仕事用プロファイル #%1$d（ここで作成）。</string>
+    <string name="workprofile_exists_foreign">仕事用プロファイル #%1$d（別のアプリが作成）。それでもアプリは移動できます。</string>
+    <string name="workprofile_create">作成</string>
+    <string name="workprofile_create_msg">App Ops Shizukuが管理対象プロファイルを作成し、その所有者になります。一部の端末/ROMでは拒否されることがあります。実機未検証です。</string>
+    <string name="workprofile_default_name">仕事</string>
+    <string name="workprofile_create_ok">仕事用プロファイルを作成しました。</string>
+    <string name="workprofile_create_no_owner">プロファイルは作成されましたが、このアプリは所有者になれませんでした。アプリの移動は可能です。</string>
+    <string name="workprofile_create_failed">端末が仕事用プロファイルの作成を拒否しました。</string>
+    <string name="workprofile_remove">プロファイルを削除</string>
+    <string name="workprofile_remove_msg">仕事用プロファイル全体を削除します。中のアプリのデータはすべて失われます。</string>
+    <string name="workprofile_removed">仕事用プロファイルを削除しました。</string>
+    <string name="workprofile_remove_failed">端末がプロファイルを削除しませんでした。</string>
+    <string name="workprofile_in">仕事用プロファイル内</string>
+    <string name="workprofile_out">メインプロファイルのみ</string>
+    <string name="workprofile_move_failed">端末がアプリを移動しませんでした。</string>
+    <string name="workprofile_admin_label">仕事用プロファイル所有者</string>
+    <string name="workprofile_admin_desc">App Ops Shizukuが自ら作成した仕事用プロファイルを管理できるようにします。</string>
 </resources>
