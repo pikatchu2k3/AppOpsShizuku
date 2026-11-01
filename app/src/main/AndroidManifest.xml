@@ -93,6 +93,9 @@
             android:name=".NetUsageActivity"
             android:exported="false" />
         <activity
+            android:name=".ActivityScanActivity"
+            android:exported="false" />
+        <activity
             android:name=".AutoRulesActivity"
             android:exported="false" />
         <activity

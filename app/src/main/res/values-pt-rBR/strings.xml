@@ -608,4 +608,23 @@
     <string name="netusage_background">%1$s em segundo plano</string>
     <string name="netusage_block_bg">Bloquear 2º plano</string>
     <string name="netusage_unblock_bg">Permitir 2º plano</string>
+    <plurals name="activity_wakeups">
+        <item quantity="one">%d despertar</item>
+        <item quantity="other">%d despertares</item>
+    </plurals>
+    <plurals name="activity_job_count">
+        <item quantity="one">%d tarefa</item>
+        <item quantity="other">%d tarefas</item>
+    </plurals>
+    <string name="menu_activity">Atividade</string>
+    <string name="activity_title">Atividade</string>
+    <string name="activity_intro">Quais apps acordam o dispositivo, agendam tarefas ou leem sensores. Os valores vêm do dumpsys e são heurísticos.</string>
+    <string name="activity_no_shizuku">Isto precisa do Shizuku. Conecte e reabra.</string>
+    <string name="activity_not_recognized">Formato não reconhecido neste dispositivo.</string>
+    <string name="activity_section">%1$s (%2$d)</string>
+    <string name="activity_alarms">Despertares do dispositivo</string>
+    <string name="activity_jobs">Tarefas agendadas</string>
+    <string name="activity_sensors">Acesso a sensores</string>
+    <string name="activity_sensor_used">Consultou sensores</string>
+    <string name="activity_open_behavior">Comportamento</string>
 </resources>

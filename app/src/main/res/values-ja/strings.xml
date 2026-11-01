@@ -607,4 +607,21 @@
     <string name="netusage_background">バックグラウンド %1$s</string>
     <string name="netusage_block_bg">背景を遮断</string>
     <string name="netusage_unblock_bg">背景を許可</string>
+    <plurals name="activity_wakeups">
+        <item quantity="other">%d 回起動</item>
+    </plurals>
+    <plurals name="activity_job_count">
+        <item quantity="other">%d 件のジョブ</item>
+    </plurals>
+    <string name="menu_activity">アクティビティ</string>
+    <string name="activity_title">アクティビティ</string>
+    <string name="activity_intro">どのアプリが端末を起動し、ジョブを予約し、センサーを読むか。値はdumpsys由来で推定です。</string>
+    <string name="activity_no_shizuku">これにはShizukuが必要です。接続して開き直してください。</string>
+    <string name="activity_not_recognized">この端末では形式を認識できません。</string>
+    <string name="activity_section">%1$s（%2$d）</string>
+    <string name="activity_alarms">端末の起動</string>
+    <string name="activity_jobs">予約ジョブ</string>
+    <string name="activity_sensors">センサーアクセス</string>
+    <string name="activity_sensor_used">センサーを読み取り</string>
+    <string name="activity_open_behavior">動作</string>
 </resources>
