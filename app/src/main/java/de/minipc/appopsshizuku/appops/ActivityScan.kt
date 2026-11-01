@@ -16,7 +16,8 @@ object ActivityScan {
      * Zeilenform (AOSP): `com.example +1m2s743ms running, 3 wakeups:`
      */
     fun parseAlarmWakeups(dump: String): Map<String, Int> {
-        val re = Regex("""^\s*($PKG)\s.*?,\s*(\d+)\s+wakeup""", RegexOption.MULTILINE)
+        // Neuere Android-Versionen setzen "u0a123:" bzw. "1000:" vor den Paketnamen
+        val re = Regex("""^\s*(?:\w+:)?($PKG)\s.*?,\s*(\d+)\s+wakeup""", RegexOption.MULTILINE)
         val out = HashMap<String, Int>()
         for (m in re.findAll(dump)) {
             val pkg = m.groupValues[1]
@@ -31,13 +32,22 @@ object ActivityScan {
      * Gezaehlt werden `service=ComponentInfo{pkg/cls}`-Vorkommen (ein Eintrag je Job).
      */
     fun parseJobs(dump: String): Map<String, Int> {
-        val re = Regex("""service=ComponentInfo\{($PKG)/""")
-        val out = HashMap<String, Int>()
-        for (m in re.findAll(dump)) {
-            val pkg = m.groupValues[1]
-            out[pkg] = (out[pkg] ?: 0) + 1
+        // Variante 1: "JOB #u0a105/12: 7ad2f8 com.pkg/.Service ..." (eine Zeile je Job)
+        // Variante 2: "service=ComponentInfo{com.pkg/...}" (aeltere Ausgaben)
+        // Es zaehlt die erste Variante mit Treffern - nie beide, sonst doppelt gezaehlt.
+        val patterns = listOf(
+            Regex("""JOB #\S+/\d+:\s+\S+\s+($PKG)/"""),
+            Regex("""service=ComponentInfo\{($PKG)/""")
+        )
+        for (re in patterns) {
+            val out = HashMap<String, Int>()
+            for (m in re.findAll(dump)) {
+                val pkg = m.groupValues[1]
+                out[pkg] = (out[pkg] ?: 0) + 1
+            }
+            if (out.isNotEmpty()) return out
         }
-        return out
+        return emptyMap()
     }
 
     /**

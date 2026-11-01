@@ -6,6 +6,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.util.Log
 import androidx.core.content.ContextCompat
@@ -48,6 +50,24 @@ object AutoRuleManager {
         }.getOrNull()
     }
 
+    /** WLAN-Zustand ohne Raten: "nicht im WLAN" ist sicher, "im WLAN, Name unlesbar" ist UNBEKANNT. */
+    sealed interface WifiState {
+        object NotWifi : WifiState
+        object Unknown : WifiState
+        data class Ssid(val name: String) : WifiState
+    }
+
+    fun wifiState(context: Context): WifiState {
+        val onWifi: Boolean? = runCatching {
+            val cm = context.getSystemService(ConnectivityManager::class.java)
+            cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+        }.getOrNull()
+        if (onWifi == false) return WifiState.NotWifi
+        // Im Hintergrund verbirgt Android den Namen unter Umstaenden: dann ist das UNBEKANNT,
+        // nicht "nicht verbunden" - sonst wuerde eine Regel faelschlich beendet.
+        return currentSsid(context)?.let { WifiState.Ssid(it) } ?: WifiState.Unknown
+    }
+
     private fun shizukuUsable(): Boolean =
         runCatching { ShizukuBackend().let { it.isAvailable() && it.hasPermission() } }.getOrDefault(false)
 
@@ -60,15 +80,20 @@ object AutoRuleManager {
         val cal = Calendar.getInstance()
         val dayMon0 = (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7 // So=1 -> 6, Mo=2 -> 0 ...
         val minute = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE)
-        val ssid = currentSsid(app)
+        val wifi by lazy { wifiState(app) }
         for (rule in rules) {
             if (!rule.enabled) continue
+            // WLAN-Regel bei unlesbarem Netznamen: nichts entscheiden (weder an noch aus)
+            if (rule.trigger == RuleTrigger.WIFI && wifi is WifiState.Unknown) continue
+            val ssid = (wifi.takeIf { rule.trigger == RuleTrigger.WIFI } as? WifiState.Ssid)?.name
             val active = RuleEval.active(rule, dayMon0, minute, ssid)
             val prev = store.lastActive(rule.id)
             if (prev == active) continue
-            // WLAN-Regel ohne lesbaren Netznamen (Standort fehlt): nicht raten, Zustand offen lassen
-            if (rule.trigger == RuleTrigger.WIFI && ssid == null && !rule.whenConnected) {
-                // "aktiv wenn NICHT verbunden" bleibt ohne Lesbarkeit unsicher -> ueberspringen
+            // Erste Auswertung und Regel gerade NICHT aktiv: nur merken. Sonst wuerde eine neu angelegte
+            // Regel ausserhalb ihres Fensters sofort "Gegenaktion" ausfuehren und z. B. einen von Hand
+            // gestarteten Lockdown beenden.
+            if (prev == null && !active) {
+                store.setLastActive(rule.id, false)
                 continue
             }
             if (!shizukuUsable()) continue // ohne Shizuku nichts anwenden; beim naechsten Mal erneut

@@ -105,6 +105,20 @@ object ChangeLog {
     fun recordOp(context: Context, pkg: String, op: AppOp, prevMode: String?, newMode: String) {
         if (prevMode == newMode) return
         val opLabel = OpLabels.of(context, op)
+        // "Nur waehrend Nutzung" ist kein Systemzustand: ein Rueckgaengig dorthin ginge ueber setMode
+        // als Erteilen. Darum nur als Info fuehren.
+        if (prevMode == WhileInUse.MODE) {
+            add(
+                context,
+                Entry(
+                    nextId(), System.currentTimeMillis(), Type.INFO,
+                    label = context.getString(
+                        R.string.log_op, appLabel(context, pkg), opLabel, prevMode, newMode
+                    )
+                )
+            )
+            return
+        }
         add(
             context,
             Entry(

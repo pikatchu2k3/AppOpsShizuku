@@ -34,6 +34,25 @@ class ActivityScanTest {
     }
 
     @Test
+    fun alarmMitUidPraefix() {
+        val dump = "Alarm Stats:\n  u0a42:com.google.android.gms +170ms running, 4 wakeups:\n  1000:com.sys.svc +1s running, 2 wakeups:"
+        val m = ActivityScan.parseAlarmWakeups(dump)
+        assertEquals(4, m["com.google.android.gms"])
+        assertEquals(2, m["com.sys.svc"])
+    }
+
+    @Test
+    fun jobsNeuesFormatOhneDoppelzaehlung() {
+        val dump = """
+            JOB #u0a105/12: 7ad2f8 com.example.app/.SyncJob
+            JOB #u0a105/13: 8be3a9 com.example.app/.OtherJob
+              service=ComponentInfo{com.example.app/com.example.app.SyncJob}
+        """.trimIndent()
+        // Variante 1 hat Treffer -> Variante 2 darf nicht zusaetzlich zaehlen
+        assertEquals(2, ActivityScan.parseJobs(dump)["com.example.app"])
+    }
+
+    @Test
     fun sensorPakete() {
         val dump = "x package=com.sensor.app y\n z pkg=com.other.app w\n nothing here"
         assertEquals(setOf("com.sensor.app", "com.other.app"), ActivityScan.parseSensorPackages(dump))

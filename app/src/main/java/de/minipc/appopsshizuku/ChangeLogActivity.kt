@@ -94,10 +94,19 @@ class ChangeLogActivity : AppCompatActivity() {
                 when (entry.type) {
                     ChangeLog.Type.OP -> {
                         val op = PrivacyOps.PRIVACY_OPS.firstOrNull { it.opName == entry.opName } ?: return@runCatching false
-                        val mode = entry.prevMode ?: "default"
-                        AppOpsController(backend).setMode(entry.packageName!!, op, mode).exitCode == 0.also {
-                            runCatching { PrivacyProfileStore(this).setOpMode(entry.packageName, op.opName, mode) }
+                        val pkg = entry.packageName!!
+                        // "Standard" bei einer Berechtigung heisst "nicht erteilt" (wie OpReset): Rueckgaengig
+                        // darf nie mehr Zugriff geben, als die App vorher nachweislich hatte.
+                        val mode = (entry.prevMode ?: "default").let {
+                            if (it == "default" && op.permissionName != null) "deny" else it
                         }
+                        val res = AppOpsController(backend).setMode(pkg, op, mode, userFixed = false)
+                        val actual = OpReadback.read(this, backend, pkg, op)
+                        val effective = res.exitCode == 0 &&
+                            de.minipc.appopsshizuku.appops.OpEffect.isSetEffective(op.permissionName, mode, actual)
+                        // Profil nur bei bestaetigtem Erfolg anfassen
+                        if (effective) runCatching { PrivacyProfileStore(this).setOpMode(pkg, op.opName, mode) }
+                        effective
                     }
                     ChangeLog.Type.NET -> {
                         val sw = NetSwitch.values().firstOrNull { it.name == entry.netSwitch } ?: return@runCatching false
