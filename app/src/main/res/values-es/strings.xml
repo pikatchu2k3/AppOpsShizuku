@@ -629,4 +629,6 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="activity_sensors">Acceso a sensores</string>
     <string name="activity_sensor_used">Ha consultado sensores</string>
     <string name="activity_open_behavior">Comportamiento</string>
+    <string name="stealth_spoof_adid">ID de publicidad: devolver ID nula (beta)</string>
+    <string name="stealth_spoof_location">Ubicación: devolver un lugar fijo a nivel de ciudad (beta)</string>
 </resources>

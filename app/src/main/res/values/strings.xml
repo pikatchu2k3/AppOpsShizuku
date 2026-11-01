@@ -494,10 +494,12 @@
     <string name="stealth_restore_success">Original app restored</string>
     <string name="stealth_secure_snapshot">Blank out content in history (incognito, like banking apps)</string>
     <string name="stealth_signature_hint">Important: The app will be re-signed. If the app is already installed, the original must be uninstalled first (app data will be lost).</string>
+    <string name="stealth_spoof_adid">Advertising ID: return a null ID (beta)</string>
     <string name="stealth_spoof_android_id">Spoof Android ID</string>
     <string name="stealth_spoof_build">Spoof device fingerprint (build)</string>
     <string name="stealth_spoof_description">Spoofs device identity values ONLY in this app (smali call-site rewriting, no root required). Affects only the patched app, not the system.</string>
     <string name="stealth_spoof_fingerprint_hint">Fingerprint (empty = original)</string>
+    <string name="stealth_spoof_location">Location: return a fixed city-level place (beta)</string>
     <string name="stealth_spoof_manufacturer_hint">Manufacturer (empty = original)</string>
     <string name="stealth_spoof_model_hint">Model (empty = original)</string>
     <string name="stealth_spoof_random">🎲 Choose random device profile</string>

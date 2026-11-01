@@ -624,4 +624,6 @@
     <string name="activity_sensors">センサーアクセス</string>
     <string name="activity_sensor_used">センサーを読み取り</string>
     <string name="activity_open_behavior">動作</string>
+    <string name="stealth_spoof_adid">広告ID: ゼロIDを返す（ベータ）</string>
+    <string name="stealth_spoof_location">位置情報: 都市レベルの固定地点を返す（ベータ）</string>
 </resources>

@@ -23,10 +23,16 @@ data class DeviceSpoofOptions(
     val fakeImsi: String? = null,
     val spoofBuild: Boolean = false,
     val spoofAndroidId: Boolean = false,
-    val spoofTelephony: Boolean = false
+    val spoofTelephony: Boolean = false,
+    /** Werbe-ID (Google Advertising ID) auf eine Null-ID setzen, Tracking-Limit auf true. */
+    val fakeAdId: Boolean = false,
+    /** getLastKnownLocation auf einen festen Ort (Stadtebene) umbiegen statt den echten zu liefern. */
+    val fakeLocation: Boolean = false,
+    val fakeLat: Double = 0.0,
+    val fakeLon: Double = 0.0
 ) {
     val anyEnabled: Boolean
-        get() = spoofBuild || spoofAndroidId || spoofTelephony
+        get() = spoofBuild || spoofAndroidId || spoofTelephony || fakeAdId || fakeLocation
 }
 
 object DeviceSpoofPatch {
@@ -86,6 +92,33 @@ object DeviceSpoofPatch {
             )
             out = imsiRegex.replace(out) { m ->
                 "invoke-static {${m.groupValues[1]}}, Lde/minipc/spoof/DeviceSpoof;->subscriberId(Landroid/telephony/TelephonyManager;)Ljava/lang/String;"
+            }
+        }
+
+        if (options.fakeAdId) {
+            // AdvertisingIdClient$Info.getId() -> DeviceSpoof.adId() (Null-ID)
+            val adIdRegex = Regex(
+                """invoke-virtual\s*\{([vp]\d+)\s*\}\s*,\s*Lcom/google/android/gms/ads/identifier/AdvertisingIdClient\${'$'}Info;->getId\(\)Ljava/lang/String;"""
+            )
+            out = adIdRegex.replace(out) { m ->
+                "invoke-static {${'$'}{m.groupValues[1]}}, Lde/minipc/spoof/DeviceSpoof;->adId(Ljava/lang/Object;)Ljava/lang/String;"
+            }
+            // isLimitAdTrackingEnabled() -> DeviceSpoof.adLimit() (immer true)
+            val adLimitRegex = Regex(
+                """invoke-virtual\s*\{([vp]\d+)\s*\}\s*,\s*Lcom/google/android/gms/ads/identifier/AdvertisingIdClient\${'$'}Info;->isLimitAdTrackingEnabled\(\)Z"""
+            )
+            out = adLimitRegex.replace(out) { m ->
+                "invoke-static {${'$'}{m.groupValues[1]}}, Lde/minipc/spoof/DeviceSpoof;->adLimit(Ljava/lang/Object;)Z"
+            }
+        }
+
+        if (options.fakeLocation) {
+            // LocationManager.getLastKnownLocation(String) -> DeviceSpoof.lastKnownLocation() (fester Ort)
+            val locRegex = Regex(
+                """invoke-virtual\s*\{([vp]\d+)\s*,\s*([vp]\d+)\s*\}\s*,\s*Landroid/location/LocationManager;->getLastKnownLocation\(Ljava/lang/String;\)Landroid/location/Location;"""
+            )
+            out = locRegex.replace(out) { m ->
+                "invoke-static {${'$'}{m.groupValues[1]}, ${'$'}{m.groupValues[2]}}, Lde/minipc/spoof/DeviceSpoof;->lastKnownLocation(Landroid/location/LocationManager;Ljava/lang/String;)Landroid/location/Location;"
             }
         }
 

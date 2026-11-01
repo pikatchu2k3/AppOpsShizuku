@@ -627,4 +627,6 @@
     <string name="activity_sensors">Accès aux capteurs</string>
     <string name="activity_sensor_used">A interrogé des capteurs</string>
     <string name="activity_open_behavior">Comportement</string>
+    <string name="stealth_spoof_adid">ID publicitaire : renvoyer une ID nulle (bêta)</string>
+    <string name="stealth_spoof_location">Position : renvoyer un lieu fixe au niveau ville (bêta)</string>
 </resources>
