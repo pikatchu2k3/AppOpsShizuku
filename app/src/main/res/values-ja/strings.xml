@@ -539,4 +539,16 @@
     <string name="log_info_block_all">%1$s: すべての権限をブロック</string>
     <string name="log_info_lockdown_on">ロックダウン開始: %1$d 件の権限を取り消し</string>
     <string name="log_info_lockdown_off">ロックダウン終了: %1$d 件の権限を戻しました</string>
+    <string name="template_button">テンプレートを適用 …</string>
+    <string name="template_title">プロフィールテンプレート</string>
+    <string name="template_game">ゲーム</string>
+    <string name="template_messenger">メッセンジャー</string>
+    <string name="template_banking">バンキング</string>
+    <string name="template_confirm">このアプリに %1$d 件の権限を設定します。テンプレートにない権限はそのまま。より多くを明かす許可は与えません。</string>
+    <string name="template_apply">適用</string>
+    <string name="template_done">テンプレートを適用: %1$d 件の権限</string>
+    <string name="template_partial">%1$d 件設定、%2$d 件は変更できませんでした</string>
+    <string name="template_share">現在のプロフィールを共有</string>
+    <string name="template_share_empty">このアプリにはまだ保存されたプロフィールがありません。</string>
+    <string name="log_info_template">%1$s: テンプレート適用（%2$d 件の権限）</string>
 </resources>

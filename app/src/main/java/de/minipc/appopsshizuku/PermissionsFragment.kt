@@ -149,6 +149,10 @@ class PermissionsFragment : Fragment() {
 
         view.findViewById<MaterialButton>(R.id.suggestionApply).setOnClickListener { applySuggestions() }
         view.findViewById<MaterialButton>(R.id.quarantineRelease).setOnClickListener { releaseQuarantine() }
+        view.findViewById<MaterialButton>(R.id.templateButton).let { button ->
+            if (packageName == requireContext().packageName) button.visibility = View.GONE
+            else button.setOnClickListener { showTemplateDialog() }
+        }
 
         view.findViewById<MaterialButton>(R.id.restoreAllButton).setOnClickListener {
             confirmRestoreAll()
@@ -388,6 +392,93 @@ class PermissionsFragment : Fragment() {
                 ).show()
             }
         }
+    }
+
+    /** Vorlagen-Auswahl mit Moeglichkeit, das aktuelle Profil als JSON zu teilen. */
+    private fun showTemplateDialog() {
+        val ids = de.minipc.appopsshizuku.appops.ProfileTemplate.Id.values()
+        val names = ids.map {
+            appContext.getString(
+                when (it) {
+                    de.minipc.appopsshizuku.appops.ProfileTemplate.Id.GAME -> R.string.template_game
+                    de.minipc.appopsshizuku.appops.ProfileTemplate.Id.MESSENGER -> R.string.template_messenger
+                    de.minipc.appopsshizuku.appops.ProfileTemplate.Id.BANKING -> R.string.template_banking
+                }
+            )
+        }.toTypedArray()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.template_title)
+            .setItems(names) { _, which -> confirmTemplate(ids[which], names[which]) }
+            .setNeutralButton(R.string.template_share) { _, _ -> shareProfile() }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
+    }
+
+    private fun confirmTemplate(id: de.minipc.appopsshizuku.appops.ProfileTemplate.Id, name: String) {
+        val count = de.minipc.appopsshizuku.appops.ProfileTemplate.opsFor(id).size
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(name)
+            .setMessage(appContext.getString(R.string.template_confirm, count))
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.template_apply) { _, _ -> applyTemplate(id) }
+            .show()
+    }
+
+    /** Vorlage anwenden: jede Op setzen, zuruecklesen, nur bei Erfolg ins Profil + Protokoll. */
+    private fun applyTemplate(id: de.minipc.appopsshizuku.appops.ProfileTemplate.Id) {
+        val wanted = de.minipc.appopsshizuku.appops.ProfileTemplate.opsFor(id)
+        val byName = ops.associateBy { it.opName }
+        setLoading(true)
+        executor.execute {
+            var ok = 0
+            var failed = 0
+            dumpsysCache = null
+            for ((opName, mode) in wanted) {
+                val op = byName[opName] ?: continue
+                if (opStates[opName] == null) continue // Geraet kennt die Op nicht
+                val prev = opStates[opName]
+                val res = controller.setMode(packageName, op, mode)
+                dumpsysCache = null
+                val actual = if (res.exitCode == 0) runCatching { readMode(op, useCache = false) }.getOrNull() else null
+                if (res.exitCode == 0 && OpEffect.isSetEffective(op.permissionName, mode, actual)) {
+                    ok++
+                    opStates[opName] = mode
+                    runCatching { profileStore.setOpMode(packageName, opName, mode) }
+                    runCatching { de.minipc.appopsshizuku.appops.ChangeLog.recordOp(appContext, packageName, op, prev, mode) }
+                } else failed++
+            }
+            if (ok > 0) runCatching {
+                de.minipc.appopsshizuku.appops.ChangeLog.recordInfo(
+                    appContext, appContext.getString(R.string.log_info_template, selfAppLabel(), ok)
+                )
+            }
+            handler.post {
+                setLoading(false)
+                refreshList()
+                Toast.makeText(
+                    appContext,
+                    if (failed == 0) appContext.getString(R.string.template_done, ok)
+                    else appContext.getString(R.string.template_partial, ok, failed),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    /** Aktuelles Profil dieser App als JSON teilen (ACTION_SEND) - zum Weitergeben einer Vorlage. */
+    private fun shareProfile() {
+        val profile = mapOf(packageName to profileStore.getProfile(packageName))
+        if (profile[packageName].isNullOrEmpty()) {
+            Toast.makeText(appContext, R.string.template_share_empty, Toast.LENGTH_LONG).show()
+            return
+        }
+        val json = PrivacyProfileStore.toJson(profile)
+        val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "application/json"
+            putExtra(android.content.Intent.EXTRA_TEXT, json)
+            putExtra(android.content.Intent.EXTRA_SUBJECT, "AppOps ${selfAppLabel()}")
+        }
+        startActivity(android.content.Intent.createChooser(send, appContext.getString(R.string.template_share)))
     }
 
     private fun selfAppLabel(): String = runCatching {

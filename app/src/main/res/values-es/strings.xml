@@ -541,4 +541,16 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="log_info_block_all">%1$s: todos los permisos bloqueados</string>
     <string name="log_info_lockdown_on">Bloqueo activado: %1$d permisos revocados</string>
     <string name="log_info_lockdown_off">Bloqueo desactivado: %1$d permisos devueltos</string>
+    <string name="template_button">Aplicar plantilla …</string>
+    <string name="template_title">Plantilla de perfil</string>
+    <string name="template_game">Juego</string>
+    <string name="template_messenger">Mensajería</string>
+    <string name="template_banking">Banca</string>
+    <string name="template_confirm">Establece %1$d permisos para esta app. Los permisos que no están en la plantilla no se tocan; no se concede nada que revele más.</string>
+    <string name="template_apply">Aplicar</string>
+    <string name="template_done">Plantilla aplicada: %1$d permisos</string>
+    <string name="template_partial">%1$d aplicados, %2$d no se pudieron cambiar</string>
+    <string name="template_share">Compartir perfil actual</string>
+    <string name="template_share_empty">Esta app aún no tiene un perfil guardado.</string>
+    <string name="log_info_template">%1$s: plantilla aplicada (%2$d permisos)</string>
 </resources>

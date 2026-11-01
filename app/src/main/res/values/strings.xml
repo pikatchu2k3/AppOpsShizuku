@@ -180,6 +180,7 @@
     <string name="log_info_lockdown_off">Lockdown off: %1$d permissions given back</string>
     <string name="log_info_lockdown_on">Lockdown on: %1$d permissions revoked</string>
     <string name="log_info_suggest">%1$s: %2$d recommended permissions revoked</string>
+    <string name="log_info_template">%1$s: template applied (%2$d permissions)</string>
     <string name="log_net_off">%1$s · %2$s off</string>
     <string name="log_net_on">%1$s · %2$s on</string>
     <string name="log_op">%1$s · %2$s: %3$s → %4$s</string>
@@ -476,6 +477,17 @@
     <string name="tab_stealth">Stealth</string>
     <string name="tab_stealth_text">Hides the app: removes it from history, removes the launcher icon, disguises it as a calculator (vault), device spoofing or cloning it as a parallel app. These features are for now still on the component screen.</string>
     <string name="tab_stealth_title">Stealth</string>
+    <string name="template_apply">Apply</string>
+    <string name="template_banking">Banking</string>
+    <string name="template_button">Apply template …</string>
+    <string name="template_confirm">Sets %1$d permissions for this app. Permissions not in the template are left unchanged; nothing is granted that reveals more.</string>
+    <string name="template_done">Template applied: %1$d permissions</string>
+    <string name="template_game">Game</string>
+    <string name="template_messenger">Messenger</string>
+    <string name="template_partial">%1$d set, %2$d could not be changed</string>
+    <string name="template_share">Share current profile</string>
+    <string name="template_share_empty">This app has no saved profile yet.</string>
+    <string name="template_title">Profile template</string>
     <string name="tracker_nothing_to_disable">Trackers: nothing disableable was found in the selected groups — nothing was changed here.</string>
     <string name="tracker_proof_failed">Before/after comparison not possible (%1$s).</string>
     <string name="error_shizuku_app_missing">Shizuku app not found (shizuku.rikka.app)</string>

@@ -539,4 +539,16 @@
     <string name="log_info_block_all">%1$s: все разрешения заблокированы</string>
     <string name="log_info_lockdown_on">Блокировка включена: отозвано разрешений: %1$d</string>
     <string name="log_info_lockdown_off">Блокировка снята: возвращено разрешений: %1$d</string>
+    <string name="template_button">Применить шаблон …</string>
+    <string name="template_title">Шаблон профиля</string>
+    <string name="template_game">Игра</string>
+    <string name="template_messenger">Мессенджер</string>
+    <string name="template_banking">Банк</string>
+    <string name="template_confirm">Задаёт %1$d разрешений для этого приложения. Отсутствующие в шаблоне не трогаются; ничего не выдаётся сверх того.</string>
+    <string name="template_apply">Применить</string>
+    <string name="template_done">Шаблон применён: разрешений %1$d</string>
+    <string name="template_partial">Задано %1$d, не удалось изменить %2$d</string>
+    <string name="template_share">Поделиться текущим профилем</string>
+    <string name="template_share_empty">Для этого приложения ещё нет сохранённого профиля.</string>
+    <string name="log_info_template">%1$s: шаблон применён (%2$d разрешений)</string>
 </resources>

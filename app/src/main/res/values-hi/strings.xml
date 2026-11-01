@@ -539,4 +539,16 @@
     <string name="log_info_block_all">%1$s: सभी अनुमतियां अवरुद्ध</string>
     <string name="log_info_lockdown_on">लॉकडाउन चालू: %1$d अनुमतियां हटाई गईं</string>
     <string name="log_info_lockdown_off">लॉकडाउन बंद: %1$d अनुमतियां वापस दी गईं</string>
+    <string name="template_button">टेम्पलेट लागू करें …</string>
+    <string name="template_title">प्रोफ़ाइल टेम्पलेट</string>
+    <string name="template_game">गेम</string>
+    <string name="template_messenger">मैसेंजर</string>
+    <string name="template_banking">बैंकिंग</string>
+    <string name="template_confirm">इस ऐप के लिए %1$d अनुमतियां सेट करता है। टेम्पलेट में शामिल न अनुमतियां अपरिवर्तित रहती हैं; ऐसा कुछ नहीं दिया जाता जो अधिक उजागर करे।</string>
+    <string name="template_apply">लागू करें</string>
+    <string name="template_done">टेम्पलेट लागू: %1$d अनुमतियां</string>
+    <string name="template_partial">%1$d सेट, %2$d नहीं बदले जा सके</string>
+    <string name="template_share">वर्तमान प्रोफ़ाइल साझा करें</string>
+    <string name="template_share_empty">इस ऐप के लिए अभी कोई प्रोफ़ाइल सहेजी नहीं गई।</string>
+    <string name="log_info_template">%1$s: टेम्पलेट लागू (%2$d अनुमतियां)</string>
 </resources>
