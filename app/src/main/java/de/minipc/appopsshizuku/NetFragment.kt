@@ -182,6 +182,9 @@ class NetFragment : Fragment() {
             val ok = net.set(sw, packageName, uid, wanted)
             if (ok) {
                 store.mark(packageName, sw, wanted)
+                runCatching {
+                    de.minipc.appopsshizuku.appops.ChangeLog.recordNet(appContext, packageName, sw, !wanted, wanted)
+                }
                 // Nur merken, wenn WIR die Firewall-Kette eingeschaltet haben (sonst nichts anfassen).
                 if (sw == NetSwitch.OFFLINE && wanted && net.lastSetEnabledChain) store.setChainMarked(true)
             }

@@ -586,6 +586,10 @@ class MainActivity : AppCompatActivity() {
                 toggleQuarantine(item)
                 true
             }
+            R.id.action_change_log -> {
+                startActivity(Intent(this, ChangeLogActivity::class.java))
+                true
+            }
             R.id.action_system -> {
                 startActivity(Intent(this, SystemActivity::class.java))
                 true

@@ -526,4 +526,17 @@
     <string name="drift_restore">पुनर्स्थापित करें</string>
     <string name="drift_restored">%1$d सेटिंग्स पुनर्स्थापित</string>
     <string name="drift_restored_partial">%1$d पुनर्स्थापित, %2$d सेट नहीं हो सके</string>
+    <string name="menu_change_log">परिवर्तन लॉग</string>
+    <string name="log_title">परिवर्तन लॉग</string>
+    <string name="log_empty">अभी तक कुछ नहीं बदला।</string>
+    <string name="log_undo">पूर्ववत करें</string>
+    <string name="log_undone">परिवर्तन पूर्ववत किया गया</string>
+    <string name="log_undo_failed">डिवाइस ने इसे वापस नहीं लिया।</string>
+    <string name="log_op">%1$s · %2$s: %3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s चालू</string>
+    <string name="log_net_off">%1$s · %2$s बंद</string>
+    <string name="log_info_suggest">%1$s: %2$d अनुशंसित अनुमतियां हटाई गईं</string>
+    <string name="log_info_block_all">%1$s: सभी अनुमतियां अवरुद्ध</string>
+    <string name="log_info_lockdown_on">लॉकडाउन चालू: %1$d अनुमतियां हटाई गईं</string>
+    <string name="log_info_lockdown_off">लॉकडाउन बंद: %1$d अनुमतियां वापस दी गईं</string>
 </resources>

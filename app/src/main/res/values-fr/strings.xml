@@ -526,4 +526,17 @@
     <string name="drift_restore">Rétablir</string>
     <string name="drift_restored">%1$d réglages rétablis</string>
     <string name="drift_restored_partial">%1$d rétablis, %2$d non applicables</string>
+    <string name="menu_change_log">Journal des modifications</string>
+    <string name="log_title">Journal des modifications</string>
+    <string name="log_empty">Rien n\'a encore été modifié.</string>
+    <string name="log_undo">Annuler</string>
+    <string name="log_undone">Modification annulée</string>
+    <string name="log_undo_failed">L\'appareil ne l\'a pas annulé.</string>
+    <string name="log_op">%1$s · %2$s : %3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s activé</string>
+    <string name="log_net_off">%1$s · %2$s désactivé</string>
+    <string name="log_info_suggest">%1$s : %2$d autorisations recommandées retirées</string>
+    <string name="log_info_block_all">%1$s : toutes les autorisations bloquées</string>
+    <string name="log_info_lockdown_on">Verrouillage activé : %1$d autorisations retirées</string>
+    <string name="log_info_lockdown_off">Verrouillage désactivé : %1$d autorisations rendues</string>
 </resources>

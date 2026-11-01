@@ -549,4 +549,17 @@
     <string name="drift_restore">Wiederherstellen</string>
     <string name="drift_restored">%1$d Einstellungen wiederhergestellt</string>
     <string name="drift_restored_partial">%1$d wiederhergestellt, %2$d ließen sich nicht setzen</string>
+    <string name="menu_change_log">Änderungsprotokoll</string>
+    <string name="log_title">Änderungsprotokoll</string>
+    <string name="log_empty">Noch nichts geändert.</string>
+    <string name="log_undo">Rückgängig</string>
+    <string name="log_undone">Änderung rückgängig gemacht</string>
+    <string name="log_undo_failed">Das Gerät hat es nicht zurückgenommen.</string>
+    <string name="log_op">%1$s · %2$s: %3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s an</string>
+    <string name="log_net_off">%1$s · %2$s aus</string>
+    <string name="log_info_suggest">%1$s: %2$d empfohlene Berechtigungen entzogen</string>
+    <string name="log_info_block_all">%1$s: alle Berechtigungen blockiert</string>
+    <string name="log_info_lockdown_on">Lockdown an: %1$d Berechtigungen entzogen</string>
+    <string name="log_info_lockdown_off">Lockdown aus: %1$d Berechtigungen zurückgegeben</string>
 </resources>

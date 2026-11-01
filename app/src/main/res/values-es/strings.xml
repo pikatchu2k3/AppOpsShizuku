@@ -528,4 +528,17 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="drift_restore">Restaurar</string>
     <string name="drift_restored">%1$d ajustes restaurados</string>
     <string name="drift_restored_partial">%1$d restaurados, %2$d no se pudieron aplicar</string>
+    <string name="menu_change_log">Registro de cambios</string>
+    <string name="log_title">Registro de cambios</string>
+    <string name="log_empty">Aún no se ha cambiado nada.</string>
+    <string name="log_undo">Deshacer</string>
+    <string name="log_undone">Cambio deshecho</string>
+    <string name="log_undo_failed">El dispositivo no lo revirtió.</string>
+    <string name="log_op">%1$s · %2$s: %3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s activado</string>
+    <string name="log_net_off">%1$s · %2$s desactivado</string>
+    <string name="log_info_suggest">%1$s: %2$d permisos recomendados revocados</string>
+    <string name="log_info_block_all">%1$s: todos los permisos bloqueados</string>
+    <string name="log_info_lockdown_on">Bloqueo activado: %1$d permisos revocados</string>
+    <string name="log_info_lockdown_off">Bloqueo desactivado: %1$d permisos devueltos</string>
 </resources>

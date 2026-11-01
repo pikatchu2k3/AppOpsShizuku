@@ -526,4 +526,17 @@
     <string name="drift_restore">Restaurar</string>
     <string name="drift_restored">%1$d configurações restauradas</string>
     <string name="drift_restored_partial">%1$d restauradas, %2$d não puderam ser aplicadas</string>
+    <string name="menu_change_log">Registro de alterações</string>
+    <string name="log_title">Registro de alterações</string>
+    <string name="log_empty">Nada foi alterado ainda.</string>
+    <string name="log_undo">Desfazer</string>
+    <string name="log_undone">Alteração desfeita</string>
+    <string name="log_undo_failed">O dispositivo não desfez.</string>
+    <string name="log_op">%1$s · %2$s: %3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s ativado</string>
+    <string name="log_net_off">%1$s · %2$s desativado</string>
+    <string name="log_info_suggest">%1$s: %2$d permissões recomendadas revogadas</string>
+    <string name="log_info_block_all">%1$s: todas as permissões bloqueadas</string>
+    <string name="log_info_lockdown_on">Bloqueio ativado: %1$d permissões revogadas</string>
+    <string name="log_info_lockdown_off">Bloqueio desativado: %1$d permissões devolvidas</string>
 </resources>
