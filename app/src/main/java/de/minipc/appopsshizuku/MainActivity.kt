@@ -16,6 +16,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import com.google.android.material.button.MaterialButton
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -190,6 +191,8 @@ class MainActivity : AppCompatActivity() {
                 applyFilterAndSort()
             }
         }
+
+        findViewById<MaterialButton>(R.id.driftRestore).setOnClickListener { restoreDrift() }
 
         findViewById<FloatingActionButton>(R.id.fabRefresh).setOnClickListener {
             blockedCache.clear()
@@ -486,6 +489,80 @@ class MainActivity : AppCompatActivity() {
         // deaktiviert/aktiviert worden sein
         loadApps()
         checkQuarantine()
+        if (manager.isConnected && manager.hasPermission) {
+            BootReceiver.clear(this)
+            checkDrift()
+        } else {
+            findViewById<View>(R.id.driftCard).visibility = View.GONE
+        }
+    }
+
+    /** opName+Paket -> gewuenschter Modus, der gerade NICHT durchgesetzt ist. */
+    private var driftItems: List<de.minipc.appopsshizuku.appops.DriftCheck.Item> = emptyList()
+
+    /**
+     * Gespeichertes Profil mit dem Ist-Zustand vergleichen (nur Apps mit Profil, meist wenige).
+     * Zeigt eine Leiste "N Einstellungen nicht mehr aktiv - wiederherstellen". Nichts wird dabei gesetzt.
+     */
+    private fun checkDrift() {
+        executor.execute {
+            val backend = de.minipc.appopsshizuku.shizuku.ShizukuBackend()
+            if (!runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)) return@execute
+            val controller = de.minipc.appopsshizuku.appops.AppOpsController(backend)
+            val catalog = de.minipc.appopsshizuku.appops.PrivacyOps.PRIVACY_OPS.associateBy { it.opName }
+            val stored = de.minipc.appopsshizuku.appops.PrivacyProfileStore(this).allProfiles()
+            val installed = packageManager.getInstalledPackages(0).map { it.packageName }.toSet()
+            val items = mutableListOf<de.minipc.appopsshizuku.appops.DriftCheck.Item>()
+            for ((pkg, ops) in stored) {
+                if (pkg !in installed) continue
+                for ((opName, want) in ops) {
+                    val op = catalog[opName] ?: continue
+                    val actual = runCatching { controller.getMode(pkg, op) }.getOrNull()
+                    if (de.minipc.appopsshizuku.appops.DriftCheck.isDrift(op.permissionName, want, actual)) {
+                        items += de.minipc.appopsshizuku.appops.DriftCheck.Item(pkg, opName, want)
+                    }
+                }
+            }
+            handler.post {
+                driftItems = items
+                val card = findViewById<View>(R.id.driftCard)
+                if (items.isEmpty()) {
+                    card.visibility = View.GONE
+                } else {
+                    card.visibility = View.VISIBLE
+                    findViewById<TextView>(R.id.driftText).text =
+                        getString(R.string.drift_text, items.size, items.map { it.packageName }.distinct().size)
+                }
+            }
+        }
+    }
+
+    private fun restoreDrift() {
+        val items = driftItems
+        if (items.isEmpty()) return
+        findViewById<View>(R.id.driftCard).visibility = View.GONE
+        executor.execute {
+            val backend = de.minipc.appopsshizuku.shizuku.ShizukuBackend()
+            val controller = de.minipc.appopsshizuku.appops.AppOpsController(backend)
+            val catalog = de.minipc.appopsshizuku.appops.PrivacyOps.PRIVACY_OPS.associateBy { it.opName }
+            var failed = 0
+            for (it in items) {
+                val op = catalog[it.opName] ?: continue
+                val res = controller.setMode(it.packageName, op, it.want)
+                if (res.exitCode != 0) failed++
+            }
+            handler.post {
+                val f = failed
+                Toast.makeText(
+                    this,
+                    if (f == 0) getString(R.string.drift_restored, items.size)
+                    else getString(R.string.drift_restored_partial, items.size - f, f),
+                    Toast.LENGTH_LONG
+                ).show()
+                checkDrift()
+                loadApps()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

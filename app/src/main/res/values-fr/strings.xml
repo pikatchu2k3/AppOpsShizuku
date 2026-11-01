@@ -518,4 +518,12 @@
     <string name="power_confirm_msg">%1$s sera désactivé pour cette appli. Les fonctions qui en dépendent (ex. saisie auto, notifications de montre) cesseront de fonctionner. Vous pouvez le réactiver dans les réglages système.</string>
     <string name="power_revoked">Retiré et confirmé</string>
     <string name="power_revoke_failed">L\'appareil n\'a pas appliqué la modification – passez par les réglages système.</string>
+    <string name="boot_notif_channel">État de la protection</string>
+    <string name="boot_notif_channel_desc">Avis lorsque la protection configurée est inactive</string>
+    <string name="boot_notif_title">Protection inactive</string>
+    <string name="boot_notif_text">Shizuku ne tourne pas après le redémarrage – les réglages de %1$d applis n\'ont aucun effet tant que vous ne lancez pas Shizuku.</string>
+    <string name="drift_text">%1$d réglages de %2$d applis ne sont plus actifs (p. ex. après une mise à jour).</string>
+    <string name="drift_restore">Rétablir</string>
+    <string name="drift_restored">%1$d réglages rétablis</string>
+    <string name="drift_restored_partial">%1$d rétablis, %2$d non applicables</string>
 </resources>

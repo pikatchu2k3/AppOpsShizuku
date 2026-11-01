@@ -541,4 +541,12 @@
     <string name="power_confirm_msg">%1$s wird für diese App ausgeschaltet. Funktionen, die darauf beruhen (z. B. Autofill, Smartwatch-Benachrichtigungen), gehen dann nicht mehr. In den Systemeinstellungen lässt es sich wieder einschalten.</string>
     <string name="power_revoked">Entzogen und bestätigt</string>
     <string name="power_revoke_failed">Das Gerät hat die Änderung nicht übernommen – bitte über die Systemeinstellungen.</string>
+    <string name="boot_notif_channel">Schutzstatus</string>
+    <string name="boot_notif_channel_desc">Hinweis, wenn der eingerichtete Schutz inaktiv ist</string>
+    <string name="boot_notif_title">Schutz inaktiv</string>
+    <string name="boot_notif_text">Shizuku läuft nach dem Neustart nicht – die Einstellungen für %1$d Apps wirken erst, wenn du Shizuku startest.</string>
+    <string name="drift_text">%1$d Einstellungen für %2$d Apps sind nicht mehr aktiv (z. B. nach einem Update).</string>
+    <string name="drift_restore">Wiederherstellen</string>
+    <string name="drift_restored">%1$d Einstellungen wiederhergestellt</string>
+    <string name="drift_restored_partial">%1$d wiederhergestellt, %2$d ließen sich nicht setzen</string>
 </resources>

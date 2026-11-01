@@ -518,4 +518,12 @@
     <string name="power_confirm_msg">将为此应用关闭%1$s。依赖它的功能（如自动填充、智能手表通知）将无法使用。你可以在系统设置中重新开启。</string>
     <string name="power_revoked">已撤销并确认</string>
     <string name="power_revoke_failed">设备未应用该更改——请使用系统设置。</string>
+    <string name="boot_notif_channel">保护状态</string>
+    <string name="boot_notif_channel_desc">配置的保护处于非活动状态时的通知</string>
+    <string name="boot_notif_title">保护已失效</string>
+    <string name="boot_notif_text">重启后 Shizuku 未运行——在你启动 Shizuku 之前，%1$d 个应用的设置不会生效。</string>
+    <string name="drift_text">%2$d 个应用的 %1$d 项设置不再生效（例如更新后）。</string>
+    <string name="drift_restore">恢复</string>
+    <string name="drift_restored">已恢复 %1$d 项设置</string>
+    <string name="drift_restored_partial">已恢复 %1$d 项，%2$d 项无法设置</string>
 </resources>

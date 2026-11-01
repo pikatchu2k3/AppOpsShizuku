@@ -21,6 +21,12 @@ class NetStore(context: Context) {
         prefs.edit().putBoolean(CHAIN_KEY, ours).apply()
     }
 
+    /** Alle Pakete mit mindestens einer eigenen Markierung (ohne interne Schluessel). */
+    fun allMarked(): Map<String, Set<NetSwitch>> =
+        prefs.all.filterKeys { !it.startsWith(MARK_PREFIX) }
+            .mapNotNull { (k, v) -> (v as? String)?.let { k to NetMarks.decode(it) } }
+            .filter { it.second.isNotEmpty() }.toMap()
+
     /** Pakete, bei denen WIR den Offline-Schalter gesetzt haben (leer = Kette darf wieder aus). */
     fun packagesWithOffline(): List<String> =
         prefs.all.filterKeys { !it.startsWith(MARK_PREFIX) }

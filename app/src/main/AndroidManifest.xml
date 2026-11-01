@@ -17,6 +17,9 @@
          dataSync ist ab Android 15 auf 6 h/Tag begrenzt und passt inhaltlich nicht;
          "specialUse" ist der einzige passende Typ ohne Zeitlimit und braucht genau dieses Recht. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- Neustart erkennen, um auf still inaktiven Schutz hinzuweisen (Shizuku laeuft nach dem
+         Neustart noch nicht). Erlaubt ohne Nutzerfreigabe. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- "Nur bei Bedarf": erkennen, wann die geoeffnete App verlassen wurde (Nutzungsereignisse).
          Wird per Shizuku fuer die EIGENE App erteilt (cmd appops set ... GET_USAGE_STATS allow). -->
     <uses-permission
@@ -88,6 +91,16 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
+        <!-- Hinweis nach Neustart: Schutz inaktiv, solange Shizuku nicht laeuft. -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Stealth-Patch im Hintergrund (Foreground-Service, Fortschritt in Notification) -->
         <service

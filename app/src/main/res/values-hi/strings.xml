@@ -518,4 +518,12 @@
     <string name="power_confirm_msg">इस ऐप के लिए %1$s बंद हो जाएगा। उस पर निर्भर सुविधाएं (जैसे ऑटोफ़िल, स्मार्टवॉच सूचनाएं) काम करना बंद कर देंगी। सिस्टम सेटिंग्स में इसे फिर चालू कर सकते हैं।</string>
     <string name="power_revoked">हटाया गया और पुष्टि हुई</string>
     <string name="power_revoke_failed">डिवाइस ने बदलाव लागू नहीं किया – सिस्टम सेटिंग्स का उपयोग करें।</string>
+    <string name="boot_notif_channel">सुरक्षा स्थिति</string>
+    <string name="boot_notif_channel_desc">सूचना जब सेट की गई सुरक्षा निष्क्रिय हो</string>
+    <string name="boot_notif_title">सुरक्षा निष्क्रिय</string>
+    <string name="boot_notif_text">पुनरारंभ के बाद Shizuku नहीं चल रहा – जब तक आप Shizuku शुरू नहीं करते, %1$d ऐप्स की सेटिंग्स प्रभावी नहीं होंगी।</string>
+    <string name="drift_text">%2$d ऐप्स की %1$d सेटिंग्स अब सक्रिय नहीं हैं (जैसे अपडेट के बाद)।</string>
+    <string name="drift_restore">पुनर्स्थापित करें</string>
+    <string name="drift_restored">%1$d सेटिंग्स पुनर्स्थापित</string>
+    <string name="drift_restored_partial">%1$d पुनर्स्थापित, %2$d सेट नहीं हो सके</string>
 </resources>

@@ -518,4 +518,12 @@
     <string name="power_confirm_msg">%1$s será desativado para este app. Recursos que dependem disso (ex.: preenchimento automático, notificações do relógio) deixam de funcionar. É possível reativar nas configurações do sistema.</string>
     <string name="power_revoked">Revogado e confirmado</string>
     <string name="power_revoke_failed">O dispositivo não aplicou a alteração – use as configurações do sistema.</string>
+    <string name="boot_notif_channel">Status de proteção</string>
+    <string name="boot_notif_channel_desc">Aviso quando a proteção configurada está inativa</string>
+    <string name="boot_notif_title">Proteção inativa</string>
+    <string name="boot_notif_text">O Shizuku não está em execução após a reinicialização – as configurações de %1$d apps só terão efeito quando você iniciar o Shizuku.</string>
+    <string name="drift_text">%1$d configurações de %2$d apps não estão mais ativas (p. ex., após uma atualização).</string>
+    <string name="drift_restore">Restaurar</string>
+    <string name="drift_restored">%1$d configurações restauradas</string>
+    <string name="drift_restored_partial">%1$d restauradas, %2$d não puderam ser aplicadas</string>
 </resources>
