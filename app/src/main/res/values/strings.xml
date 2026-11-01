@@ -56,6 +56,10 @@
     <string name="block_all_done">All permissions blocked</string>
     <string name="block_all_own_app">Own app is not blocked</string>
     <string name="block_all_partial">The device could not change %1$d permissions</string>
+    <string name="boot_notif_channel">Protection status</string>
+    <string name="boot_notif_channel_desc">Notice when the configured protection is inactive</string>
+    <string name="boot_notif_text">Shizuku is not running after the restart – the settings for %1$d apps have no effect until you start Shizuku.</string>
+    <string name="boot_notif_title">Protection inactive</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_check">Check</string>
     <string name="btn_connect">Connect</string>
@@ -125,6 +129,10 @@
     <string name="dns_status_host">Currently: %1$s</string>
     <string name="dns_status_off">Currently: off</string>
     <string name="dns_title">Private DNS</string>
+    <string name="drift_restore">Restore</string>
+    <string name="drift_restored">%1$d settings restored</string>
+    <string name="drift_restored_partial">%1$d restored, %2$d could not be set</string>
+    <string name="drift_text">%1$d settings for %2$d apps are no longer active (e.g. after an update).</string>
     <string name="dynamic_color_off">Fixed Petrol palette of the app</string>
     <string name="dynamic_color_on">Colors from the system wallpaper</string>
     <string name="empty_no_apps">No apps found</string>

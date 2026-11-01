@@ -66,6 +66,44 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Abweichung nach Neustart/Update: gespeicherter Schutz ist nicht mehr aktiv -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/driftCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="?attr/colorTertiaryContainer">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/driftText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnTertiaryContainer" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/driftRestore"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/drift_restore" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Filter-Chips -->
     <!-- Bleibende Rueckmeldung zum letzten Export/Import statt eines fluechtigen Toasts:
          bleibt nach dem Vorgang (und nach App-Neustart) sichtbar und nennt den Fehlergrund. -->

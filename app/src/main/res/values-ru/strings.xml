@@ -518,4 +518,12 @@
     <string name="power_confirm_msg">%1$s будет отключено для этого приложения. Зависящие функции (например, автозаполнение, уведомления на часах) перестанут работать. Снова включить можно в настройках системы.</string>
     <string name="power_revoked">Отозвано и подтверждено</string>
     <string name="power_revoke_failed">Устройство не применило изменение – воспользуйтесь настройками системы.</string>
+    <string name="boot_notif_channel">Статус защиты</string>
+    <string name="boot_notif_channel_desc">Уведомление, когда настроенная защита неактивна</string>
+    <string name="boot_notif_title">Защита неактивна</string>
+    <string name="boot_notif_text">После перезагрузки Shizuku не запущен — настройки для %1$d приложений не действуют, пока вы не запустите Shizuku.</string>
+    <string name="drift_text">%1$d настроек для %2$d приложений больше не активны (например, после обновления).</string>
+    <string name="drift_restore">Восстановить</string>
+    <string name="drift_restored">Восстановлено настроек: %1$d</string>
+    <string name="drift_restored_partial">Восстановлено %1$d, не удалось задать %2$d</string>
 </resources>

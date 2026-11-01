@@ -520,4 +520,12 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="power_confirm_msg">%1$s se desactivará para esta app. Las funciones que dependen de ello (p. ej., autocompletar, notificaciones del reloj) dejarán de funcionar. Puedes reactivarlo en los ajustes del sistema.</string>
     <string name="power_revoked">Revocado y confirmado</string>
     <string name="power_revoke_failed">El dispositivo no aplicó el cambio: usa los ajustes del sistema.</string>
+    <string name="boot_notif_channel">Estado de protección</string>
+    <string name="boot_notif_channel_desc">Aviso cuando la protección configurada está inactiva</string>
+    <string name="boot_notif_title">Protección inactiva</string>
+    <string name="boot_notif_text">Shizuku no se está ejecutando tras el reinicio: los ajustes de %1$d apps no tienen efecto hasta que inicies Shizuku.</string>
+    <string name="drift_text">%1$d ajustes de %2$d apps ya no están activos (p. ej., tras una actualización).</string>
+    <string name="drift_restore">Restaurar</string>
+    <string name="drift_restored">%1$d ajustes restaurados</string>
+    <string name="drift_restored_partial">%1$d restaurados, %2$d no se pudieron aplicar</string>
 </resources>

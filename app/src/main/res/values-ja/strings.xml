@@ -518,4 +518,12 @@
     <string name="power_confirm_msg">このアプリの%1$sをオフにします。それに依存する機能（自動入力、スマートウォッチ通知など）は動作しなくなります。システム設定で再度オンにできます。</string>
     <string name="power_revoked">取り消して確認しました</string>
     <string name="power_revoke_failed">端末が変更を反映しませんでした – システム設定を使ってください。</string>
+    <string name="boot_notif_channel">保護状態</string>
+    <string name="boot_notif_channel_desc">設定した保護が無効なときの通知</string>
+    <string name="boot_notif_title">保護が無効です</string>
+    <string name="boot_notif_text">再起動後、Shizukuが動作していません。Shizukuを起動するまで %1$d 個のアプリの設定は無効です。</string>
+    <string name="drift_text">%2$d 個のアプリの %1$d 件の設定が有効でなくなりました（更新後など）。</string>
+    <string name="drift_restore">復元</string>
+    <string name="drift_restored">%1$d 件の設定を復元しました</string>
+    <string name="drift_restored_partial">%1$d 件復元、%2$d 件は設定できませんでした</string>
 </resources>
