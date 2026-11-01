@@ -6,6 +6,10 @@
         android:title="@string/menu_by_permission"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_net_usage"
+        android:title="@string/menu_net_usage"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_auto_rules"
         android:title="@string/menu_auto_rules"
         app:showAsAction="never" />

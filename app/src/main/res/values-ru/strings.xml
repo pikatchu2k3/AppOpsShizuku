@@ -595,4 +595,19 @@
     <string name="rule_delete">Удалить</string>
     <string name="log_info_rule_on">Правило «%1$s»: условие выполнено</string>
     <string name="log_info_rule_off">Правило «%1$s»: условие завершено</string>
+    <plurals name="netusage_unused_days">
+        <item quantity="one">%d день не открывалось</item>
+        <item quantity="few">%d дня не открывалось</item>
+        <item quantity="many">%d дней не открывалось</item>
+        <item quantity="other">%d дня не открывалось</item>
+    </plurals>
+    <string name="menu_net_usage">Сетевой трафик</string>
+    <string name="netusage_title">Сетевой трафик (7 дней)</string>
+    <string name="netusage_info">Приложения с большим фоновым трафиком, которые вы редко открываете, показаны вверху.</string>
+    <string name="netusage_no_access">Нужен доступ к статистике использования (выдаётся через Shizuku). Подключите Shizuku и откройте снова.</string>
+    <string name="netusage_empty">За последние 7 дней сетевой трафик не зафиксирован.</string>
+    <string name="netusage_total">%1$s всего</string>
+    <string name="netusage_background">%1$s в фоне</string>
+    <string name="netusage_block_bg">Фон: запретить</string>
+    <string name="netusage_unblock_bg">Фон: разрешить</string>
 </resources>
