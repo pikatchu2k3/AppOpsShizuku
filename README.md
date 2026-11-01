@@ -44,6 +44,16 @@ To get updates automatically, add the repository to [Obtainium](https://github.c
   - **System-wide** (menu): *Lockdown* takes camera/microphone (optionally location) from all user apps and gives it back to exactly those apps — also as a Quick Settings tile. *Private DNS* with presets (AdGuard, Mullvad adblock, Quad9, Cloudflare) or an own host, with "back to previous". *Powerful access*: accessibility services, notification access, keyboards, default apps (SMS, phone, assistant, browser), always-on VPN and device admins — revocable where the shell may, otherwise a button to the system settings.
   - Blocking a permission now also sets `user-fixed`, so the app cannot simply ask again; granting and "Reset all" clear it.
 
+- **More privacy tools (new, not yet tested on a device):**
+  - **Change log** (menu): every change this app makes, with per-entry *Undo* for permission and network toggles.
+  - **Profile templates** (Permissions tab): Game / Messenger / Banking in one tap, shareable as JSON.
+  - **By network usage** (menu): per-app traffic over 7 days, background shown separately; apps with much background traffic that you rarely open are listed first, with a one-tap "block background".
+  - **Activity** (menu): which apps wake the device, schedule jobs or read sensors (from dumpsys, heuristic).
+  - **Automatic rules** (menu): by time (days + window, incl. overnight) or Wi-Fi (connected / not), action = Lockdown or take chosen apps offline. The Wi-Fi name is read only after you grant this app the location permission on first use (the app has no network access of its own).
+  - **Work profile** (menu): App Ops Shizuku can create a managed profile itself (own profile owner) and move apps into it; it can also move apps into an existing profile (e.g. Shelter) using shell rights alone.
+  - **Placeholder data instead of blocking (beta patch)**: in the re-signed clone/patch, return a null advertising ID and a fixed city-level location instead of the real values, so apps that crash on "denied" keep working.
+  - **Restart notice**: after a reboot (Shizuku not yet running) a notification points out that the configured protection is inactive; once connected, a bar offers to restore settings that drifted.
+
 ### Honest limits
 
 - **Single components of other apps cannot be switched at runtime.** Android 15/16 refuses it to the shell (`SecurityException: Shell cannot change component state`), so there is deliberately no switch for it. The Stealth tab gets around this differently: it edits the manifest of a re-signed copy (see *Work in progress*).
@@ -125,7 +135,7 @@ Because the repository is public, the source that belongs to every released pack
 
 ### Languages / Sprachen
 
-The interface ships in English (base) plus 8 translations — 513 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 625 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
@@ -182,6 +192,16 @@ Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obta
   - **Quarantäne für neue Apps** (Menü, standardmäßig aus): nach dem Einschalten installierte Apps bekommen keine Hintergrunddaten, keine Zwischenablage und keinen Hintergrund-Lauf, bis du sie im Reiter *Berechtigungen* freigibst.
   - **Systemweit** (Menü): *Lockdown* entzieht allen Nutzer-Apps Kamera/Mikrofon (wahlweise Standort) und gibt sie genau diesen Apps zurück — auch als Schnelleinstellungs-Kachel. *Privates DNS* mit Vorlagen (AdGuard, Mullvad adblock, Quad9, Cloudflare) oder eigenem Host, mit „Zurück auf vorher". *Mächtige Rechte*: Bedienungshilfen, Benachrichtigungszugriff, Tastaturen, Standard-Apps (SMS, Telefon, Assistent, Browser), dauerhaftes VPN und Geräteadministratoren — entziehbar, wo die Shell es darf, sonst ein Knopf zu den Systemeinstellungen.
   - Blockieren einer Berechtigung setzt jetzt zusätzlich `user-fixed`, die App kann also nicht einfach erneut fragen; Erteilen und „Alle auf Standard" heben das wieder auf.
+
+- **Weitere Datenschutz-Werkzeuge (neu, noch nicht am Gerät getestet):**
+  - **Änderungsprotokoll** (Menü): jede Änderung dieser App, Berechtigungs- und Netz-Schalter je Eintrag *rückgängig*.
+  - **Profil-Vorlagen** (Reiter Berechtigungen): Spiel / Messenger / Banking per Tipp, als JSON teilbar.
+  - **Netzverkehr** (Menü): Verkehr je App über 7 Tage, Hintergrund getrennt; Apps mit viel Hintergrundverkehr, die man selten öffnet, stehen oben, mit „Hintergrund sperren" per Tipp.
+  - **Aktivität** (Menü): welche Apps das Gerät wecken, Jobs planen oder Sensoren abfragen (aus dumpsys, heuristisch).
+  - **Automatische Regeln** (Menü): nach Zeit (Tage + Fenster, auch über Nacht) oder WLAN (verbunden / nicht), Aktion = Lockdown oder gewählte Apps offline. Der WLAN-Name wird erst gelesen, nachdem du dieser App bei der ersten Nutzung die Standortberechtigung erteilt hast (die App hat selbst keinen Netzzugriff).
+  - **Arbeitsprofil** (Menü): App Ops Shizuku kann selbst ein verwaltetes Profil anlegen (eigener Profilbesitzer) und Apps hineinverschieben; in ein vorhandenes Profil (z. B. Shelter) verschiebt es Apps auch allein mit Shell-Rechten.
+  - **Platzhalter-Daten statt Sperre (Beta-Patch)**: im neu signierten Klon/Patch eine Null-Werbe-ID und einen festen Ort auf Stadtebene statt der echten Werte liefern, damit Apps, die bei „verweigert" abstürzen, weiterlaufen.
+  - **Neustart-Hinweis**: nach einem Neustart (Shizuku läuft noch nicht) meldet eine Benachrichtigung, dass der eingerichtete Schutz inaktiv ist; nach dem Verbinden bietet eine Leiste an, abgewichene Einstellungen wiederherzustellen.
 
 ### Ehrliche Grenzen
 
