@@ -285,6 +285,9 @@ class PermissionOverviewActivity : AppCompatActivity() {
                 if (op != selected) return@post
                 val idx = rows.indexOfFirst { it.packageName == row.packageName }
                 if (idx < 0) return@post
+                if (ok) runCatching {
+                    de.minipc.appopsshizuku.appops.ChangeLog.recordOp(this, row.packageName, op, row.mode, actual ?: "default")
+                }
                 rows = rows.toMutableList().also { it[idx] = it[idx].copy(mode = actual) }
                 adapter.notifyItemChanged(idx)
                 updateSummary()

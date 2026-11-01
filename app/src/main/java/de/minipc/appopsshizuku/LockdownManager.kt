@@ -72,6 +72,9 @@ object LockdownManager {
         if (!store.active) store.since = System.currentTimeMillis()
         store.active = true
         Log.i(TAG, "Lockdown an: ${revoked.size} entzogen, $failed fehlgeschlagen")
+        runCatching {
+            de.minipc.appopsshizuku.appops.ChangeLog.recordInfo(app, app.getString(R.string.log_info_lockdown_on, revoked.size))
+        }
         return Result(revoked.size, failed)
     }
 
@@ -98,6 +101,9 @@ object LockdownManager {
         store.revoked = left
         store.active = left.isNotEmpty()
         Log.i(TAG, "Lockdown aus: $restored zurueckgegeben, ${left.size} offen")
+        runCatching {
+            de.minipc.appopsshizuku.appops.ChangeLog.recordInfo(app, app.getString(R.string.log_info_lockdown_off, restored))
+        }
         return Result(restored, left.size)
     }
 

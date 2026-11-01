@@ -526,4 +526,17 @@
     <string name="drift_restore">Восстановить</string>
     <string name="drift_restored">Восстановлено настроек: %1$d</string>
     <string name="drift_restored_partial">Восстановлено %1$d, не удалось задать %2$d</string>
+    <string name="menu_change_log">Журнал изменений</string>
+    <string name="log_title">Журнал изменений</string>
+    <string name="log_empty">Пока ничего не изменено.</string>
+    <string name="log_undo">Отменить</string>
+    <string name="log_undone">Изменение отменено</string>
+    <string name="log_undo_failed">Устройство не выполнило отмену.</string>
+    <string name="log_op">%1$s · %2$s: %3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s вкл.</string>
+    <string name="log_net_off">%1$s · %2$s выкл.</string>
+    <string name="log_info_suggest">%1$s: отозвано рекомендованных разрешений: %2$d</string>
+    <string name="log_info_block_all">%1$s: все разрешения заблокированы</string>
+    <string name="log_info_lockdown_on">Блокировка включена: отозвано разрешений: %1$d</string>
+    <string name="log_info_lockdown_off">Блокировка снята: возвращено разрешений: %1$d</string>
 </resources>

@@ -526,4 +526,17 @@
     <string name="drift_restore">復元</string>
     <string name="drift_restored">%1$d 件の設定を復元しました</string>
     <string name="drift_restored_partial">%1$d 件復元、%2$d 件は設定できませんでした</string>
+    <string name="menu_change_log">変更履歴</string>
+    <string name="log_title">変更履歴</string>
+    <string name="log_empty">まだ変更はありません。</string>
+    <string name="log_undo">元に戻す</string>
+    <string name="log_undone">変更を元に戻しました</string>
+    <string name="log_undo_failed">端末が元に戻せませんでした。</string>
+    <string name="log_op">%1$s · %2$s: %3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s オン</string>
+    <string name="log_net_off">%1$s · %2$s オフ</string>
+    <string name="log_info_suggest">%1$s: 推奨された %2$d 件の権限を取り消し</string>
+    <string name="log_info_block_all">%1$s: すべての権限をブロック</string>
+    <string name="log_info_lockdown_on">ロックダウン開始: %1$d 件の権限を取り消し</string>
+    <string name="log_info_lockdown_off">ロックダウン終了: %1$d 件の権限を戻しました</string>
 </resources>

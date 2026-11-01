@@ -372,6 +372,11 @@ class PermissionsFragment : Fragment() {
                     failed++
                 }
             }
+            if (ok > 0) runCatching {
+                de.minipc.appopsshizuku.appops.ChangeLog.recordInfo(
+                    appContext, appContext.getString(R.string.log_info_suggest, selfAppLabel(), ok)
+                )
+            }
             handler.post {
                 setLoading(false)
                 refreshList()
@@ -384,6 +389,10 @@ class PermissionsFragment : Fragment() {
             }
         }
     }
+
+    private fun selfAppLabel(): String = runCatching {
+        appContext.packageManager.getApplicationInfo(packageName, 0).loadLabel(appContext.packageManager).toString()
+    }.getOrDefault(packageName)
 
     private fun buildItems(): List<OpsListItem> {
         val items = mutableListOf<OpsListItem>()
@@ -440,6 +449,7 @@ class PermissionsFragment : Fragment() {
         // Die Liste kann eine beschriftete Kopie liefern ("nicht setzbar"/"nicht angefordert")
         // -> Original aus dem Katalog nehmen, sonst landet der Zusatz im gespeicherten Profil.
         val op = ops.firstOrNull { it.opName == selected.opName } ?: selected
+        val prevMode = opStates[op.opName]
         if (mode == WhileInUse.MODE) {
             enableWhileInUse(op)
             return
@@ -480,6 +490,9 @@ class PermissionsFragment : Fragment() {
                     // Profil-Speicherung darf den UI-Thread NIE crashen
                     // (z.B. korruptes/leeres JSON in den Prefs -> JSONException).
                     runCatching { profileStore.setOpMode(packageName, op.opName, mode) }
+                    runCatching {
+                        de.minipc.appopsshizuku.appops.ChangeLog.recordOp(appContext, packageName, op, prevMode, mode)
+                    }
                     Toast.makeText(
                         appContext,
                         appContext.getString(R.string.op_set_ok, op.label, mode),
@@ -618,6 +631,11 @@ class PermissionsFragment : Fragment() {
                 if (res.exitCode != 0) failed++
                 opStates[op.opName] = "ignore"
                 runCatching { profileStore.setOpMode(packageName, op.opName, "ignore") }
+            }
+            runCatching {
+                de.minipc.appopsshizuku.appops.ChangeLog.recordInfo(
+                    appContext, appContext.getString(R.string.log_info_block_all, selfAppLabel())
+                )
             }
             handler.post {
                 setLoading(false)

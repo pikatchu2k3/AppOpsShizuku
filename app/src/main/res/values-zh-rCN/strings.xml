@@ -526,4 +526,17 @@
     <string name="drift_restore">恢复</string>
     <string name="drift_restored">已恢复 %1$d 项设置</string>
     <string name="drift_restored_partial">已恢复 %1$d 项，%2$d 项无法设置</string>
+    <string name="menu_change_log">更改记录</string>
+    <string name="log_title">更改记录</string>
+    <string name="log_empty">尚无更改。</string>
+    <string name="log_undo">撤销</string>
+    <string name="log_undone">已撤销更改</string>
+    <string name="log_undo_failed">设备未能撤销。</string>
+    <string name="log_op">%1$s · %2$s：%3$s → %4$s</string>
+    <string name="log_net_on">%1$s · %2$s 开</string>
+    <string name="log_net_off">%1$s · %2$s 关</string>
+    <string name="log_info_suggest">%1$s：已撤销 %2$d 项建议权限</string>
+    <string name="log_info_block_all">%1$s：已阻止所有权限</string>
+    <string name="log_info_lockdown_on">锁定开启：撤销 %1$d 项权限</string>
+    <string name="log_info_lockdown_off">锁定关闭：归还 %1$d 项权限</string>
 </resources>

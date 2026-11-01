@@ -6,6 +6,10 @@
         android:title="@string/menu_by_permission"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_change_log"
+        android:title="@string/menu_change_log"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_system"
         android:title="@string/menu_system"
         app:showAsAction="never" />

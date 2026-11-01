@@ -79,6 +79,10 @@
             android:name=".SystemActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ChangeLogActivity"
+            android:exported="false" />
+
         <!-- Schnellstart-Kachel "Lockdown" (Kamera/Mikrofon fuer alle Nutzer-Apps). Nur das System
              darf sich binden (BIND_QUICK_SETTINGS_TILE). -->
         <service
