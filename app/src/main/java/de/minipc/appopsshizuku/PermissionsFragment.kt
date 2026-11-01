@@ -435,7 +435,9 @@ class PermissionsFragment : Fragment() {
             dumpsysCache = null
             for ((opName, mode) in wanted) {
                 val op = byName[opName] ?: continue
-                if (opStates[opName] == null) continue // Geraet kennt die Op nicht
+                // Geraet kennt die Op nicht ODER die App fordert die Berechtigung gar nicht an: nichts zu tun
+                // (sonst meldet die Vorlage faelschlich "nicht aenderbar")
+                if (opStates[opName] == null || opStates[opName] == OpEffect.NOT_REQUESTED) continue
                 val prev = opStates[opName]
                 val res = controller.setMode(packageName, op, mode)
                 dumpsysCache = null

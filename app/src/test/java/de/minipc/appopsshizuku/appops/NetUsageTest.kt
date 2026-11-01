@@ -9,6 +9,13 @@ class NetUsageTest {
 
     @Test
     fun groessen() {
+        // Dezimaltrenner haengt an der Sprache (de: "38,0") - fuer den Test festnageln
+        val saved = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.US)
+        try { pruefeGroessen() } finally { java.util.Locale.setDefault(saved) }
+    }
+
+    private fun pruefeGroessen() {
         assertEquals("512 B", NetUsage.formatBytes(512))
         assertEquals("1.0 KB", NetUsage.formatBytes(1024))
         assertEquals("38.0 MB", NetUsage.formatBytes(38L * 1024 * 1024))

@@ -686,16 +686,21 @@ class MainActivity : AppCompatActivity() {
         executor.execute {
             val backend = de.minipc.appopsshizuku.shizuku.ShizukuBackend()
             if (!runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)) return@execute
-            val controller = de.minipc.appopsshizuku.appops.AppOpsController(backend)
             val catalog = de.minipc.appopsshizuku.appops.PrivacyOps.PRIVACY_OPS.associateBy { it.opName }
             val stored = de.minipc.appopsshizuku.appops.PrivacyProfileStore(this).allProfiles()
+            val wiu = de.minipc.appopsshizuku.appops.WhileInUseStore(this)
             val installed = packageManager.getInstalledPackages(0).map { it.packageName }.toSet()
             val items = mutableListOf<de.minipc.appopsshizuku.appops.DriftCheck.Item>()
             for ((pkg, ops) in stored) {
                 if (pkg !in installed) continue
                 for ((opName, want) in ops) {
                     val op = catalog[opName] ?: continue
-                    val actual = runCatching { controller.getMode(pkg, op) }.getOrNull()
+                    // "Nur waehrend Nutzung": erteilt ist hier gewollt, solange die App vorne ist
+                    if (wiu.has(pkg, opName)) continue
+                    // Unlesbar oder von der App gar nicht angefordert: nichts zu vergleichen
+                    // (nach "alles blockieren" steht jede Op im Profil, auch nicht angeforderte)
+                    val actual = runCatching { OpReadback.read(this, backend, pkg, op) }.getOrNull()
+                    if (actual == null || actual == OpReadback.NOT_REQUESTED) continue
                     if (de.minipc.appopsshizuku.appops.DriftCheck.isDrift(op.permissionName, want, actual)) {
                         items += de.minipc.appopsshizuku.appops.DriftCheck.Item(pkg, opName, want)
                     }

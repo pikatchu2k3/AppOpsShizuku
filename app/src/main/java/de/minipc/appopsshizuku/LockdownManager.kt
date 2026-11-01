@@ -89,6 +89,8 @@ object LockdownManager {
         for (key in store.revoked) {
             val (pkg, opName) = Lockdown.parseKey(key) ?: continue
             val op = PrivacyOps.PRIVACY_OPS.firstOrNull { it.opName == opName && it.permissionName != null } ?: continue
+            // Op steht auf "Nur waehrend Nutzung": die erteilt der Waechter, nicht das Lockdown-Ende
+            if (de.minipc.appopsshizuku.appops.WhileInUseStore(app).has(pkg, opName)) continue
             when (isGranted(app, pkg, op.permissionName!!)) {
                 null -> Unit // deinstalliert oder fordert sie nicht mehr an: vergessen
                 true -> restored++ // schon wieder erteilt (z. B. von Hand)
