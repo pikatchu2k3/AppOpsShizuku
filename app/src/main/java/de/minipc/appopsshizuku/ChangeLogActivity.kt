@@ -51,6 +51,7 @@ class ChangeLogActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         DesignSettings.applyDynamicColorsIfEnabled(this)
         setContentView(R.layout.activity_change_log)
+        de.minipc.appopsshizuku.ui.SpaceScreen.apply(this)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout)) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
