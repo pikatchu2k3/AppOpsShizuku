@@ -83,6 +83,20 @@
             android:taskAffinity=""
             android:theme="@style/Theme.AppOpsShizuku.Translucent" />
 
+        <!-- "Nur bei Bedarf" fuer eigene Starter-Apps (z. B. AppDialer NXT): exportierter Zweiteingang.
+             Der Aufrufer muss sich per startActivityForResult zu erkennen geben; eine neue Starter-App
+             wird einmal beim Nutzer erfragt (OnDemandCallers). Freigegeben wird nur, was auf
+             "Nur bei Bedarf" steht. -->
+        <activity-alias
+            android:name=".OnDemandExternalLaunch"
+            android:exported="true"
+            android:targetActivity=".OnDemandLaunchActivity">
+            <intent-filter>
+                <action android:name="de.minipc.appopsshizuku.action.OPEN_ON_DEMAND" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name=".SystemActivity"
             android:exported="false" />

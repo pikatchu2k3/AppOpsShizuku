@@ -670,5 +670,14 @@
     <string name="tool_desc_work_profile">アプリを2つ目のプロファイルに隔離</string>
     <string name="tool_desc_change_log">このアプリの変更履歴と取り消し</string>
     <string name="ondemand_lock_stop">停止のみ – どのランチャー（Novaなど）からでも起動できます。弱め: 他のアプリが意図的に起動できます。</string>
+    <string name="ondemand_caller_unknown">許可したアプリだけがロック中のアプリを開けます。ショートカットから起動してください。</string>
+    <string name="ondemand_caller_title">起動を許可しますか？</string>
+    <string name="ondemand_caller_text">「%1$s」が「必要なときだけ」に設定したアプリ（今回: 「%2$s」）を開こうとしています。App Ops Shizuku はショートカットと同じようにロックを解除し、終了後に再びロックします。</string>
+    <string name="ondemand_caller_allow">常に許可</string>
+    <string name="ondemand_caller_once">今回のみ</string>
+    <string name="ondemand_caller_deny">拒否</string>
+    <string name="ondemand_callers_revoke">他のアプリのアクセスを取り消す</string>
+    <string name="ondemand_callers_revoked">他のアプリはロック中のアプリを開けなくなりました。</string>
+    <string name="ondemand_state_callers">他に開けるアプリ: %1$s</string>
     <string name="ondemand_suspend_dialog">必要なときのみ（App Ops Shizuku）: ホーム画面のショートカットから開くか、App Ops Shizukuでロック方法「停止のみ」を選ぶとどのランチャーでも開けます。</string>
 </resources>

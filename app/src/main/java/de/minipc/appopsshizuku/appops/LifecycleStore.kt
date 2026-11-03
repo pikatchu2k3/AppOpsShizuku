@@ -70,6 +70,16 @@ class LifecycleStore(context: Context) {
         onDemandOpen = onDemandOpen + packageName
     }
 
+    /**
+     * "Nur bei Bedarf": fremde Starter-Apps (z. B. AppDialer NXT), die gesperrte Bedarfs-Apps
+     * freigeben und oeffnen duerfen. Vom Nutzer im Dialog erlaubt; geraetebezogen, nicht exportiert.
+     */
+    var onDemandCallers: Set<String>
+        get() = state.getStringSet(KEY_ON_DEMAND_CALLERS, emptySet())?.toSet().orEmpty()
+        set(value) {
+            state.edit().putStringSet(KEY_ON_DEMAND_CALLERS, value.toSet()).apply()
+        }
+
     fun openedAt(packageName: String): Long? =
         state.getLong(KEY_OPENED_AT_PREFIX + packageName, -1L).takeIf { it > 0 }
 
@@ -84,6 +94,7 @@ class LifecycleStore(context: Context) {
         const val KEY_SUSPENDED_BY_US = "suspended_by_us"
         const val KEY_LAST_REPORT = "last_report"
         const val KEY_ON_DEMAND_OPEN = "on_demand_open"
+        const val KEY_ON_DEMAND_CALLERS = "on_demand_callers"
         const val KEY_OPENED_AT_PREFIX = "on_demand_opened_at_"
     }
 }

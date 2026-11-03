@@ -2,6 +2,7 @@ package de.minipc.appopsshizuku
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.minipc.appopsshizuku.appops.DesignSettings
 import de.minipc.appopsshizuku.appops.LifecycleStore
+import de.minipc.appopsshizuku.appops.OnDemandCallers
 import de.minipc.appopsshizuku.appops.OnDemandExecutor
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import rikka.shizuku.Shizuku
@@ -23,11 +25,17 @@ import java.util.concurrent.Executors
  * Nicht exportiert: Angeheftete Verknuepfungen startet der Launcher im Namen UNSERER App, fremde
  * Apps koennen hierueber also keine gesperrte App freigeben. Zusaetzlich wird nur freigegeben,
  * was in den Einstellungen wirklich auf "Nur bei Bedarf" steht.
+ *
+ * Zweiter Eingang: der exportierte Alias [EXTERNAL_ALIAS] (Aktion [OnDemandCallers.ACTION_OPEN]) fuer
+ * eigene Starter wie AppDialer NXT. Dort muss sich der Aufrufer per startActivityForResult zu
+ * erkennen geben; eine neue Starter-App fragt einmal beim Nutzer nach ([OnDemandCallers.decide]).
  */
 class OnDemandLaunchActivity : AppCompatActivity() {
 
     companion object {
-        private const val EXTRA_PACKAGE = "pkg"
+        private const val EXTRA_PACKAGE = OnDemandCallers.EXTRA_PACKAGE
+        /** Exportierter Alias (Manifest) fuer fremde Starter-Apps. */
+        private const val EXTERNAL_ALIAS = "de.minipc.appopsshizuku.OnDemandExternalLaunch"
         private const val TAG = "AppOps.OnDemand"
         /** Nach einem Kaltstart liefert Shizuku seinen Binder asynchron - so lange warten wir hoechstens. */
         private const val BINDER_WAIT_MS = 3000L
@@ -51,6 +59,58 @@ class OnDemandLaunchActivity : AppCompatActivity() {
             finish()
             return
         }
+        if (intent.component?.className == EXTERNAL_ALIAS) {
+            checkCaller(pkg)
+            return
+        }
+        proceed(pkg)
+    }
+
+    /** Fremder Starter: nur erkennbare und vom Nutzer erlaubte Apps kommen durch. */
+    private fun checkCaller(pkg: String) {
+        val caller = callingPackage
+            ?: if (Build.VERSION.SDK_INT >= 34) launchedFromPackage else null
+        val store = LifecycleStore(this)
+        when (OnDemandCallers.decide(caller, packageName, pkg, store.onDemandCallers)) {
+            OnDemandCallers.Decision.ALLOW -> proceed(pkg)
+            OnDemandCallers.Decision.DENY -> {
+                Log.w(TAG, "Fremder Start von $pkg abgelehnt (Aufrufer: $caller)")
+                Toast.makeText(this, R.string.ondemand_caller_unknown, Toast.LENGTH_LONG).show()
+                finish()
+            }
+            OnDemandCallers.Decision.ASK -> askCaller(caller!!, pkg, store)
+        }
+    }
+
+    private fun askCaller(caller: String, pkg: String, store: LifecycleStore) {
+        // Gesperrt hat nur, was wirklich auf "Nur bei Bedarf" steht - sonst gar nicht erst fragen
+        if (store.get(pkg).onDemand != true) {
+            proceed(pkg)
+            return
+        }
+        var answered = false
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.ondemand_caller_title)
+            .setMessage(getString(R.string.ondemand_caller_text, labelOf(caller), labelOf(pkg)))
+            .setPositiveButton(R.string.ondemand_caller_allow) { _, _ ->
+                answered = true
+                store.onDemandCallers = store.onDemandCallers + caller
+                proceed(pkg)
+            }
+            .setNeutralButton(R.string.ondemand_caller_once) { _, _ ->
+                answered = true
+                proceed(pkg)
+            }
+            .setNegativeButton(R.string.ondemand_caller_deny, null)
+            .setOnDismissListener { if (!answered) finish() }
+            .show()
+    }
+
+    private fun labelOf(pkg: String): String = runCatching {
+        packageManager.getApplicationInfo(pkg, 0).loadLabel(packageManager).toString()
+    }.getOrDefault(pkg)
+
+    private fun proceed(pkg: String) {
         if (LifecycleStore(this).get(pkg).onDemand != true) {
             Toast.makeText(this, R.string.ondemand_not_active, Toast.LENGTH_LONG).show()
             finish()

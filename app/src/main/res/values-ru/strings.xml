@@ -679,5 +679,14 @@
     <string name="tool_desc_work_profile">Изолировать приложения во втором профиле</string>
     <string name="tool_desc_change_log">Все изменения приложения — с отменой</string>
     <string name="ondemand_lock_stop">Только остановить — открывается из любого лаунчера (Nova и др.). Слабее: другие приложения могут запустить его намеренно.</string>
+    <string name="ondemand_caller_unknown">Открывать заблокированные приложения могут только разрешённые вами приложения. Запустите его через ярлык.</string>
+    <string name="ondemand_caller_title">Разрешить открытие?</string>
+    <string name="ondemand_caller_text">«%1$s» хочет открыть приложения, для которых выбрано «Только по запросу» (сейчас: «%2$s»). App Ops Shizuku разблокирует его, как через ярлык, и снова заблокирует после выхода.</string>
+    <string name="ondemand_caller_allow">Всегда разрешать</string>
+    <string name="ondemand_caller_once">Только сейчас</string>
+    <string name="ondemand_caller_deny">Запретить</string>
+    <string name="ondemand_callers_revoke">Отозвать доступ других приложений</string>
+    <string name="ondemand_callers_revoked">Другие приложения больше не могут открывать заблокированные приложения.</string>
+    <string name="ondemand_state_callers">Также может открывать: %1$s</string>
     <string name="ondemand_suspend_dialog">Только по запросу (App Ops Shizuku): откройте приложение через ярлык на главном экране — или выберите в App Ops Shizuku блокировку «Только остановить», тогда подойдёт любой лаунчер.</string>
 </resources>
