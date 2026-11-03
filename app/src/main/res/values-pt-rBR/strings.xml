@@ -672,4 +672,6 @@
     <string name="tool_desc_system">Bloqueio, DNS privado, acessos poderosos</string>
     <string name="tool_desc_work_profile">Isolar apps em um segundo perfil</string>
     <string name="tool_desc_change_log">Tudo o que este app alterou – desfazer</string>
+    <string name="ondemand_lock_stop">Só encerrar – abre por qualquer launcher (Nova etc.). Mais fraco: outros apps podem iniciá-lo de propósito.</string>
+    <string name="ondemand_suspend_dialog">Somente sob demanda (App Ops Shizuku): abra este app pelo atalho da tela inicial – ou escolha o bloqueio \"Só encerrar\" no App Ops Shizuku para que qualquer launcher funcione.</string>
 </resources>

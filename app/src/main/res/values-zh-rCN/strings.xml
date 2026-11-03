@@ -669,4 +669,6 @@
     <string name="tool_desc_system">锁定、私人 DNS、高权限访问</string>
     <string name="tool_desc_work_profile">将应用隔离到第二个资料</string>
     <string name="tool_desc_change_log">本应用所做的所有更改——可撤销</string>
+    <string name="ondemand_lock_stop">仅停止——可从任何启动器（如 Nova）打开。较弱：其他应用可以有意启动它。</string>
+    <string name="ondemand_suspend_dialog">仅按需（App Ops Shizuku）：请通过主屏幕快捷方式打开此应用——或在 App Ops Shizuku 中选择锁定方式“仅停止”，这样任何启动器都可以打开。</string>
 </resources>

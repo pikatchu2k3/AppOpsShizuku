@@ -1,6 +1,7 @@
 package de.minipc.appopsshizuku.appops
 
 import de.minipc.appopsshizuku.shizuku.ShellBackend
+import de.minipc.appopsshizuku.shizuku.ShellResult
 
 /**
  * "Nur bei Bedarf": Die App ist dauerhaft gesperrt und laeuft nur, nachdem sie ueber unsere
@@ -17,7 +18,14 @@ enum class OnDemandLock(val json: String) {
     SUSPEND("suspend"),
 
     /** `pm disable-user`: Icon verschwindet; in den System-Einstellungen wieder aktivierbar. */
-    DISABLE("disable");
+    DISABLE("disable"),
+
+    /**
+     * Nur `am force-stop`: die App bleibt startbar - aus JEDEM Launcher, nicht nur ueber unsere
+     * Verknuepfung. "Beendet" heisst wie bei den anderen Sperrarten: keine Wecker, Jobs oder
+     * Push-Broadcasts, bis die App geoeffnet wird. Schwaecher: andere Apps koennen sie gezielt starten.
+     */
+    STOP("stop");
 
     companion object {
         fun fromJson(s: String?): OnDemandLock? = entries.firstOrNull { it.json == s }
@@ -29,6 +37,7 @@ data class LockState(val suspended: Boolean?, val disabled: Boolean?, val stoppe
     fun isLocked(lock: OnDemandLock): Boolean = when (lock) {
         OnDemandLock.SUSPEND -> suspended == true
         OnDemandLock.DISABLE -> disabled == true
+        OnDemandLock.STOP -> stopped == true
     }
 
     /** Frei = weder eingefroren noch deaktiviert (beides sicher gelesen). */
@@ -84,6 +93,10 @@ object OnDemand {
         return lines.any { " $packageName/" in it }
     }
 
+    /** Bedarfs-Apps mit Sperrart "Nur beenden": ihr Start aus fremden Launchern wird erkannt. */
+    fun stopApps(entries: Map<String, LifecycleEntry>, apps: Set<String>): Set<String> =
+        apps.filter { entries[it]?.let { e -> lockOf(e) } == OnDemandLock.STOP }.toSet()
+
     /** Frist nach dem Verlassen abgelaufen? Bei Frist 0 sperrt nur das Bildschirm-Aus. */
     fun shouldLock(nowMs: Long, leftAtMs: Long?, graceSeconds: Int): Boolean =
         graceSeconds > 0 && leftAtMs != null && nowMs - leftAtMs >= graceSeconds * 1000L
@@ -106,7 +119,11 @@ fun parseLockState(dumpsys: String): LockState {
 }
 
 /** Sperren und Freigeben ueber die Shell; Erfolg zaehlt nur nach frisch gelesenem Zustand. */
-class OnDemandExecutor(private val backend: ShellBackend) {
+/**
+ * @param dialogMessage Text fuer den System-Dialog beim Tippen auf eine eingefrorene App
+ *   (`pm suspend --dialogMessage`), statt "wird ueber die App Shell verwaltet".
+ */
+class OnDemandExecutor(private val backend: ShellBackend, private val dialogMessage: String? = null) {
 
     fun state(packageName: String): LockState =
         parseLockState(backend.exec("dumpsys", "package", packageName).stdout)
@@ -115,12 +132,23 @@ class OnDemandExecutor(private val backend: ShellBackend) {
         val raw = StringBuilder()
         raw.append(rawOf(backend.exec("am", "force-stop", packageName)))
         val res = when (lock) {
-            OnDemandLock.SUSPEND -> backend.suspendPackage(packageName)
+            OnDemandLock.SUSPEND -> suspend(packageName)
             OnDemandLock.DISABLE -> backend.exec("pm", "disable-user", "--user", "0", packageName)
+            OnDemandLock.STOP -> ShellResult(0, "", "") // force-stop oben genuegt
         }
         raw.append(' ').append(rawOf(res))
         val st = state(packageName)
         return OnDemandResult(packageName, st.isLocked(lock), st, raw.toString().trim())
+    }
+
+    /** Mit eigenem Dialogtext einfrieren; kennt das Geraet die Option nicht, ohne Text. */
+    private fun suspend(packageName: String): ShellResult {
+        val msg = dialogMessage
+        if (!msg.isNullOrBlank()) {
+            val r = backend.exec("pm", "suspend", "--user", "0", "--dialogMessage", msg, packageName)
+            if (r.exitCode == 0 && !r.stderr.contains("Unknown option", ignoreCase = true)) return r
+        }
+        return backend.suspendPackage(packageName)
     }
 
     /** Hebt beide Sperrarten auf (auch eine, die vor einem Wechsel der Sperrart gesetzt wurde). */

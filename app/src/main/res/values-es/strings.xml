@@ -674,4 +674,6 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="tool_desc_system">Bloqueo, DNS privado, accesos con poder</string>
     <string name="tool_desc_work_profile">Aislar apps en un segundo perfil</string>
     <string name="tool_desc_change_log">Todo lo que cambió esta app: deshacer</string>
+    <string name="ondemand_lock_stop">Solo detener: se abre desde cualquier launcher (Nova, etc.). Más débil: otras apps pueden iniciarla a propósito.</string>
+    <string name="ondemand_suspend_dialog">Solo bajo demanda (App Ops Shizuku): abre esta app con su acceso directo de la pantalla de inicio, o elige el bloqueo «Solo detener» en App Ops Shizuku para que funcione cualquier launcher.</string>
 </resources>

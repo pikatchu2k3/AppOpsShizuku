@@ -669,4 +669,6 @@
     <string name="tool_desc_system">ロックダウン・プライベートDNS・強力な権限</string>
     <string name="tool_desc_work_profile">アプリを2つ目のプロファイルに隔離</string>
     <string name="tool_desc_change_log">このアプリの変更履歴と取り消し</string>
+    <string name="ondemand_lock_stop">停止のみ – どのランチャー（Novaなど）からでも起動できます。弱め: 他のアプリが意図的に起動できます。</string>
+    <string name="ondemand_suspend_dialog">必要なときのみ（App Ops Shizuku）: ホーム画面のショートカットから開くか、App Ops Shizukuでロック方法「停止のみ」を選ぶとどのランチャーでも開けます。</string>
 </resources>

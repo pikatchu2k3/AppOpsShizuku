@@ -786,8 +786,11 @@ class BehaviorFragment : Fragment() {
     }
 
     private fun selectedLock(): OnDemandLock =
-        if (root.findViewById<RadioGroup>(R.id.onDemandLockGroup).checkedRadioButtonId == R.id.onDemandLockDisable)
-            OnDemandLock.DISABLE else OnDemandLock.SUSPEND
+        when (root.findViewById<RadioGroup>(R.id.onDemandLockGroup).checkedRadioButtonId) {
+            R.id.onDemandLockDisable -> OnDemandLock.DISABLE
+            R.id.onDemandLockStop -> OnDemandLock.STOP
+            else -> OnDemandLock.SUSPEND
+        }
 
     private fun setupOnDemand(view: View) {
         val e = LifecycleStore(requireContext()).get(packageName)
@@ -797,7 +800,11 @@ class BehaviorFragment : Fragment() {
         // Erst Zustand setzen, dann Listener - sonst loest das Laden schon Aktionen aus.
         sw.setQuietly(e.onDemand == true)
         lockGroup.check(
-            if (OnDemand.lockOf(e) == OnDemandLock.DISABLE) R.id.onDemandLockDisable else R.id.onDemandLockSuspend
+            when (OnDemand.lockOf(e)) {
+                OnDemandLock.DISABLE -> R.id.onDemandLockDisable
+                OnDemandLock.STOP -> R.id.onDemandLockStop
+                OnDemandLock.SUSPEND -> R.id.onDemandLockSuspend
+            }
         )
         graceGroup.check(graceButtonId(OnDemand.graceOf(e)))
 
@@ -841,7 +848,7 @@ class BehaviorFragment : Fragment() {
             OnDemandSupport.grantUsageAccess(ctx, b)
             val store = LifecycleStore(ctx)
             store.onDemandOpen = store.onDemandOpen - packageName
-            val r = OnDemandExecutor(b).lock(packageName, lock)
+            val r = OnDemandExecutor(b, getString(R.string.ondemand_suspend_dialog)).lock(packageName, lock)
             Log.i(LIFECYCLE_TAG, "$packageName Nur bei Bedarf an ($lock): ok=${r.ok} ${r.state} ${r.raw}")
             handler.post {
                 if (!isAdded) return@post
@@ -866,7 +873,7 @@ class BehaviorFragment : Fragment() {
         executor.execute {
             val store = LifecycleStore(ctx)
             store.onDemandOpen = store.onDemandOpen - packageName
-            val r = OnDemandExecutor(b).unlock(packageName)
+            val r = OnDemandExecutor(b, getString(R.string.ondemand_suspend_dialog)).unlock(packageName)
             Log.i(LIFECYCLE_TAG, "$packageName Nur bei Bedarf aus: freigegeben ok=${r.ok} ${r.state} ${r.raw}")
             handler.post {
                 if (!isAdded) return@post
@@ -892,7 +899,7 @@ class BehaviorFragment : Fragment() {
         }
         val b = backend
         executor.execute {
-            val exec = OnDemandExecutor(b)
+            val exec = OnDemandExecutor(b, getString(R.string.ondemand_suspend_dialog))
             exec.unlock(packageName)
             val r = exec.lock(packageName, lock)
             handler.post {

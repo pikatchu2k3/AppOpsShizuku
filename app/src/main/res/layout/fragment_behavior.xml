@@ -576,6 +576,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/ondemand_lock_disable" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/onDemandLockStop"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ondemand_lock_stop" />
                 </RadioGroup>
 
                 <TextView
