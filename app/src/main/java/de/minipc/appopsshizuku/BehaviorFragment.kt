@@ -815,6 +815,11 @@ class BehaviorFragment : Fragment() {
             refreshOnDemand()
         }
         view.findViewById<MaterialButton>(R.id.onDemandShortcutButton).setOnClickListener { pinShortcut() }
+        view.findViewById<MaterialButton>(R.id.onDemandCallersButton).setOnClickListener {
+            LifecycleStore(requireContext()).onDemandCallers = emptySet()
+            Toast.makeText(requireContext(), R.string.ondemand_callers_revoked, Toast.LENGTH_SHORT).show()
+            refreshOnDemand()
+        }
     }
 
     private fun onOnDemandToggled(checked: Boolean) {
@@ -931,6 +936,10 @@ class BehaviorFragment : Fragment() {
         }
     }
 
+    private fun labelOf(ctx: android.content.Context, pkg: String): String = runCatching {
+        ctx.packageManager.getApplicationInfo(pkg, 0).loadLabel(ctx.packageManager).toString()
+    }.getOrDefault(pkg)
+
     private fun refreshOnDemand() {
         val ctx = requireContext()
         val store = LifecycleStore(ctx)
@@ -944,6 +953,9 @@ class BehaviorFragment : Fragment() {
             for (i in 0 until g.childCount) g.getChildAt(i).isEnabled = allowed
         }
         root.findViewById<MaterialButton>(R.id.onDemandShortcutButton).isEnabled = allowed && on
+        val callers = store.onDemandCallers
+        root.findViewById<MaterialButton>(R.id.onDemandCallersButton).visibility =
+            if (callers.isNotEmpty()) View.VISIBLE else View.GONE
 
         val lines = mutableListOf<String>()
         when {
@@ -959,6 +971,9 @@ class BehaviorFragment : Fragment() {
             )
             if (OnDemandSupport.isPinned(ctx, packageName) == false) lines.add(getString(R.string.ondemand_state_no_shortcut))
             if (!OnDemandSupport.hasUsageAccess(ctx)) lines.add(getString(R.string.ondemand_state_no_usage))
+            callers.takeIf { it.isNotEmpty() }?.let { c ->
+                lines.add(getString(R.string.ondemand_state_callers, c.joinToString(", ") { labelOf(ctx, it) }))
+            }
             screenOffSyncError?.let { lines.add(getString(R.string.screen_off_service_failed, it)) }
             lines.add(getString(R.string.ondemand_state_needs_shizuku))
         }

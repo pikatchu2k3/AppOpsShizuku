@@ -675,5 +675,14 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="tool_desc_work_profile">Aislar apps en un segundo perfil</string>
     <string name="tool_desc_change_log">Todo lo que cambió esta app: deshacer</string>
     <string name="ondemand_lock_stop">Solo detener: se abre desde cualquier launcher (Nova, etc.). Más débil: otras apps pueden iniciarla a propósito.</string>
+    <string name="ondemand_caller_unknown">Solo las apps que permitiste pueden abrir apps bloqueadas. Ábrela desde su acceso directo.</string>
+    <string name="ondemand_caller_title">¿Permitir abrir?</string>
+    <string name="ondemand_caller_text">\"%1$s\" quiere abrir apps que configuraste como \"Solo cuando se necesite\" (ahora: \"%2$s\"). App Ops Shizuku la libera para ello, igual que con el acceso directo, y la vuelve a bloquear al salir.</string>
+    <string name="ondemand_caller_allow">Permitir siempre</string>
+    <string name="ondemand_caller_once">Solo esta vez</string>
+    <string name="ondemand_caller_deny">Denegar</string>
+    <string name="ondemand_callers_revoke">Revocar acceso de otras apps</string>
+    <string name="ondemand_callers_revoked">Las otras apps ya no pueden abrir apps bloqueadas.</string>
+    <string name="ondemand_state_callers">También puede abrir: %1$s</string>
     <string name="ondemand_suspend_dialog">Solo bajo demanda (App Ops Shizuku): abre esta app con su acceso directo de la pantalla de inicio, o elige el bloqueo «Solo detener» en App Ops Shizuku para que funcione cualquier launcher.</string>
 </resources>
