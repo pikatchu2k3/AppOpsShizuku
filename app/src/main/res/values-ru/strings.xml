@@ -678,4 +678,6 @@
     <string name="tool_desc_system">Блокировка, частный DNS, мощные права</string>
     <string name="tool_desc_work_profile">Изолировать приложения во втором профиле</string>
     <string name="tool_desc_change_log">Все изменения приложения — с отменой</string>
+    <string name="ondemand_lock_stop">Только остановить — открывается из любого лаунчера (Nova и др.). Слабее: другие приложения могут запустить его намеренно.</string>
+    <string name="ondemand_suspend_dialog">Только по запросу (App Ops Shizuku): откройте приложение через ярлык на главном экране — или выберите в App Ops Shizuku блокировку «Только остановить», тогда подойдёт любой лаунчер.</string>
 </resources>

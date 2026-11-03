@@ -672,4 +672,6 @@
     <string name="tool_desc_system">लॉकडाउन, निजी DNS, शक्तिशाली एक्सेस</string>
     <string name="tool_desc_work_profile">ऐप्स को दूसरी प्रोफ़ाइल में अलग करें</string>
     <string name="tool_desc_change_log">इस ऐप ने जो बदला – पूर्ववत करें</string>
+    <string name="ondemand_lock_stop">केवल बंद करें – किसी भी लॉन्चर (Nova आदि) से खुलता है। कमज़ोर: अन्य ऐप्स इसे जानबूझकर शुरू कर सकते हैं।</string>
+    <string name="ondemand_suspend_dialog">केवल ज़रूरत पर (App Ops Shizuku): यह ऐप होम-स्क्रीन शॉर्टकट से खोलें – या App Ops Shizuku में लॉक \"केवल बंद करें\" चुनें, तब कोई भी लॉन्चर चलेगा।</string>
 </resources>

@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import de.minipc.appopsshizuku.appops.LifecycleEntry
 import de.minipc.appopsshizuku.appops.LifecycleStore
 import de.minipc.appopsshizuku.appops.OnDemand
+import de.minipc.appopsshizuku.appops.OnDemandLock
 import de.minipc.appopsshizuku.appops.OnDemandExecutor
 import de.minipc.appopsshizuku.appops.ScreenOffExecutor
 import de.minipc.appopsshizuku.appops.installedOnly
@@ -296,6 +297,8 @@ class LifecycleScreenService : Service() {
         // "Nur waehrend Nutzung": beim Bildschirm-Aus sofort zuruecknehmen, beim An wieder beobachten
         runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
         updateWiuPoll()
+        if (!screenOn) stopLastPoll = 0L
+        updatePoll() // "Nur beenden"-Apps nur bei eingeschaltetem Bildschirm beobachten
         val label = if (screenOn) "Bildschirm an" else "Bildschirm aus"
         val entries = installedEntries(this, store)
         // Von uns eingefrorene Apps, die inzwischen deinstalliert sind: vergessen statt freigeben
@@ -313,7 +316,7 @@ class LifecycleScreenService : Service() {
         val alreadySuspended = if (screenOn) emptySet() else entries
             .filter { it.value.screenOffExit == true && it.key !in suspendedByUs }
             .keys.filter { exec.isSuspended(it) }.toSet()
-        if (!screenOn) lockOnDemandApps(entries, exec = OnDemandExecutor(backend), all = true, reason = label)
+        if (!screenOn) lockOnDemandApps(entries, exec = onDemandExecutor(backend), all = true, reason = label)
         val actions = screenActions(entries, screenOn, packageName, system, suspendedByUs, alreadySuspended)
         if (actions.isEmpty()) {
             Log.i(TAG, "$label: nichts zu tun")
@@ -376,14 +379,47 @@ class LifecycleScreenService : Service() {
         leftAt.keys.retainAll(open)
         val backend = ShizukuBackend()
         if (runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)) {
-            lockOnDemandApps(entries, OnDemandExecutor(backend), all = false, reason = getString(R.string.ondemand_report_sweep))
+            lockOnDemandApps(entries, onDemandExecutor(backend), all = false, reason = getString(R.string.ondemand_report_sweep))
         }
         updatePoll()
     }
 
-    /** Abfrage nur laufen lassen, solange eine Bedarfs-App offen ist. */
+    private fun onDemandExecutor(backend: de.minipc.appopsshizuku.shizuku.ShellBackend) =
+        OnDemandExecutor(backend, getString(R.string.ondemand_suspend_dialog))
+
+    /** Bedarfs-Apps mit Sperrart "Nur beenden" (aus jedem Launcher startbar). */
+    private fun stopModeApps(): Set<String> {
+        val entries = onDemandEntries()
+        return OnDemand.stopApps(entries, entries.keys)
+    }
+
+    /** Seit wann nach Starts von "Nur beenden"-Apps gesucht wurde. */
+    private var stopLastPoll = 0L
+
+    /**
+     * Start einer "Nur beenden"-App aus einem fremden Launcher erkennen: dann gilt sie als geoeffnet
+     * (wie nach unserer Verknuepfung) und wird nach dem Verlassen wieder beendet.
+     */
+    private fun detectStopModeLaunches(backend: de.minipc.appopsshizuku.shizuku.ShellBackend?) {
+        val candidates = stopModeApps() - store.onDemandOpen
+        if (candidates.isEmpty()) return
+        val now = System.currentTimeMillis()
+        val since = if (stopLastPoll == 0L) now - TimeUnit.SECONDS.toMillis(30) else stopLastPoll - 1_000
+        stopLastPoll = now
+        val fg = OnDemandSupport.foregroundMap(this, backend, candidates, since)
+        for ((pkg, isFg) in fg) {
+            if (isFg == true) {
+                store.markOpened(pkg, now)
+                openedAt[pkg] = now
+                leftAt.remove(pkg)
+                Log.i(TAG, "Nur bei Bedarf: $pkg ueber anderen Launcher geoeffnet")
+            }
+        }
+    }
+
+    /** Abfrage laufen lassen, solange eine Bedarfs-App offen ist ODER "Nur beenden"-Apps beobachtet werden. */
     private fun updatePoll() {
-        val needed = store.onDemandOpen.isNotEmpty()
+        val needed = store.onDemandOpen.isNotEmpty() || (screenOn && stopModeApps().isNotEmpty())
         if (needed && poll == null) {
             pollShizukuReported = false
             poll = executor.scheduleWithFixedDelay({ runCatching { pollTick() }.onFailure {
@@ -397,6 +433,11 @@ class LifecycleScreenService : Service() {
 
     private fun pollTick() {
         val entries = onDemandEntries()
+        if (screenOn) {
+            val b = ShizukuBackend()
+            val usable = runCatching { b.isAvailable() && b.hasPermission() }.getOrDefault(false)
+            detectStopModeLaunches(if (usable) b else null)
+        }
         val open = store.onDemandOpen.filter { it in entries }
         if (open.isEmpty()) {
             store.onDemandOpen = emptySet()
@@ -421,7 +462,7 @@ class LifecycleScreenService : Service() {
                 pollShizukuReported = true
                 continue
             }
-            lockOne(pkg, e, OnDemandExecutor(backend), getString(R.string.ondemand_report_left))
+            lockOne(pkg, e, onDemandExecutor(backend), getString(R.string.ondemand_report_left))
         }
     }
 
@@ -441,6 +482,19 @@ class LifecycleScreenService : Service() {
             if (!all && pkg in open) continue
             val e = entries.getValue(pkg)
             if (exec.state(pkg).isLocked(OnDemand.lockOf(e)) && pkg !in open) continue
+            // "Nur beenden": laeuft die App, kann sie gerade aus einem fremden Launcher geoeffnet
+            // worden sein. Nur beenden, wenn sicher NICHT vorne - eine offene App nie abschiessen.
+            if (!all && OnDemand.lockOf(e) == OnDemandLock.STOP) {
+                val b = ShizukuBackend()
+                val usable = runCatching { b.isAvailable() && b.hasPermission() }.getOrDefault(false)
+                val fg = OnDemandSupport.isForeground(
+                    this, if (usable) b else null, pkg, System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(10)
+                )
+                if (fg != false) {
+                    if (fg == true) store.markOpened(pkg, System.currentTimeMillis())
+                    continue
+                }
+            }
             lockOne(pkg, e, exec, reason)
         }
     }

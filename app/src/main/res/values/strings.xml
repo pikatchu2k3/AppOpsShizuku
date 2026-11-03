@@ -260,6 +260,8 @@
     <string name="netusage_total">%1$s total</string>
     <string name="netusage_unblock_bg">Allow bg</string>
     <string name="no_apps">No apps found</string>
+    <string name="ondemand_lock_stop">Only stop – opens from any launcher (Nova etc.). Weaker: other apps can start it on purpose.</string>
+    <string name="ondemand_suspend_dialog">Only on demand (App Ops Shizuku): open this app via its home-screen shortcut – or choose the lock \"Only stop\" in App Ops Shizuku so any launcher works.</string>
     <string name="op_deny_warning">Caution: deny may make the app crash on start (SecurityException). For the clipboard, ignore is the better choice (silent block).</string>
     <string name="op_label_access_background_location">Location in background</string>
     <string name="op_label_access_local_network">Local network</string>

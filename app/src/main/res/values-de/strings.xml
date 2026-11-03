@@ -695,4 +695,6 @@
     <string name="tool_desc_system">Lockdown, privates DNS, mächtige Rechte</string>
     <string name="tool_desc_work_profile">Apps in ein zweites Profil abschotten</string>
     <string name="tool_desc_change_log">Alles, was diese App geändert hat – rückgängig</string>
+    <string name="ondemand_lock_stop">Nur beenden – startet aus jedem Launcher (Nova usw.). Schwächer: andere Apps können sie gezielt starten.</string>
+    <string name="ondemand_suspend_dialog">Nur bei Bedarf (App Ops Shizuku): Öffne diese App über ihre Verknüpfung auf dem Startbildschirm – oder wähle in App Ops Shizuku die Sperrart „Nur beenden“, dann geht jeder Launcher.</string>
 </resources>
