@@ -697,7 +697,7 @@
     <string name="tool_desc_change_log">Alles, was diese App geändert hat – rückgängig</string>
     <string name="ondemand_lock_stop">Nur beenden – startet aus jedem Launcher (Nova usw.). Schwächer: andere Apps können sie gezielt starten.</string>
     <string name="ondemand_report_woken">Im Hintergrund geweckt</string>
-    <string name="ondemand_state_suspend_limit">Einfrieren sperrt nur das Öffnen. Startet das System oder eine andere App sie im Hintergrund (z. B. Bluetooth-Gerät verbindet sich), beendet der Wächter sie innerhalb von etwa 2 Minuten wieder; ganz verhindert das nur „Deaktivieren“.</string>
+    <string name="ondemand_state_suspend_limit">Einfrieren sperrt nur das Öffnen. Startet das System oder eine andere App sie im Hintergrund (z. B. Bluetooth-Gerät verbindet sich), beendet der Wächter sie innerhalb von etwa 5 Minuten wieder; ganz verhindert das nur „Deaktivieren“.</string>
     <string name="ondemand_caller_unknown">Nur Apps, die du erlaubt hast, dürfen gesperrte Apps öffnen. Starte sie stattdessen über die Verknüpfung.</string>
     <string name="ondemand_caller_title">Öffnen erlauben?</string>
     <string name="ondemand_caller_text">„%1$s“ möchte Apps öffnen, die du auf „Nur bei Bedarf“ gestellt hast (jetzt: „%2$s“). App Ops Shizuku gibt die App dafür frei – genau wie über die Verknüpfung – und sperrt sie nach dem Verlassen wieder.</string>

@@ -671,7 +671,7 @@
     <string name="tool_desc_change_log">本应用所做的所有更改——可撤销</string>
     <string name="ondemand_lock_stop">仅停止——可从任何启动器（如 Nova）打开。较弱：其他应用可以有意启动它。</string>
     <string name="ondemand_report_woken">在后台被唤醒</string>
-    <string name="ondemand_state_suspend_limit">冻结只会阻止打开。如果系统或其他应用在后台启动它（例如蓝牙设备连接时），守护服务会在约 2 分钟内再次停止它；只有“停用”才能完全阻止。</string>
+    <string name="ondemand_state_suspend_limit">冻结只会阻止打开。如果系统或其他应用在后台启动它（例如蓝牙设备连接时），守护服务会在约 5 分钟内再次停止它；只有“停用”才能完全阻止。</string>
     <string name="ondemand_caller_unknown">只有你允许的应用才能打开已锁定的应用。请通过其快捷方式启动。</string>
     <string name="ondemand_caller_title">允许打开？</string>
     <string name="ondemand_caller_text">“%1$s”想打开你设为“仅在需要时”的应用（本次：“%2$s”）。App Ops Shizuku 会像通过快捷方式一样解锁它，并在离开后重新锁定。</string>

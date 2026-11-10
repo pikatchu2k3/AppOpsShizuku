@@ -70,7 +70,7 @@ class LifecycleScreenService : Service() {
         private const val NOTIF_ID = 43
         private const val POLL_SECONDS = 3L
         /** Abstand des Weck-Waechters (zaehlt nur, solange das Geraet wach ist - genau dann laufen auch Jobs). */
-        private const val WAKE_GUARD_SECONDS = 120L
+        private const val WAKE_GUARD_SECONDS = 300L
         private const val ACTION_NOTIF_DISMISSED = "de.minipc.appopsshizuku.lifecycle.NOTIF_DISMISSED"
 
         /**
@@ -401,7 +401,11 @@ class LifecycleScreenService : Service() {
      * Zwischen zwei Bildschirm-Aus-Ereignissen ist das die einzige Stelle, die das bemerkt.
      */
     private fun wakeGuardTick() {
-        val entries = onDemandEntries()
+        // Nur eingefrorene Apps: deaktivierte kann niemand wecken, "Nur beenden" darf laufen, bis sie
+        // verlassen wird. Ohne eingefrorene Bedarfs-App kostet der Durchlauf keinen Shell-Aufruf.
+        val all = onDemandEntries()
+        val frozen = OnDemand.suspendApps(all, all.keys)
+        val entries = all.filterKeys { it in frozen }
         if (entries.isEmpty()) return
         val backend = ShizukuBackend()
         if (!runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)) return

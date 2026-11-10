@@ -671,7 +671,7 @@
     <string name="tool_desc_change_log">このアプリの変更履歴と取り消し</string>
     <string name="ondemand_lock_stop">停止のみ – どのランチャー（Novaなど）からでも起動できます。弱め: 他のアプリが意図的に起動できます。</string>
     <string name="ondemand_report_woken">バックグラウンドで起動されました</string>
-    <string name="ondemand_state_suspend_limit">凍結は起動をブロックするだけです。システムや他のアプリがバックグラウンドで起動した場合（Bluetooth 機器の接続など）、監視が約2分以内に再び停止します。完全に防げるのは「無効化」だけです。</string>
+    <string name="ondemand_state_suspend_limit">凍結は起動をブロックするだけです。システムや他のアプリがバックグラウンドで起動した場合（Bluetooth 機器の接続など）、監視が約5分以内に再び停止します。完全に防げるのは「無効化」だけです。</string>
     <string name="ondemand_caller_unknown">許可したアプリだけがロック中のアプリを開けます。ショートカットから起動してください。</string>
     <string name="ondemand_caller_title">起動を許可しますか？</string>
     <string name="ondemand_caller_text">「%1$s」が「必要なときだけ」に設定したアプリ（今回: 「%2$s」）を開こうとしています。App Ops Shizuku はショートカットと同じようにロックを解除し、終了後に再びロックします。</string>

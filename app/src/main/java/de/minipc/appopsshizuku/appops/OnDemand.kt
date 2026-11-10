@@ -109,6 +109,10 @@ object OnDemand {
     fun stopApps(entries: Map<String, LifecycleEntry>, apps: Set<String>): Set<String> =
         apps.filter { entries[it]?.let { e -> lockOf(e) } == OnDemandLock.STOP }.toSet()
 
+    /** Bedarfs-Apps mit Sperrart "Einfrieren": nur sie koennen trotz Sperre im Hintergrund geweckt werden. */
+    fun suspendApps(entries: Map<String, LifecycleEntry>, apps: Set<String>): Set<String> =
+        apps.filter { entries[it]?.let { e -> lockOf(e) } == OnDemandLock.SUSPEND }.toSet()
+
     /** Frist nach dem Verlassen abgelaufen? Bei Frist 0 sperrt nur das Bildschirm-Aus. */
     fun shouldLock(nowMs: Long, leftAtMs: Long?, graceSeconds: Int): Boolean =
         graceSeconds > 0 && leftAtMs != null && nowMs - leftAtMs >= graceSeconds * 1000L

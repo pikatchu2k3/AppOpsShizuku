@@ -46,6 +46,15 @@ class OnDemandTest {
         assertFalse(again.state.wokeUp(OnDemandLock.SUSPEND))
     }
 
+    @Test fun weckWaechter_pruuftNurEingefroreneApps() {
+        val entries = mapOf(
+            "a.frozen" to LifecycleEntry(onDemand = true), // Standard-Sperrart = Einfrieren
+            "b.disabled" to LifecycleEntry(onDemand = true, onDemandLock = OnDemandLock.DISABLE),
+            "c.stop" to LifecycleEntry(onDemand = true, onDemandLock = OnDemandLock.STOP)
+        )
+        assertEquals(setOf("a.frozen"), OnDemand.suspendApps(entries, entries.keys))
+    }
+
     @Test fun geweckt_nurBeiEinfrieren_undNurBeiSicherGelesenemZustand() {
         // Deaktivierte Apps kann niemand starten; unlesbarer Zustand ist keine Aussage
         assertFalse(LockState(suspended = false, disabled = true, stopped = false).wokeUp(OnDemandLock.DISABLE))
