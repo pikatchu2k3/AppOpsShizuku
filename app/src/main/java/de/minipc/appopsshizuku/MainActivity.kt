@@ -353,7 +353,8 @@ class MainActivity : AppCompatActivity() {
             Tool(R.string.menu_auto_rules, R.string.tool_desc_auto_rules, R.drawable.ic_rule, 0xFF7B5CD6.toInt(), AutoRulesActivity::class.java),
             Tool(R.string.menu_system, R.string.tool_desc_system, R.drawable.ic_shield, 0xFFC0392B.toInt(), SystemActivity::class.java),
             Tool(R.string.menu_work_profile, R.string.tool_desc_work_profile, R.drawable.ic_work, 0xFF3E8E41.toInt(), WorkProfileActivity::class.java),
-            Tool(R.string.menu_change_log, R.string.tool_desc_change_log, R.drawable.ic_history, 0xFF2E6FA0.toInt(), ChangeLogActivity::class.java)
+            Tool(R.string.menu_change_log, R.string.tool_desc_change_log, R.drawable.ic_history, 0xFF2E6FA0.toInt(), ChangeLogActivity::class.java),
+            Tool(R.string.diag_title, R.string.tool_desc_diag, R.drawable.ic_tune, 0xFF607D8B.toInt(), DiagnosticsActivity::class.java)
         )
         val container = findViewById<android.widget.LinearLayout>(R.id.toolsContainer)
         val inflater = layoutInflater
@@ -399,6 +400,43 @@ class MainActivity : AppCompatActivity() {
         val version = runCatching { packageManager.getPackageInfo(packageName, 0).versionName }.getOrNull()
         findViewById<TextView>(R.id.settingsAbout).text = getString(R.string.settings_about, version ?: "?")
         findViewById<View>(R.id.shizukuHint).setOnClickListener { showPanel(PANEL_SETTINGS) }
+        findViewById<View>(R.id.standingButton).setOnClickListener { toggleStanding() }
+        renderStanding()
+    }
+
+    private fun renderStanding() {
+        val has = StandingAccess.has(this)
+        findViewById<TextView>(R.id.standingStatus).setText(
+            if (has) R.string.standing_on else R.string.standing_off
+        )
+        findViewById<MaterialButton>(R.id.standingButton).setText(
+            if (has) R.string.standing_revoke else R.string.standing_grant
+        )
+    }
+
+    /** Dauerrecht per Shizuku erteilen bzw. wieder entziehen; Ergebnis wird zurueckgelesen. */
+    private fun toggleStanding() {
+        if (!(manager.isConnected && manager.hasPermission)) {
+            Toast.makeText(this, R.string.status_no_permission, Toast.LENGTH_LONG).show()
+            return
+        }
+        val grant = !StandingAccess.has(this)
+        executor.execute {
+            val b = ShizukuBackend()
+            val ok = if (grant) StandingAccess.grant(this, b) else StandingAccess.revoke(this, b)
+            handler.post {
+                renderStanding()
+                Toast.makeText(
+                    this,
+                    when {
+                        !ok -> R.string.standing_failed
+                        grant -> R.string.standing_granted
+                        else -> R.string.standing_revoked
+                    },
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     private fun loadApps() {
@@ -765,12 +803,14 @@ class MainActivity : AppCompatActivity() {
             }
             handler.post {
                 result.onSuccess { r ->
-                    if (r.count == 0 && r.behaviorCount == 0 && r.lifecycleCount == 0) {
+                    if (r.count == 0 && r.behaviorCount == 0 && r.lifecycleCount == 0 && r.extrasCount == 0) {
                         setBackupStatus(getString(R.string.profiles_export_empty), false)
                         Toast.makeText(this, R.string.profiles_export_empty, Toast.LENGTH_SHORT).show()
                     } else {
                         setBackupStatus(
-                            getString(R.string.backup_status_export_ok, r.count, r.behaviorCount), false
+                            getString(R.string.backup_status_export_ok, r.count, r.behaviorCount) +
+                                "\n" + getString(R.string.backup_status_extras, r.extrasCount) +
+                                "\n" + r.path, false
                         )
                         Toast.makeText(
                             this,
@@ -843,7 +883,12 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     // Importierte Screen-Off-Haken wirken erst mit laufendem Dienst
-                    if (imported.lifecycle.isNotEmpty()) LifecycleScreenService.sync(this)
+                    if (imported.lifecycle.isNotEmpty() || imported.extras.whileInUse.isNotEmpty()) {
+                        LifecycleScreenService.sync(this)
+                    }
+                    if (imported.extras.rules.isNotEmpty()) {
+                        executor.execute { runCatching { AutoRuleManager.evaluate(this) } }
+                    }
                     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 }.onFailure { e ->
                     val reason = e.message ?: e.javaClass.simpleName
