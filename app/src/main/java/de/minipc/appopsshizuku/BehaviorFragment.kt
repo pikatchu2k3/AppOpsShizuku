@@ -975,6 +975,7 @@ class BehaviorFragment : Fragment() {
                 lines.add(getString(R.string.ondemand_state_callers, c.joinToString(", ") { labelOf(ctx, it) }))
             }
             screenOffSyncError?.let { lines.add(getString(R.string.screen_off_service_failed, it)) }
+            if (OnDemand.lockOf(e) == OnDemandLock.SUSPEND) lines.add(getString(R.string.ondemand_state_suspend_limit))
             lines.add(getString(R.string.ondemand_state_needs_shizuku))
         }
         onDemandLastResult?.let { lines.add(it) }

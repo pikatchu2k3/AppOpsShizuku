@@ -261,6 +261,8 @@
     <string name="netusage_unblock_bg">Allow bg</string>
     <string name="no_apps">No apps found</string>
     <string name="ondemand_lock_stop">Only stop – opens from any launcher (Nova etc.). Weaker: other apps can start it on purpose.</string>
+    <string name="ondemand_report_woken">Woken in the background</string>
+    <string name="ondemand_state_suspend_limit">Freezing only blocks opening. If the system or another app starts it in the background (e.g. a Bluetooth device connects), the watcher stops it again within about 5 minutes; only \"Disable\" prevents that completely.</string>
     <string name="ondemand_caller_unknown">Only apps you allowed may open locked apps. Start it via its shortcut instead.</string>
     <string name="ondemand_caller_title">Allow opening?</string>
     <string name="ondemand_caller_text">\"%1$s\" wants to open apps you set to \"Only on demand\" (now: \"%2$s\"). App Ops Shizuku releases the app for this, just like via its shortcut, and locks it again after leaving.</string>
