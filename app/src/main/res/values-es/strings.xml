@@ -675,6 +675,8 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="tool_desc_work_profile">Aislar apps en un segundo perfil</string>
     <string name="tool_desc_change_log">Todo lo que cambió esta app: deshacer</string>
     <string name="ondemand_lock_stop">Solo detener: se abre desde cualquier launcher (Nova, etc.). Más débil: otras apps pueden iniciarla a propósito.</string>
+    <string name="ondemand_report_woken">Despertada en segundo plano</string>
+    <string name="ondemand_state_suspend_limit">Congelar solo bloquea la apertura. Si el sistema u otra app la inicia en segundo plano (p. ej. al conectarse un dispositivo Bluetooth), el vigilante la detiene de nuevo en unos 2 minutos; solo \"Desactivar\" lo impide por completo.</string>
     <string name="ondemand_caller_unknown">Solo las apps que permitiste pueden abrir apps bloqueadas. Ábrela desde su acceso directo.</string>
     <string name="ondemand_caller_title">¿Permitir abrir?</string>
     <string name="ondemand_caller_text">\"%1$s\" quiere abrir apps que configuraste como \"Solo cuando se necesite\" (ahora: \"%2$s\"). App Ops Shizuku la libera para ello, igual que con el acceso directo, y la vuelve a bloquear al salir.</string>

@@ -11,6 +11,8 @@ import de.minipc.appopsshizuku.shizuku.ShellResult
  *
  * Gesperrt heisst immer zuerst `am force-stop` (Prozess weg, Wecker/Jobs geloescht, keine
  * Broadcasts bis zum naechsten Start), danach je nach [OnDemandLock] einfrieren oder deaktivieren.
+ * Einfrieren allein haelt die App NICHT im Hintergrund an (siehe [LockState.wokeUp]); der Dienst
+ * prueft deshalb regelmaessig nach und beendet eine geweckte App erneut.
  * Reine Logik (JVM-testbar); Erkennen von Bildschirm und Verlassen macht der Dienst.
  */
 enum class OnDemandLock(val json: String) {
@@ -39,6 +41,16 @@ data class LockState(val suspended: Boolean?, val disabled: Boolean?, val stoppe
         OnDemandLock.DISABLE -> disabled == true
         OnDemandLock.STOP -> stopped == true
     }
+
+    /**
+     * Gesperrt, laeuft aber wieder: `pm suspend` blockiert nur das OEFFNEN (Activities). Jobs,
+     * Dienste und Broadcasts laufen bei einer eingefrorenen App weiter, sobald das System oder eine
+     * andere App sie startet (z. B. Bluetooth-Geraet verbunden) - dann ist "stopped" wieder false.
+     * Davor schuetzt nur der Beendet-Zustand, also muss erneut beendet werden.
+     * Deaktivierte Apps kann niemand starten; "Nur beenden" gilt ohne stopped ohnehin als frei.
+     */
+    fun wokeUp(lock: OnDemandLock): Boolean =
+        lock == OnDemandLock.SUSPEND && suspended == true && stopped == false
 
     /** Frei = weder eingefroren noch deaktiviert (beides sicher gelesen). */
     val isUnlocked: Boolean get() = suspended == false && disabled == false

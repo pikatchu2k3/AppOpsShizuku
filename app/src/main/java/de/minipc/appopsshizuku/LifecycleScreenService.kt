@@ -69,6 +69,8 @@ class LifecycleScreenService : Service() {
         private const val CHANNEL_ID = "lifecycle_screen"
         private const val NOTIF_ID = 43
         private const val POLL_SECONDS = 3L
+        /** Abstand des Weck-Waechters (zaehlt nur, solange das Geraet wach ist - genau dann laufen auch Jobs). */
+        private const val WAKE_GUARD_SECONDS = 120L
         private const val ACTION_NOTIF_DISMISSED = "de.minipc.appopsshizuku.lifecycle.NOTIF_DISMISSED"
 
         /**
@@ -136,6 +138,9 @@ class LifecycleScreenService : Service() {
     private val leftAt = HashMap<String, Long>()
     /** "Shizuku fehlt" pro Abfrage-Serie nur einmal melden. */
     private var pollShizukuReported = false
+
+    /** Prueft regelmaessig, ob eine eingefrorene Bedarfs-App im Hintergrund geweckt wurde. */
+    private var wakeGuard: ScheduledFuture<*>? = null
     private lateinit var store: LifecycleStore
     private lateinit var wiuStore: WhileInUseStore
     /** "Nur waehrend Nutzung": eigene Abfrage, Vordergrund-Zustand, Verlassen-Zeitpunkte. */
@@ -272,6 +277,11 @@ class LifecycleScreenService : Service() {
         }
         // Bedarfs-Apps: offene ueberwachen, alle anderen sicher gesperrt halten
         executor.execute { onDemandSweep() }
+        if (wakeGuard == null) {
+            wakeGuard = executor.scheduleWithFixedDelay({ runCatching { wakeGuardTick() }.onFailure {
+                Log.w(TAG, "Weck-Waechter fehlgeschlagen: $it")
+            } }, WAKE_GUARD_SECONDS, WAKE_GUARD_SECONDS, TimeUnit.SECONDS)
+        }
         executor.execute { whileInUseSweep() }
         return START_STICKY
     }
@@ -280,6 +290,7 @@ class LifecycleScreenService : Service() {
         destroyed = true
         poll?.cancel(false)
         wiuPoll?.cancel(false)
+        wakeGuard?.cancel(false)
         if (registered) {
             runCatching { unregisterReceiver(screenReceiver) }
             runCatching { unregisterReceiver(otherReceiver) }
@@ -384,6 +395,19 @@ class LifecycleScreenService : Service() {
         updatePoll()
     }
 
+    /**
+     * `pm suspend` sperrt nur das Oeffnen. Startet das System eine eingefrorene Bedarfs-App im
+     * Hintergrund (Job, Bluetooth, andere App), laeuft sie trotz Sperre - bis hier wieder beendet wird.
+     * Zwischen zwei Bildschirm-Aus-Ereignissen ist das die einzige Stelle, die das bemerkt.
+     */
+    private fun wakeGuardTick() {
+        val entries = onDemandEntries()
+        if (entries.isEmpty()) return
+        val backend = ShizukuBackend()
+        if (!runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)) return
+        lockOnDemandApps(entries, onDemandExecutor(backend), all = false, reason = getString(R.string.ondemand_report_woken))
+    }
+
     private fun onDemandExecutor(backend: de.minipc.appopsshizuku.shizuku.ShellBackend) =
         OnDemandExecutor(backend, getString(R.string.ondemand_suspend_dialog))
 
@@ -481,7 +505,14 @@ class LifecycleScreenService : Service() {
         for (pkg in apps.sorted()) {
             if (!all && pkg in open) continue
             val e = entries.getValue(pkg)
-            if (exec.state(pkg).isLocked(OnDemand.lockOf(e)) && pkg !in open) continue
+            val st = exec.state(pkg)
+            val woke = st.wokeUp(OnDemand.lockOf(e))
+            if (st.isLocked(OnDemand.lockOf(e)) && pkg !in open && !woke) continue
+            if (woke && pkg !in open) {
+                // Eingefroren, aber vom System/anderen Apps im Hintergrund gestartet: erneut beenden
+                lockOne(pkg, e, exec, getString(R.string.ondemand_report_woken))
+                continue
+            }
             // "Nur beenden": laeuft die App, kann sie gerade aus einem fremden Launcher geoeffnet
             // worden sein. Nur beenden, wenn sicher NICHT vorne - eine offene App nie abschiessen.
             if (!all && OnDemand.lockOf(e) == OnDemandLock.STOP) {
