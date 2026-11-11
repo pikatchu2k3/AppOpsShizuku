@@ -673,6 +673,17 @@
     <string name="tool_desc_work_profile">Isolar apps em um segundo perfil</string>
     <string name="tool_desc_change_log">Tudo o que este app alterou – desfazer</string>
     <string name="ondemand_lock_stop">Só encerrar – abre por qualquer launcher (Nova etc.). Mais fraco: outros apps podem iniciá-lo de propósito.</string>
+    <string name="ondemand_report_woken">Acordado em segundo plano</string>
+    <string name="ondemand_state_suspend_limit">Congelar só bloqueia a abertura. Se o sistema ou outro app o iniciar em segundo plano (ex.: um dispositivo Bluetooth conecta), o vigia o encerra de novo em cerca de 5 minutos; só \"Desativar\" impede isso por completo.</string>
+    <string name="ondemand_caller_unknown">Só apps que você permitiu podem abrir apps bloqueados. Abra pelo atalho.</string>
+    <string name="ondemand_caller_title">Permitir abrir?</string>
+    <string name="ondemand_caller_text">\"%1$s\" quer abrir apps que você definiu como \"Só quando precisar\" (agora: \"%2$s\"). O App Ops Shizuku libera o app para isso, como pelo atalho, e o bloqueia de novo ao sair.</string>
+    <string name="ondemand_caller_allow">Sempre permitir</string>
+    <string name="ondemand_caller_once">Só desta vez</string>
+    <string name="ondemand_caller_deny">Negar</string>
+    <string name="ondemand_callers_revoke">Revogar acesso de outros apps</string>
+    <string name="ondemand_callers_revoked">Outros apps não podem mais abrir apps bloqueados.</string>
+    <string name="ondemand_state_callers">Também pode abrir: %1$s</string>
     <string name="ondemand_suspend_dialog">Somente sob demanda (App Ops Shizuku): abra este app pelo atalho da tela inicial – ou escolha o bloqueio \"Só encerrar\" no App Ops Shizuku para que qualquer launcher funcione.</string>
     <string name="diag_title">Diagnóstico</string>
     <string name="tool_desc_diag">O que funciona neste dispositivo?</string>

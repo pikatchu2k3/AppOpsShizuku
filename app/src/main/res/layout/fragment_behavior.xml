@@ -630,6 +630,14 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/ondemand_shortcut_button" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/onDemandCallersButton"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ondemand_callers_revoke"
+                    android:visibility="gone" />
+
                 <TextView
                     android:id="@+id/onDemandState"
                     android:layout_width="match_parent"

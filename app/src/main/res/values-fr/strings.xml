@@ -673,6 +673,17 @@
     <string name="tool_desc_work_profile">Isoler des applis dans un second profil</string>
     <string name="tool_desc_change_log">Tout ce que l\'appli a modifié – annuler</string>
     <string name="ondemand_lock_stop">Arrêter seulement – s\'ouvre depuis n\'importe quel lanceur (Nova, etc.). Plus faible : d\'autres applis peuvent la lancer exprès.</string>
+    <string name="ondemand_report_woken">Réveillée en arrière-plan</string>
+    <string name="ondemand_state_suspend_limit">Geler ne bloque que l\'ouverture. Si le système ou une autre appli la lance en arrière-plan (p. ex. un appareil Bluetooth se connecte), le gardien l\'arrête de nouveau en 5 minutes environ ; seul « Désactiver » l\'empêche complètement.</string>
+    <string name="ondemand_caller_unknown">Seules les applis que vous avez autorisées peuvent ouvrir des applis verrouillées. Ouvrez-la via son raccourci.</string>
+    <string name="ondemand_caller_title">Autoriser l\'ouverture ?</string>
+    <string name="ondemand_caller_text">« %1$s » veut ouvrir des applis réglées sur « Seulement à la demande » (ici : « %2$s »). App Ops Shizuku la libère pour cela, comme via le raccourci, et la reverrouille après sa fermeture.</string>
+    <string name="ondemand_caller_allow">Toujours autoriser</string>
+    <string name="ondemand_caller_once">Seulement cette fois</string>
+    <string name="ondemand_caller_deny">Refuser</string>
+    <string name="ondemand_callers_revoke">Retirer l\'accès des autres applis</string>
+    <string name="ondemand_callers_revoked">Les autres applis ne peuvent plus ouvrir les applis verrouillées.</string>
+    <string name="ondemand_state_callers">Peut aussi ouvrir : %1$s</string>
     <string name="ondemand_suspend_dialog">Seulement à la demande (App Ops Shizuku) : ouvrez cette appli via son raccourci sur l\'écran d\'accueil, ou choisissez le verrou « Arrêter seulement » dans App Ops Shizuku pour que tout lanceur fonctionne.</string>
     <string name="diag_title">Diagnostic</string>
     <string name="tool_desc_diag">Qu\'est-ce qui fonctionne sur cet appareil ?</string>

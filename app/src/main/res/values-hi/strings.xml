@@ -673,6 +673,17 @@
     <string name="tool_desc_work_profile">ऐप्स को दूसरी प्रोफ़ाइल में अलग करें</string>
     <string name="tool_desc_change_log">इस ऐप ने जो बदला – पूर्ववत करें</string>
     <string name="ondemand_lock_stop">केवल बंद करें – किसी भी लॉन्चर (Nova आदि) से खुलता है। कमज़ोर: अन्य ऐप्स इसे जानबूझकर शुरू कर सकते हैं।</string>
+    <string name="ondemand_report_woken">बैकग्राउंड में जगाया गया</string>
+    <string name="ondemand_state_suspend_limit">फ़्रीज़ करना केवल खोलने को रोकता है। यदि सिस्टम या कोई अन्य ऐप इसे बैकग्राउंड में शुरू करता है (जैसे ब्लूटूथ डिवाइस जुड़ने पर), तो निगरानी सेवा इसे लगभग 5 मिनट में फिर बंद कर देती है; इसे पूरी तरह केवल \"अक्षम करें\" रोकता है।</string>
+    <string name="ondemand_caller_unknown">केवल आपके द्वारा अनुमति प्राप्त ऐप्स ही लॉक किए गए ऐप्स खोल सकते हैं। इसे इसके शॉर्टकट से खोलें।</string>
+    <string name="ondemand_caller_title">खोलने की अनुमति दें?</string>
+    <string name="ondemand_caller_text">\"%1$s\" उन ऐप्स को खोलना चाहता है जिन्हें आपने \"केवल ज़रूरत पर\" पर सेट किया है (अभी: \"%2$s\")। App Ops Shizuku इसके लिए ऐप को शॉर्टकट की तरह ही अनलॉक करता है और छोड़ने के बाद फिर से लॉक करता है।</string>
+    <string name="ondemand_caller_allow">हमेशा अनुमति दें</string>
+    <string name="ondemand_caller_once">केवल इस बार</string>
+    <string name="ondemand_caller_deny">अस्वीकार करें</string>
+    <string name="ondemand_callers_revoke">अन्य ऐप्स की पहुँच हटाएँ</string>
+    <string name="ondemand_callers_revoked">अन्य ऐप्स अब लॉक किए गए ऐप्स नहीं खोल सकते।</string>
+    <string name="ondemand_state_callers">यह भी खोल सकता है: %1$s</string>
     <string name="ondemand_suspend_dialog">केवल ज़रूरत पर (App Ops Shizuku): यह ऐप होम-स्क्रीन शॉर्टकट से खोलें – या App Ops Shizuku में लॉक \"केवल बंद करें\" चुनें, तब कोई भी लॉन्चर चलेगा।</string>
     <string name="diag_title">डायग्नोस्टिक</string>
     <string name="tool_desc_diag">इस डिवाइस पर क्या काम करता है?</string>

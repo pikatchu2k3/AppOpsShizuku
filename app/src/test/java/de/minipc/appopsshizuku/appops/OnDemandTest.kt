@@ -25,6 +25,44 @@ class OnDemandTest {
         assertTrue(dev.indexOf("am", "force-stop") < dev.indexOf("pm", "suspend"))
     }
 
+    // --- Eingefroren, aber im Hintergrund geweckt (pm suspend haelt keine Jobs/Dienste an) ---
+
+    @Test fun eingefrorenUndBeendet_giltNichtAlsGeweckt() {
+        val dev = FakeDevice()
+        val r = OnDemandExecutor(dev).lock(PKG, OnDemandLock.SUSPEND)
+        assertFalse(r.state.wokeUp(OnDemandLock.SUSPEND))
+    }
+
+    @Test fun eingefrorenAberWiederGestartet_wirdErkannt_undErneutBeendet() {
+        val dev = FakeDevice()
+        val exec = OnDemandExecutor(dev)
+        exec.lock(PKG, OnDemandLock.SUSPEND)
+        dev.stopped = false // System startet die App im Hintergrund (Job, Bluetooth, andere App)
+        val st = exec.state(PKG)
+        assertTrue(st.isLocked(OnDemandLock.SUSPEND)) // "gesperrt" allein reicht also nicht
+        assertTrue(st.wokeUp(OnDemandLock.SUSPEND))
+        val again = exec.lock(PKG, OnDemandLock.SUSPEND)
+        assertEquals(true, again.state.stopped)
+        assertFalse(again.state.wokeUp(OnDemandLock.SUSPEND))
+    }
+
+    @Test fun weckWaechter_pruuftNurEingefroreneApps() {
+        val entries = mapOf(
+            "a.frozen" to LifecycleEntry(onDemand = true), // Standard-Sperrart = Einfrieren
+            "b.disabled" to LifecycleEntry(onDemand = true, onDemandLock = OnDemandLock.DISABLE),
+            "c.stop" to LifecycleEntry(onDemand = true, onDemandLock = OnDemandLock.STOP)
+        )
+        assertEquals(setOf("a.frozen"), OnDemand.suspendApps(entries, entries.keys))
+    }
+
+    @Test fun geweckt_nurBeiEinfrieren_undNurBeiSicherGelesenemZustand() {
+        // Deaktivierte Apps kann niemand starten; unlesbarer Zustand ist keine Aussage
+        assertFalse(LockState(suspended = false, disabled = true, stopped = false).wokeUp(OnDemandLock.DISABLE))
+        assertFalse(LockState(suspended = false, disabled = false, stopped = false).wokeUp(OnDemandLock.STOP))
+        assertFalse(LockState(suspended = true, disabled = false, stopped = null).wokeUp(OnDemandLock.SUSPEND))
+        assertFalse(LockState(suspended = false, disabled = false, stopped = false).wokeUp(OnDemandLock.SUSPEND))
+    }
+
     @Test fun sperrenDeaktivieren_liestEnabledAusDerUser0Zeile() {
         val dev = FakeDevice()
         val r = OnDemandExecutor(dev).lock(PKG, OnDemandLock.DISABLE)
