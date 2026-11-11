@@ -21,6 +21,7 @@
     <string name="app_unchanged">Unchanged</string>
     <string name="backup_status_export_fail">Export failed: %1$s</string>
     <string name="backup_status_export_ok">Export: %1$d profiles, %2$d app settings backed up</string>
+    <string name="backup_status_extras">Also saved: %1$d rules / while-in-use settings</string>
     <string name="backup_status_import_fail">Import failed: %1$s</string>
     <string name="backup_status_import_ok">Import: %1$d profiles, %2$d app settings applied</string>
     <string name="backup_status_import_warn">Import: %1$d profiles applied, %2$d app settings NOT applied – %3$s</string>
@@ -124,6 +125,29 @@
     <string name="components_title">Components</string>
     <string name="components_unfrozen">App unfrozen</string>
     <string name="components_widgets">Widgets</string>
+    <string name="diag_alarm">Activity: wakeups recognised</string>
+    <string name="diag_appops">Read App Ops / access log</string>
+    <string name="diag_bg_data">Block background data</string>
+    <string name="diag_bg_restrict">Background restrict list</string>
+    <string name="diag_dns">Private DNS</string>
+    <string name="diag_intro">Harmless checks only: nothing is changed. The report contains model and Android version, no app list and no personal data.</string>
+    <string name="diag_jobs">Activity: jobs recognised</string>
+    <string name="diag_mark_fail">✗</string>
+    <string name="diag_mark_ok">✓</string>
+    <string name="diag_mark_unknown">\?</string>
+    <string name="diag_offline">Offline switch (firewall chain)</string>
+    <string name="diag_profiles">Work profile possible</string>
+    <string name="diag_profiles_detail">%1$d users, max %2$d, work profiles: %3$d</string>
+    <string name="diag_roles">Default apps (roles)</string>
+    <string name="diag_run">Check again</string>
+    <string name="diag_sensors">Activity: sensor apps recognised</string>
+    <string name="diag_share">Share report</string>
+    <string name="diag_shizuku">Shizuku connected</string>
+    <string name="diag_standing">Standing access (settings without Shizuku)</string>
+    <string name="diag_suspend_dialog">Own text in the freeze dialog</string>
+    <string name="diag_title">Diagnostics</string>
+    <string name="diag_usage">Usage access</string>
+    <string name="diag_user_fixed">Block re-asking (permission flags)</string>
     <string name="dns_applied">Private DNS set and confirmed</string>
     <string name="dns_apply">Apply</string>
     <string name="dns_auto">Automatic</string>
@@ -454,6 +478,14 @@
     </string-array>
 
     <string name="sort_update">Update date</string>
+    <string name="standing_failed">The device did not take the change.</string>
+    <string name="standing_grant">Grant</string>
+    <string name="standing_granted">Standing access granted</string>
+    <string name="standing_off">Not granted. Granted once via Shizuku, private DNS and revoking accessibility services keep working after a restart, without Shizuku running.</string>
+    <string name="standing_on">Granted: private DNS and revoking accessibility services work without Shizuku. Everything else still needs Shizuku.</string>
+    <string name="standing_revoke">Take back</string>
+    <string name="standing_revoked">Standing access taken back</string>
+    <string name="standing_title">Standing access</string>
     <string name="stat_allowed">Allowed</string>
     <string name="stat_blocked">Blocked</string>
     <string name="stat_default">Default</string>
@@ -552,6 +584,7 @@
     <string name="suggest_reason_category">unusual for this kind of app</string>
     <string name="suggest_reason_unused">unused for %1$d days</string>
     <string name="system_needs_shizuku">Shizuku is not connected: only device admins can be shown, nothing can be changed.</string>
+    <string name="system_standing_only">Shizuku is not connected. Thanks to standing access, private DNS and accessibility services still work; the rest needs Shizuku.</string>
     <string name="system_title">System-wide</string>
     <string name="tab_apps">Apps</string>
     <string name="tab_behavior">Behavior</string>
@@ -577,6 +610,7 @@
     <string name="tool_desc_auto_rules">Act by time or Wi-Fi</string>
     <string name="tool_desc_by_permission">Which apps may use camera, location …?</string>
     <string name="tool_desc_change_log">Everything this app changed – undo</string>
+    <string name="tool_desc_diag">What works on this device?</string>
     <string name="tool_desc_net_usage">Who sends data in the background?</string>
     <string name="tool_desc_system">Lockdown, private DNS, powerful access</string>
     <string name="tool_desc_work_profile">Isolate apps in a second profile</string>

@@ -52,6 +52,9 @@ To get updates automatically, add the repository to [Obtainium](https://github.c
   - **Automatic rules** (menu): by time (days + window, incl. overnight) or Wi-Fi (connected / not), action = Lockdown or take chosen apps offline. The Wi-Fi name is read only after you grant this app the location permission on first use (the app has no network access of its own). If Android hides the name while the app runs in the background, the rule is skipped (not switched off) until you open the app.
   - **Work profile** (menu): App Ops Shizuku can create a managed profile itself (own profile owner) and move apps into it; it can also move apps into an existing profile (e.g. Shelter) using shell rights alone.
   - **Placeholder data instead of blocking (beta patch)**: in the re-signed clone/patch, return a null advertising ID and a fixed city-level location instead of the real values, so apps that crash on "denied" keep working.
+  - **Diagnostics** (Tools): harmless checks showing which levers work on this device (permission flags, freeze-dialog text, firewall chain, dumpsys formats, work profile); the report can be shared as text.
+  - **Standing access** (Settings): the app grants itself `WRITE_SECURE_SETTINGS` once via Shizuku; private DNS and revoking accessibility services then work after a restart without Shizuku.
+  - **Backup** now also contains automatic rules, "only while in use", the quarantine switch and the lockdown selection.
   - **Restart notice**: after a reboot (Shizuku not yet running) a notification points out that the configured protection is inactive; once connected, a bar offers to restore settings that drifted.
 
 ### Honest limits
@@ -135,7 +138,7 @@ Because the repository is public, the source that belongs to every released pack
 
 ### Languages / Sprachen
 
-The interface ships in English (base) plus 8 translations — 625 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 693 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
@@ -201,6 +204,9 @@ Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obta
   - **Automatische Regeln** (Menü): nach Zeit (Tage + Fenster, auch über Nacht) oder WLAN (verbunden / nicht), Aktion = Lockdown oder gewählte Apps offline. Der WLAN-Name wird erst gelesen, nachdem du dieser App bei der ersten Nutzung die Standortberechtigung erteilt hast (die App hat selbst keinen Netzzugriff). Verbirgt Android den Namen, solange die App im Hintergrund läuft, wird die Regel übersprungen (nicht abgeschaltet), bis du die App öffnest.
   - **Arbeitsprofil** (Menü): App Ops Shizuku kann selbst ein verwaltetes Profil anlegen (eigener Profilbesitzer) und Apps hineinverschieben; in ein vorhandenes Profil (z. B. Shelter) verschiebt es Apps auch allein mit Shell-Rechten.
   - **Platzhalter-Daten statt Sperre (Beta-Patch)**: im neu signierten Klon/Patch eine Null-Werbe-ID und einen festen Ort auf Stadtebene statt der echten Werte liefern, damit Apps, die bei „verweigert" abstürzen, weiterlaufen.
+  - **Diagnose** (Werkzeuge): harmlose Prüfungen zeigen, welche Hebel auf diesem Gerät funktionieren (Permission-Flags, Sperrdialog-Text, Firewall-Kette, dumpsys-Formate, Arbeitsprofil); der Bericht lässt sich als Text teilen.
+  - **Dauerrecht** (Einstellungen): die App erteilt sich einmal über Shizuku `WRITE_SECURE_SETTINGS`; privates DNS und das Entziehen von Bedienungshilfen gehen danach auch nach einem Neustart ohne Shizuku.
+  - **Sicherung** enthält jetzt auch Automatik-Regeln, „Nur während Nutzung", den Quarantäne-Schalter und die Lockdown-Auswahl.
   - **Neustart-Hinweis**: nach einem Neustart (Shizuku läuft noch nicht) meldet eine Benachrichtigung, dass der eingerichtete Schutz inaktiv ist; nach dem Verbinden bietet eine Leiste an, abgewichene Einstellungen wiederherzustellen.
 
 ### Ehrliche Grenzen

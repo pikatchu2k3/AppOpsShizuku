@@ -66,7 +66,10 @@ class SystemActivity : AppCompatActivity() {
     private lateinit var lockdown: LockdownStore
     private var dnsState: PrivateDns.State? = null
 
-    private val shizukuOn: Boolean get() = backend !is NoopBackend
+    private var shizukuOn = false
+
+    /** Einstellungen les-/schreibbar: ueber Shizuku oder das Dauerrecht WRITE_SECURE_SETTINGS. */
+    private val canSettings: Boolean get() = shizukuOn || StandingAccess.has(this)
 
     /** Eine Zeile der Liste "Maechtige Rechte". */
     private data class PowerRow(
@@ -94,11 +97,17 @@ class SystemActivity : AppCompatActivity() {
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        backend = runCatching {
+        val real = runCatching {
             ShizukuBackend().takeIf { it.isAvailable() && it.hasPermission() }
         }.getOrNull() ?: NoopBackend()
+        shizukuOn = real !is NoopBackend
+        // Mit Dauerrecht gehen "settings"-Befehle direkt, auch ohne Shizuku
+        backend = SettingsBackend(applicationContext, real)
         lockdown = LockdownStore(this)
-        findViewById<View>(R.id.systemShizukuHint).visibility = if (shizukuOn) View.GONE else View.VISIBLE
+        findViewById<TextView>(R.id.systemShizukuHint).apply {
+            visibility = if (shizukuOn) View.GONE else View.VISIBLE
+            if (!shizukuOn && canSettings) setText(R.string.system_standing_only)
+        }
 
         setupLockdown()
         setupDns()
@@ -222,11 +231,11 @@ class SystemActivity : AppCompatActivity() {
         }
         findViewById<MaterialButton>(R.id.dnsApply).setOnClickListener { applyDns() }
         findViewById<MaterialButton>(R.id.dnsRestore).setOnClickListener { restoreDns() }
-        findViewById<MaterialButton>(R.id.dnsApply).isEnabled = shizukuOn
+        findViewById<MaterialButton>(R.id.dnsApply).isEnabled = canSettings
     }
 
     private fun readDns(): PrivateDns.State? {
-        if (!shizukuOn) return null
+        if (!canSettings) return null
         val mode = PrivateDns.clean(sh("settings", "get", "global", "private_dns_mode"))
         val host = PrivateDns.clean(sh("settings", "get", "global", "private_dns_specifier"))
         return PrivateDns.State(mode, host)
@@ -331,11 +340,13 @@ class SystemActivity : AppCompatActivity() {
 
     private fun readPower(): List<Pair<String, List<PowerRow>>> {
         val out = mutableListOf<Pair<String, List<PowerRow>>>()
-        if (shizukuOn) {
+        if (canSettings) {
             val acc = sh("settings", "get", "secure", "enabled_accessibility_services")
             out += getString(R.string.power_accessibility) to PowerfulAccess.parseComponents(acc).map {
                 PowerRow(it.packageName, it.className, Action.REMOVE_ACCESSIBILITY, component = it)
             }
+        }
+        if (shizukuOn) {
             val nl = sh("settings", "get", "secure", "enabled_notification_listeners")
             out += getString(R.string.power_listeners) to PowerfulAccess.parseComponents(nl).map {
                 PowerRow(it.packageName, it.className, Action.REMOVE_LISTENER, component = it)
@@ -414,7 +425,8 @@ class SystemActivity : AppCompatActivity() {
                     }
                     else -> {
                         btn.setText(R.string.power_revoke)
-                        btn.isEnabled = shizukuOn && row.pkg != packageName
+                        btn.isEnabled = row.pkg != packageName &&
+                            (shizukuOn || (row.action == Action.REMOVE_ACCESSIBILITY && canSettings))
                         btn.setOnClickListener { confirmRevoke(title, row) }
                     }
                 }

@@ -25,6 +25,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Automatik-Regeln: ungefaehre Weckrufe planen (keine Exact-Alarm-Berechtigung noetig). -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />
+    <!-- Dauerrecht: wird EINMAL per Shizuku erteilt (pm grant) und bleibt ueber Neustarts. Damit
+         funktionieren privates DNS und das Entziehen von Bedienungshilfen ohne laufendes Shizuku. -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
     <!-- Neustart erkennen, um auf still inaktiven Schutz hinzuweisen (Shizuku laeuft nach dem
          Neustart noch nicht). Erlaubt ohne Nutzerfreigabe. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -113,6 +118,9 @@
             android:exported="false" />
         <activity
             android:name=".WorkProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DiagnosticsActivity"
             android:exported="false" />
         <activity
             android:name=".AutoRulesActivity"

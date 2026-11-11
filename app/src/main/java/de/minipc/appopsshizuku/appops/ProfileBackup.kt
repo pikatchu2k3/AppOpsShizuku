@@ -27,14 +27,16 @@ class ProfileBackup(context: Context) {
         val count: Int,
         val behaviorCount: Int,
         val path: String,
-        val lifecycleCount: Int = 0
+        val lifecycleCount: Int = 0,
+        val extrasCount: Int = 0
     )
 
     /** Projekt-Nummer im Export-Bericht fuer den Aufrufer (ohne das Backup anzuwenden). */
     data class ImportResult(
         val profiles: Map<String, Map<String, String>>,
         val behavior: Map<String, BehaviorState>,
-        val lifecycle: Map<String, LifecycleEntry> = emptyMap()
+        val lifecycle: Map<String, LifecycleEntry> = emptyMap(),
+        val extras: BackupExtras = BackupExtras()
     )
 
     /**
@@ -45,7 +47,8 @@ class ProfileBackup(context: Context) {
         val profiles = store.allProfiles()
         val behaviorJson = behaviorStateToJson(behavior)
         val lifecycleJson = lifecycleToJson(lifecycleStore.all())
-        if (profiles.isEmpty() && behaviorJson.length() == 0 && lifecycleJson.length() == 0) {
+        val extras = BackupExtras.collect(appContext)
+        if (profiles.isEmpty() && behaviorJson.length() == 0 && lifecycleJson.length() == 0 && extras.isEmpty) {
             return ExportResult(0, 0, "")
         }
         val file = store.exportFile()
@@ -54,8 +57,9 @@ class ProfileBackup(context: Context) {
             .put("profiles", JSONArray(PrivacyProfileStore.toJson(profiles)))
             .put("behavior", behaviorJson)
             .put("lifecycle", lifecycleJson)
+            .put("extras", extras.toJson())
         file.writeText(doc.toString(2))
-        return ExportResult(profiles.size, behaviorJson.length(), file.absolutePath, lifecycleJson.length())
+        return ExportResult(profiles.size, behaviorJson.length(), file.absolutePath, lifecycleJson.length(), extras.count)
     }
 
     /**
@@ -72,7 +76,9 @@ class ProfileBackup(context: Context) {
         store.importProfiles(profiles)
         // Nur Einstellungen mergen - angewendet wird ein Lifecycle-Profil erst per Knopf
         lifecycleStore.importEntries(lifecycle)
-        return ImportResult(profiles, behavior, lifecycle)
+        val extras = BackupExtras.parse(json)
+        BackupExtras.apply(appContext, extras)
+        return ImportResult(profiles, behavior, lifecycle, extras)
     }
 
     companion object {
