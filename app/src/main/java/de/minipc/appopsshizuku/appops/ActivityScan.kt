@@ -51,13 +51,20 @@ object ActivityScan {
     }
 
     /**
-     * `dumpsys sensorservice` -> Pakete, die (zuletzt) Sensoren abgefragt haben. Best-Effort ueber
-     * `package=...`/`pkg=...`-Marker; Bewegungssensoren brauchen keine Berechtigung und werden fuers
-     * Fingerprinting genutzt.
+     * `dumpsys sensorservice` -> Pakete, die Sensoren abfragen oder zuletzt abgefragt haben.
+     * Formate laut AOSP (SensorEventConnection.cpp, SensorRegistrationInfo.h):
+     *  - aktive Verbindung:      `\t com.pkg | WakeLockRefCount 0 | uid 10123 | ...`
+     *  - fruehere Registrierung: `... result=OK (sensor, package): (Accelerometer   , com.pkg)`
+     *  - aeltere Ausgaben:       `package=com.pkg` / `pkg=com.pkg`
+     * Bewegungssensoren brauchen keine Berechtigung und werden fuers Fingerprinting genutzt.
      */
     fun parseSensorPackages(dump: String): Set<String> {
-        val re = Regex("""(?:package|pkg)=($PKG)""")
-        return re.findAll(dump).map { it.groupValues[1] }.toSet()
+        val patterns = listOf(
+            Regex("""^\s*($PKG)\S*\s+\|\s+WakeLockRefCount""", RegexOption.MULTILINE),
+            Regex("""\(sensor, package\):\s*\(.*?,\s*($PKG)[^)]*\)"""),
+            Regex("""(?:package|pkg)=($PKG)""")
+        )
+        return patterns.flatMap { re -> re.findAll(dump).map { it.groupValues[1] } }.toSet()
     }
 
     enum class Kind { ALARM, JOB, SENSOR }

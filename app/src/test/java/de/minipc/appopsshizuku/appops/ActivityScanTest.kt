@@ -53,6 +53,14 @@ class ActivityScanTest {
     }
 
     @Test
+    fun sensorPaketeAospFormat() {
+        val dump = "Active connections\n\t com.fitness.app | WakeLockRefCount 0 | uid 10231 | cache size 0 | max cache size 0 | has sensor access: true\n" +
+            "Previous Registrations:\n12:01:02 + 0x00000001 pid= 1234 uid=10231 samplingPeriod=   20000us batchingPeriod=       0us result=OK (sensor, package): (LSM6DSO Accelerometer      , com.game.xyz)\n" +
+            "12:00:00 - 0x00000001 pid= 1234 uid=10231 result=OK (sensor, package): (Gyro, com.maps.app.SensorHelper)\n"
+        assertEquals(setOf("com.fitness.app", "com.game.xyz", "com.maps.app.SensorHelper"), ActivityScan.parseSensorPackages(dump))
+    }
+
+    @Test
     fun sensorPakete() {
         val dump = "x package=com.sensor.app y\n z pkg=com.other.app w\n nothing here"
         assertEquals(setOf("com.sensor.app", "com.other.app"), ActivityScan.parseSensorPackages(dump))
