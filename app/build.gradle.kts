@@ -11,8 +11,8 @@ android {
         applicationId = "de.minipc.appopsshizuku"
         minSdk = 26
         targetSdk = 35
-        versionCode = 42
-        versionName = "1.20.2"
+        versionCode = 43
+        versionName = "1.20.3"
     }
 
     buildTypes {
