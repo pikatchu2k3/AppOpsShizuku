@@ -20,42 +20,95 @@ Download the APK from the [latest GitHub release](https://github.com/pikatchu2k3
 
 To get updates automatically, add the repository to [Obtainium](https://github.com/ImranR98/Obtainium) (source: *GitHub Releases*, URL `https://github.com/pikatchu2k3/AppOpsShizuku`). The signing certificate stays the same, so an update installs in place and keeps your data.
 
+### At a glance
+
+App Ops Shizuku is a **privacy control panel for the other apps on your phone**. It can:
+
+- **See and restrict** what each app may do: 33 permissions and App Ops (camera, microphone, location, contacts, calendar, call log, SMS, clipboard, media, background running, overlays, …) — with an **access log** showing when an app last used each one and which attempts were refused.
+- **Grant only while needed**: *only while in use* (permission exists only while the app is in front), *only on demand* (app stays closed until you open it) and a *quick lockdown* that takes camera and microphone away from every app at once.
+- **Cut network access**: block background data, take an app fully offline, see **per-app traffic** (background shown separately), and switch **private DNS** (with tracker-blocking presets) for the whole phone.
+- **Automate**: rules by time or Wi-Fi, a quarantine for newly installed apps, one-tap profile templates, a Quick Settings tile.
+- **Find out what apps do**: who wakes the device, who schedules jobs, who reads sensors, who holds accessibility or notification access.
+- **Isolate apps**: move them into a work profile (this app can create one itself).
+- **Rewrite apps (beta)**: hide from recents, blank thumbnails, spoof device IDs, remove permissions or tracker components, return placeholder data, install parallel clones.
+- **Stay in control**: every change is read back from the device, listed in a **change log with undo**, and the app itself has **no internet permission** — nothing leaves the phone.
+
+### Where do I find it?
+
+The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and **Settings**. Tapping an app opens its detail page with the tabs *Permissions*, *Behavior*, *Stealth* and *Network & Trackers*.
+
+| Feature | Where |
+|---|---|
+| Per-app permissions, access log, recommendations, templates, only while in use | App → *Permissions* |
+| Freeze, disable, clear data, standby bucket, battery exemption, only on demand | App → *Behavior* |
+| Background data, offline, restrict list, tracker detection | App → *Network & Trackers* |
+| Patch, clone, hide, spoof, disable trackers, remove permissions | App → *Stealth* |
+| Search, sort, filter (*All / Blocked / Changed*) | Header buttons of *Apps* |
+| By permission · Network usage · Activity · Automatic rules · System-wide · Work profile · Change log · Diagnostics | *Tools* |
+| Shizuku status, quarantine, system colours, backup, standing access | *Settings* |
+| Lockdown | *Tools → System-wide*, and as Quick Settings tile |
+
 ### Features
 
-- **App list** with live search (label and package name), sorting by name / install date / update date, and a "blocked" filter.
-- **Privacy profile per app** (tab *Permissions*): camera, microphone, contacts, calendar, call log, accounts, clipboard, sensors and more, set per app to default / allow / ignore / deny. "Block all", "Reset all to default", and JSON export/import of profiles. Every change is read back from the device; ops the device refuses are shown as "not settable".
-- **Behaviour control** (tab *Behavior*): disable an app, freeze it (`pm suspend`), clear its data (confirmed by typing the package name), set the standby bucket, grant/remove the battery (Doze) exemption, "optimize app" (force recompile). Also a lifecycle profile (battery exemption + standby bucket + background ops in one step, revertible) and an optional "stop app when the screen turns off" (runs a foreground service while enabled).
-  - **Only on demand (new, not yet tested on a device):** the app stays closed and locked (`am force-stop` + `pm suspend`, or `pm disable-user`, or **only stop** – `am force-stop` alone, so the app can still be opened from any launcher such as Nova; the watcher notices the start and stops it again after you leave) and only runs after you open it via its own home-screen shortcut. After leaving it, it is locked again after 10 s / 1 min / 5 min, or only when the screen turns off; turning the screen on never releases it. Leaving is detected via usage events (usage access is granted to this app via Shizuku), otherwise via `dumpsys activity`. Opening needs a running Shizuku; with *Disable* the app can also be re-enabled in the system settings without Shizuku. While locked, the app's messages, alarms and background sync do not arrive. Note on *Freeze*: `pm suspend` only blocks opening the app; if the system or another app starts it in the background (job, Bluetooth device, bound service), it runs despite being frozen. The watcher therefore checks every 5 minutes (frozen apps only) and at screen-off whether a frozen app has left the stopped state and force-stops it again; only *Disable* prevents such wake-ups completely. **Own launchers** (e.g. AppDialer NXT) can open a frozen app through the exported action `de.minipc.appopsshizuku.action.OPEN_ON_DEMAND` (extra `pkg`); the caller must use `startActivityForResult` so Android reports who it is, and each new launcher is asked once (*Always allow* / *Only this time* / *Deny*; revocable in the *Behavior* tab).
-- **Stealth** (tab *Stealth*; the controls currently live in the *Components* screen): patches an app's APK on the device and re-signs it. Hide from recents, hide the launcher icon, blank the recents thumbnail (`FLAG_SECURE`), require an active VPN, hide behind a calculator (vault), app-specific device-ID spoofing (build fields, Android ID, IMEI/IMSI), or install as a parallel clone.
-- **Network & Trackers** (tab *Network & Trackers*):
-  - block background data,
-  - take an app completely offline,
-  - put an app on Android's background restrict list,
-  - tracker detection: reads the app's manifest and lists known building blocks (Firebase Analytics/DataTransport, Crashlytics, Facebook SDK, AdMob, Audience Network, Sentry, Mixpanel, Braze, AppsFlyer, Adjust, Kochava).
-  
-  Each switch is verified by reading the state back from the device. "Reset all" only undoes what this app changed.
+#### App list
+- Live search (label and package name), sorting by name / install date / update date, filters *All*, *Blocked* and *Changed*.
+- A **status line** on every card shows what this app changed on it: blocked permissions, offline, no background data, only on demand, only while in use, quarantine. It is read from the app's own records, so no shell call is needed.
+- Gradient cards in the colour of each app icon on a calm star-field background (light and dark). A notice appears while Shizuku is not connected.
 
-- **New, not yet tested on a device:**
-  - **Access log** (tab *Permissions*): last use, blocked attempts and "in use right now" per permission, from one `cmd appops get`. A suggestion card lists permissions that are granted but unused for 30 days, or unusual for the app's category (games, media, news) — nothing changes until you tap *Revoke*.
-  - **Only while in use**: extra mode for permissions Android has no foreground mode for (contacts, calendar, call log, media, accounts …). Granted while the app is in front, revoked 10 s after leaving or when the screen turns off (Android then ends the app in the background). Runs in the screen watcher service.
-  - **By permission** (menu): pick one permission and see which apps have it and when they last used it; switch per app or block it for all user apps at once (system apps never).
-  - **Status line in the app list** (blocked, offline, no background data, on demand, while in use, quarantine) and a filter chip *Changed* — from this app's own records, no shell call.
-  - **Quarantine for new apps** (menu, off by default): apps installed after switching it on get no background data, no clipboard and no background running until you release them in the *Permissions* tab.
-  - **System-wide** (menu): *Lockdown* takes camera/microphone (optionally location) from all user apps and gives it back to exactly those apps — also as a Quick Settings tile. *Private DNS* with presets (AdGuard, Mullvad adblock, Quad9, Cloudflare) or an own host, with "back to previous". *Powerful access*: accessibility services, notification access, keyboards, default apps (SMS, phone, assistant, browser), always-on VPN and device admins — revocable where the shell may, otherwise a button to the system settings.
-  - Blocking a permission now also sets `user-fixed`, so the app cannot simply ask again; granting and "Reset all" clear it.
+#### Permissions per app (tab *Permissions*)
+- **33 privacy permissions** in eight groups — *sensors* (camera, microphone, body sensors, activity recognition, Bluetooth scan, nearby Wi-Fi, local network), *location* (precise, approximate, background, photo location), *data* (contacts, calendar, call log, clipboard, phone state, SMS), *media* (photos, videos, audio, selected media, all files), *accounts*, *background* (run in background, foreground services from background, usage stats), *identity* (device IDs, mock location) and *system UI* (overlay, notifications, screen on, picture-in-picture).
+- Each one can be set to default / allow / ignore / deny. Permissions with a runtime grant use `pm grant|revoke` (blocking also sets `user-fixed`, so the app cannot simply ask again); pure App Ops use `cmd appops set`. Ops the device does not know are shown as "not settable", permissions the app never requests as "not requested".
+- **Block all** and **Reset all to default** (a reset never grants anything). Profiles are stored and exported as JSON.
+- **Access log**: last use, refused attempts and "in use right now" per permission, from a single `cmd appops get`.
+- **Recommendation card**: permissions that are granted but unused for 30 days, or unusual for the app's category (games, media, news). Nothing changes until you tap *Revoke*.
+- **Profile templates**: *Game*, *Messenger* and *Banking* in one tap; the current profile can be shared as JSON.
+- **Only while in use**: an extra mode for permissions Android has no foreground mode for (contacts, calendar, call log, media, accounts, …). Granted while the app is in front, revoked 10 s after leaving or when the screen turns off (Android then ends the app in the background).
+- Clipboard note: `deny` can make an app crash on start — *ignore* (silent block) is the better choice, and the app warns about it.
 
-- **More privacy tools (new, not yet tested on a device):**
-  - **Change log** (menu): every change this app makes, with per-entry *Undo* for permission and network toggles.
-  - **Profile templates** (Permissions tab): Game / Messenger / Banking in one tap, shareable as JSON.
-  - **By network usage** (menu): per-app traffic over 7 days, background shown separately; apps with much background traffic that you rarely open are listed first, with a one-tap "block background".
-  - **Activity** (menu): which apps wake the device, schedule jobs or read sensors (from dumpsys, heuristic).
-  - **Automatic rules** (menu): by time (days + window, incl. overnight) or Wi-Fi (connected / not), action = Lockdown or take chosen apps offline. The Wi-Fi name is read only after you grant this app the location permission on first use (the app has no network access of its own). If Android hides the name while the app runs in the background, the rule is skipped (not switched off) until you open the app.
-  - **Work profile** (menu): App Ops Shizuku can create a managed profile itself (own profile owner) and move apps into it; it can also move apps into an existing profile (e.g. Shelter) using shell rights alone.
-  - **Placeholder data instead of blocking (beta patch)**: in the re-signed clone/patch, return a null advertising ID and a fixed city-level location instead of the real values, so apps that crash on "denied" keep working.
-  - **Diagnostics** (Tools): harmless checks showing which levers work on this device (permission flags, freeze-dialog text, firewall chain, dumpsys formats, work profile); the report can be shared as text.
-  - **Standing access** (Settings): the app grants itself `WRITE_SECURE_SETTINGS` once via Shizuku; private DNS and revoking accessibility services then work after a restart without Shizuku.
-  - **Backup** now also contains automatic rules, "only while in use", the quarantine switch and the lockdown selection.
-  - **Restart notice**: after a reboot (Shizuku not yet running) a notification points out that the configured protection is inactive; once connected, a bar offers to restore settings that drifted.
+#### Across all apps (*Tools*)
+- **By permission**: pick one permission and see which apps hold it and when they last used it; switch per app, or revoke it for all user apps at once (system apps are never touched).
+- **Lockdown**: takes camera and microphone (optionally location) from all user apps and gives them back to *exactly* those apps. Also available as a **Quick Settings tile**.
+- **Quarantine for new apps** (*Settings*, off by default): apps installed while it is on get no background data, no clipboard and no background running until you release them.
+- **Automatic rules**: by **time** (weekdays + window, also overnight) or **Wi-Fi** (connected / not connected to a network). Action: Lockdown, or take chosen apps offline. The Wi-Fi name is read only after you grant this app the location permission on first use (it has no network access of its own). If Android hides the name while the app runs in the background, the rule is skipped — not switched off — until you open the app. Rules need a running Shizuku.
+
+#### Behaviour (tab *Behavior*)
+- Disable an app, **freeze** it (`pm suspend`, with your own text in the system dialog), clear its data (confirmed by typing the package name), set the standby bucket, grant or remove the battery (Doze) exemption, "optimize app" (force recompile).
+- **Lifecycle profile**: battery exemption + standby bucket + background ops in one step, revertible. Optional **stop app when the screen turns off** (runs a foreground service while enabled).
+- **Only on demand:** the app stays closed and locked (`am force-stop` + `pm suspend`, or `pm disable-user`, or **only stop** – `am force-stop` alone, so the app can still be opened from any launcher such as Nova; the watcher notices the start and stops it again after you leave) and only runs after you open it via its own home-screen shortcut. After leaving it, it is locked again after 10 s / 1 min / 5 min, or only when the screen turns off; turning the screen on never releases it. Leaving is detected via usage events (usage access is granted to this app via Shizuku), otherwise via `dumpsys activity`. Opening needs a running Shizuku; with *Disable* the app can also be re-enabled in the system settings without Shizuku. While locked, the app's messages, alarms and background sync do not arrive. Note on *Freeze*: `pm suspend` only blocks opening the app; if the system or another app starts it in the background (job, Bluetooth device, bound service), it runs despite being frozen. The watcher therefore checks every 5 minutes (frozen apps only) and at screen-off whether a frozen app has left the stopped state and force-stops it again; only *Disable* prevents such wake-ups completely. **Own launchers** (e.g. AppDialer NXT) can open a frozen app through the exported action `de.minipc.appopsshizuku.action.OPEN_ON_DEMAND` (extra `pkg`); the caller must use `startActivityForResult` so Android reports who it is, and each new launcher is asked once (*Always allow* / *Only this time* / *Deny*; revocable in the *Behavior* tab).
+
+#### Network & trackers
+- **Per app** (tab *Network & Trackers*): block background data · take the app completely offline · put it on Android's background restrict list · **tracker detection** (reads the manifest and scans the code for known building blocks: Firebase Analytics / DataTransport / Crashlytics, Facebook SDK and Audience Network, AdMob, Google Analytics, Sentry, Mixpanel, Segment, Amplitude, Braze, AppsFlyer, Adjust, Kochava). Each switch is verified by reading the state back; "Reset all" only undoes what this app changed.
+- **Network usage** (*Tools*): traffic per app over 7 days, background shown separately. Apps with much background traffic that you rarely open are listed first, with a one-tap "block background".
+- **Private DNS** (*Tools → System-wide*): off / automatic / presets (AdGuard, Mullvad adblock, Quad9, Cloudflare) / your own host, with "back to previous".
+
+#### Insight (*Tools*)
+- **Activity**: which apps wake the device, schedule jobs or read sensors (parsed from `dumpsys`, heuristic).
+- **Change log**: every change this app makes, with *Undo* per entry for permission and network toggles.
+- **Diagnostics**: harmless checks showing which levers work on *your* device (permission flags, freeze-dialog text, firewall chain, `dumpsys` formats, work profile). The report can be shared as text; it contains model and Android version, no app list and no personal data.
+- **Restart notice**: after a reboot (Shizuku not running yet) a notification says that the configured protection is inactive; once connected, a bar offers to restore settings that drifted.
+
+#### System-wide and powerful access (*Tools → System-wide*, *Work profile*)
+- **Powerful access** overview: accessibility services, notification access, keyboards, default apps (SMS, phone, assistant, browser), always-on VPN and device admins — revocable where the shell may, otherwise a button into the system settings.
+- **Standing access** (*Settings*): the app grants itself `WRITE_SECURE_SETTINGS` once via Shizuku; private DNS and revoking accessibility services then also work after a restart without Shizuku.
+- **Work profile**: this app can create a managed profile itself (own profile owner) and move apps into it; it can also move apps into an existing profile (e.g. Shelter) using shell rights alone. Moved apps see neither the contacts nor the files of the main profile and start with their own data.
+
+#### Stealth — patch and clone (beta, tab *Stealth*)
+- (The controls currently live in the *Components* screen.) Patches an app's APK on the device and re-signs it: hide from recents, hide the launcher icon, blank the recents thumbnail (`FLAG_SECURE`), require an active VPN, hide behind a calculator (vault), app-specific device-ID spoofing (build fields, Android ID, IMEI/IMSI), or install as a **parallel clone**.
+- **Disable trackers**, **remove permissions** (internet, advertising ID, installed-app list, location, phone state, account list) and **placeholder data instead of blocking** (null advertising ID, fixed city-level location) — details and limits under *Work in progress*.
+
+#### Settings and backup
+- Shizuku status, quarantine switch, *System colors (Material You)*, **standing access**, export / import and the app version.
+- **Backup** is one JSON file: privacy profiles, behaviour settings, lifecycle profiles, automatic rules, "only while in use", the quarantine switch and the lockdown selection. Older files stay readable; on import only known permissions are accepted. Live device state (which apps are in quarantine right now) is deliberately not backed up. For scripts and Tasker the import also works without a file dialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <path>`.
+
+### Safety principles
+
+- **No internet permission**: the app cannot send anything anywhere; its data lives in its own private storage.
+- **Nothing is assumed**: every change is read back from the device and reported as done only if it really took effect.
+- **Everything is reversible**: change log with *Undo*, "Reset all" undoes only what this app changed, original APKs are saved before a patch.
+- **Location only on demand**: the permission is requested the first time you create a Wi-Fi rule, never at start.
+- **Open source** under GPL-3.0.
+
+Features marked *beta* or described as new in the release notes have not all been verified on every device — use *Diagnostics* to see which levers work on yours.
 
 ### Honest limits
 
@@ -118,9 +171,11 @@ export ANDROID_SDK_ROOT=$ANDROID_HOME
 
 The APK ends up in `app/build/outputs/apk/debug/`. Unit tests: `./gradlew :app:testDebugUnitTest`. `scripts/release.sh` builds, tests, checks the signature and publishes a GitHub release (maintainer use).
 
-### Colours
+Note: `app/src/main/res/raw/calcyou.apk` (the calculator-vault build, see *License*) is **not** in the repository because `*.apk` is git-ignored. To build, put that file there (a placeholder is enough for development; the vault then cannot install its calculator).
 
-The app uses a **complete Material 3 palette** derived systematically from a calm petrol/teal seed (light and dark), with red reserved for real errors. Menu of the main list → **System colors (Material You)**: on (default) = colours from the system wallpaper (Android 12+), off = the app's own petrol palette; the choice is remembered. On Android 11 and older the entry is greyed out. Measured contrast: worst text pair 6.49:1 (light) / 5.46:1 (dark) — target was 4.5:1.
+### Design and colours
+
+The app uses a **complete Material 3 palette** derived systematically from a calm petrol/teal seed (light and dark), with red reserved for real errors. *Settings* → **System colors (Material You)**: on (default) = colours from the system wallpaper (Android 12+), off = the app's own petrol palette; the choice is remembered. On Android 11 and older the entry is greyed out. Measured contrast: worst text pair 6.49:1 (light) / 5.46:1 (dark) — target was 4.5:1. The app list and tools use gradient cards on a star-field background; the card colour comes from each app icon and is darkened until white text has at least 4.5:1 contrast (covered by a unit test).
 
 ### Signature
 
@@ -142,14 +197,14 @@ The interface ships in English (base) plus 8 translations — 693 strings each, 
 
 | Language | Locale | Coverage |
 |---|---|---|
-| German/Deutsch | `values-de` | 372/372 (100%) |
-| Spanish/Español | `values-es` | 372/372 (100%) |
-| French/Français | `values-fr` | 372/372 (100%) |
-| Hindi/हिन्दी | `values-hi` | 372/372 (100%) |
-| Japanese/日本語 | `values-ja` | 372/372 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 372/372 (100%) |
-| Russian/Русский | `values-ru` | 372/372 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 372/372 (100%) |
+| German/Deutsch | `values-de` | 693/693 (100%) |
+| Spanish/Español | `values-es` | 693/693 (100%) |
+| French/Français | `values-fr` | 693/693 (100%) |
+| Hindi/हिन्दी | `values-hi` | 693/693 (100%) |
+| Japanese/日本語 | `values-ja` | 693/693 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 693/693 (100%) |
+| Russian/Русский | `values-ru` | 693/693 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 693/693 (100%) |
 
 Alle Übersetzungen sind maschinell geprüft (Platzhalter, Pluralformen, XML-Struktur) — `R.array.*`-Ressourcen bleiben unberührt. English is the base, so any device with an unsupported language falls back to English instead of German.
 ## Deutsch
@@ -172,42 +227,95 @@ APK aus dem [neuesten GitHub-Release](https://github.com/pikatchu2k3/AppOpsShizu
 
 Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obtainium) eintragen (Quelle: *GitHub Releases*, URL `https://github.com/pikatchu2k3/AppOpsShizuku`). Die Signatur bleibt gleich, deshalb wird ein Update direkt über die installierte App eingespielt, die Daten bleiben erhalten.
 
+### Auf einen Blick
+
+App Ops Shizuku ist ein **Datenschutz-Steuerpult für die anderen Apps auf deinem Handy**. Es kann:
+
+- **Sehen und einschränken**, was jede App darf: 33 Berechtigungen und App Ops (Kamera, Mikrofon, Standort, Kontakte, Kalender, Anrufliste, SMS, Zwischenablage, Medien, Hintergrund-Lauf, Overlays, …) — mit einem **Zugriffsprotokoll**, das zeigt, wann eine App sie zuletzt benutzt hat und welche Versuche abgewehrt wurden.
+- **Nur bei Bedarf erteilen**: *nur während Nutzung* (die Berechtigung gibt es nur, solange die App vorne ist), *nur bei Bedarf* (die App bleibt geschlossen, bis du sie öffnest) und ein *Schnell-Lockdown*, der allen Apps auf einmal Kamera und Mikrofon entzieht.
+- **Netzzugriff kappen**: Hintergrunddaten sperren, eine App komplett offline nehmen, den **Verkehr je App** sehen (Hintergrund getrennt) und **privates DNS** (mit Tracker-Blocker-Vorlagen) für das ganze Handy umschalten.
+- **Automatisieren**: Regeln nach Zeit oder WLAN, Quarantäne für neu installierte Apps, Profil-Vorlagen per Tipp, eine Schnelleinstellungs-Kachel.
+- **Herausfinden, was Apps tun**: wer das Gerät weckt, wer Jobs plant, wer Sensoren abfragt, wer Bedienungshilfen- oder Benachrichtigungszugriff hat.
+- **Apps abschotten**: in ein Arbeitsprofil verschieben (die App kann selbst eins anlegen).
+- **Apps umschreiben (Beta)**: aus dem Verlauf ausblenden, Vorschaubilder schwärzen, Geräte-IDs fälschen, Berechtigungen oder Tracker-Komponenten entfernen, Platzhalter-Daten liefern, parallele Klone installieren.
+- **Die Kontrolle behalten**: jede Änderung wird vom Gerät zurückgelesen, steht in einem **Änderungsprotokoll mit „Rückgängig"**, und die App hat selbst **keine Internet-Berechtigung** — nichts verlässt das Handy.
+
+### Wo finde ich was?
+
+Die App hat unten in einer schwebenden Leiste drei Bereiche: **Apps**, **Werkzeuge** und **Einstellungen**. Ein Tipp auf eine App öffnet ihre Detailseite mit den Reitern *Berechtigungen*, *Verhalten*, *Tarnung* und *Netz & Tracker*.
+
+| Funktion | Wo |
+|---|---|
+| Berechtigungen je App, Zugriffsprotokoll, Empfehlungen, Vorlagen, nur während Nutzung | App → *Berechtigungen* |
+| Einfrieren, Deaktivieren, Daten löschen, Standby-Stufe, Akku-Ausnahme, nur bei Bedarf | App → *Verhalten* |
+| Hintergrunddaten, Offline, Sperrliste, Tracker-Erkennung | App → *Netz & Tracker* |
+| Patch, Klon, Ausblenden, Fälschen, Tracker abschalten, Berechtigungen entfernen | App → *Tarnung* |
+| Suchen, Sortieren, Filtern (*Alle / Blockiert / Geändert*) | Knöpfe in der Kopfzeile von *Apps* |
+| Nach Berechtigung · Netzverkehr · Aktivität · Automatische Regeln · Systemweit · Arbeitsprofil · Änderungsprotokoll · Diagnose | *Werkzeuge* |
+| Shizuku-Status, Quarantäne, Systemfarben, Sicherung, Dauerrecht | *Einstellungen* |
+| Lockdown | *Werkzeuge → Systemweit* und als Schnelleinstellungs-Kachel |
+
 ### Funktionen
 
-- **App-Liste** mit Live-Suche (Name und Paketname), Sortierung nach Name / Installations- / Aktualisierungsdatum und Filter „Blockiert".
-- **Privacy-Profil je App** (Reiter *Berechtigungen*): Kamera, Mikrofon, Kontakte, Kalender, Anrufliste, Konten, Zwischenablage, Sensoren u. a., je App auf Standard / erlauben / ignorieren / verweigern. „Alles blockieren", „Alle auf Standard" sowie JSON-Export/-Import der Profile. Jede Änderung wird vom Gerät zurückgelesen; Ops, die das Gerät verweigert, erscheinen als „nicht setzbar".
-- **Verhaltens-Steuerung** (Reiter *Verhalten*): App deaktivieren, einfrieren (`pm suspend`), Daten löschen (Bestätigung per Paketname), Standby-Stufe setzen, Akku-Ausnahme (Doze) erteilen/entfernen, „App optimieren" (neu kompilieren). Dazu ein Lifecycle-Profil (Akku-Ausnahme + Standby-Stufe + Hintergrund-Ops in einem Schritt, zurücknehmbar) und optional „Beim Bildschirm-Aus anhalten" (solange aktiv, läuft ein Vordergrunddienst).
-  - **Nur bei Bedarf (neu, noch nicht am Gerät getestet):** Die App bleibt geschlossen und gesperrt (`am force-stop` + `pm suspend` oder `pm disable-user` oder **nur beenden** – allein `am force-stop`, damit die App weiter aus jedem Launcher wie Nova startbar ist; der Wächter erkennt den Start und beendet sie nach dem Verlassen wieder) und läuft nur, nachdem du sie über ihre eigene Verknüpfung auf dem Startbildschirm geöffnet hast. Nach dem Verlassen wird sie nach 10 s / 1 Min. / 5 Min. oder nur beim Bildschirm-Aus wieder gesperrt; das Einschalten des Bildschirms gibt sie nie frei. Das Verlassen wird über Nutzungsereignisse erkannt (Nutzungszugriff erteilt sich die App per Shizuku), sonst über `dumpsys activity`. Zum Öffnen muss Shizuku laufen; bei *Deaktivieren* lässt sich die App auch ohne Shizuku in den System-Einstellungen wieder aktivieren. Solange sie gesperrt ist, kommen Nachrichten, Wecker und Hintergrund-Sync der App nicht an. Hinweis zu *Einfrieren*: `pm suspend` sperrt nur das Öffnen; startet das System oder eine andere App sie im Hintergrund (Job, Bluetooth-Gerät, gebundener Dienst), läuft sie trotz Einfrieren. Der Wächter prüft deshalb alle 5 Minuten (nur eingefrorene Apps) und beim Bildschirm-Aus, ob eine eingefrorene App den Beendet-Zustand verlassen hat, und beendet sie erneut; ganz verhindert solche Weckrufe nur *Deaktivieren*. **Eigene Starter** (z. B. AppDialer NXT) können eine eingefrorene App über die exportierte Aktion `de.minipc.appopsshizuku.action.OPEN_ON_DEMAND` (Extra `pkg`) öffnen; der Aufrufer muss `startActivityForResult` nutzen, damit Android meldet, wer anfragt, und jeder neue Starter wird einmal gefragt (*Immer erlauben* / *Nur diesmal* / *Ablehnen*; im Reiter *Verhalten* widerrufbar).
-- **Tarnung / Stealth** (Reiter *Tarnung*; die Schalter liegen derzeit noch im Bildschirm *Komponenten*): patcht die APK einer App auf dem Gerät und signiert sie neu. Aus dem Verlauf ausblenden, Launcher-Icon entfernen, Verlaufs-Vorschau schwärzen (`FLAG_SECURE`), VPN-Pflicht, als Taschenrechner tarnen (Vault), app-spezifisches Geräte-Spoofing (Build-Felder, Android-ID, IMEI/IMSI) oder als parallelen Klon installieren.
-- **Netz & Tracker** (Reiter *Netz & Tracker*):
-  - Hintergrund-Datenverkehr sperren,
-  - App komplett offline schalten,
-  - App auf Androids Hintergrund-Sperrliste setzen,
-  - Tracker-Erkennung: liest das Manifest der App und listet bekannte Bausteine (Firebase Analytics/DataTransport, Crashlytics, Facebook SDK, AdMob, Audience Network, Sentry, Mixpanel, Braze, AppsFlyer, Adjust, Kochava).
-  
-  Jeder Schalter wird durch Zurücklesen vom Gerät geprüft. „Alles zurücksetzen" macht nur rückgängig, was diese App selbst geändert hat.
+#### App-Liste
+- Live-Suche (Name und Paketname), Sortierung nach Name / Installations- / Aktualisierungsdatum, Filter *Alle*, *Blockiert* und *Geändert*.
+- Eine **Statuszeile** auf jeder Karte zeigt, was diese App an ihr geändert hat: blockierte Berechtigungen, offline, keine Hintergrunddaten, nur bei Bedarf, nur während Nutzung, Quarantäne. Sie kommt aus den eigenen Speichern der App, ein Shell-Aufruf ist nicht nötig.
+- Verlaufskarten in der Farbe des jeweiligen App-Icons auf einem ruhigen Sternenhimmel (hell und dunkel). Solange Shizuku nicht verbunden ist, erscheint ein Hinweis.
 
-- **Neu, noch nicht am Gerät getestet:**
-  - **Zugriffsprotokoll** (Reiter *Berechtigungen*): letzte Nutzung, abgewehrte Versuche und „wird gerade benutzt" je Berechtigung, aus einem einzigen `cmd appops get`. Eine Empfehlungskarte nennt Berechtigungen, die erteilt, aber seit 30 Tagen ungenutzt oder für die App-Kategorie unüblich sind (Spiele, Medien, Nachrichten) — geändert wird erst nach Tipp auf *Entziehen*.
-  - **Nur während Nutzung**: zusätzlicher Modus für Berechtigungen ohne Vordergrund-Modus in Android (Kontakte, Kalender, Anrufliste, Medien, Konten …). Erteilt, solange die App vorne ist; entzogen 10 s nach dem Verlassen oder beim Bildschirm-Aus (Android beendet die App dann im Hintergrund). Läuft im Bildschirm-Wächter.
-  - **Nach Berechtigung** (Menü): eine Berechtigung wählen und sehen, welche Apps sie haben und wann sie sie zuletzt benutzt haben; je App umschalten oder allen Nutzer-Apps auf einmal entziehen (System-Apps nie).
-  - **Statuszeile in der App-Liste** (blockiert, offline, keine Hintergrunddaten, nur bei Bedarf, nur während Nutzung, Quarantäne) und Filter-Chip *Geändert* — aus den eigenen Speichern, ohne Shell-Aufruf.
-  - **Quarantäne für neue Apps** (Menü, standardmäßig aus): nach dem Einschalten installierte Apps bekommen keine Hintergrunddaten, keine Zwischenablage und keinen Hintergrund-Lauf, bis du sie im Reiter *Berechtigungen* freigibst.
-  - **Systemweit** (Menü): *Lockdown* entzieht allen Nutzer-Apps Kamera/Mikrofon (wahlweise Standort) und gibt sie genau diesen Apps zurück — auch als Schnelleinstellungs-Kachel. *Privates DNS* mit Vorlagen (AdGuard, Mullvad adblock, Quad9, Cloudflare) oder eigenem Host, mit „Zurück auf vorher". *Mächtige Rechte*: Bedienungshilfen, Benachrichtigungszugriff, Tastaturen, Standard-Apps (SMS, Telefon, Assistent, Browser), dauerhaftes VPN und Geräteadministratoren — entziehbar, wo die Shell es darf, sonst ein Knopf zu den Systemeinstellungen.
-  - Blockieren einer Berechtigung setzt jetzt zusätzlich `user-fixed`, die App kann also nicht einfach erneut fragen; Erteilen und „Alle auf Standard" heben das wieder auf.
+#### Berechtigungen je App (Reiter *Berechtigungen*)
+- **33 Datenschutz-Berechtigungen** in acht Gruppen — *Sensoren* (Kamera, Mikrofon, Körper-Sensoren, Aktivitätserkennung, Bluetooth-Suche, WLAN-Geräte in der Nähe, lokales Netzwerk), *Standort* (genau, ungefähr, im Hintergrund, Foto-Standort), *Daten* (Kontakte, Kalender, Anrufliste, Zwischenablage, Telefonstatus, SMS), *Medien* (Fotos, Videos, Audio, ausgewählte Medien, alle Dateien), *Konten*, *Hintergrund* (Hintergrund-Ausführung, Vordergrunddienste aus dem Hintergrund, Nutzungsstatistik), *Identität* (Geräte-IDs, Standort vortäuschen) und *System-UI* (Overlay, Benachrichtigungen, Bildschirm einschalten, Bild-in-Bild).
+- Jede lässt sich auf Standard / erlauben / ignorieren / verweigern setzen. Berechtigungen mit Laufzeit-Erteilung nutzen `pm grant|revoke` (Blockieren setzt zusätzlich `user-fixed`, die App kann also nicht einfach erneut fragen); reine App Ops nutzen `cmd appops set`. Ops, die das Gerät nicht kennt, erscheinen als „nicht setzbar", Berechtigungen, die die App nie anfordert, als „nicht angefordert".
+- **Alles blockieren** und **Alle auf Standard** (ein Reset erteilt nie etwas). Profile werden gespeichert und als JSON exportiert.
+- **Zugriffsprotokoll**: letzte Nutzung, abgewehrte Versuche und „wird gerade benutzt" je Berechtigung, aus einem einzigen `cmd appops get`.
+- **Empfehlungskarte**: Berechtigungen, die erteilt, aber seit 30 Tagen ungenutzt oder für die App-Kategorie unüblich sind (Spiele, Medien, Nachrichten). Geändert wird erst nach Tipp auf *Entziehen*.
+- **Profil-Vorlagen**: *Spiel*, *Messenger* und *Banking* per Tipp; das aktuelle Profil lässt sich als JSON teilen.
+- **Nur während Nutzung**: zusätzlicher Modus für Berechtigungen, für die Android keinen Vordergrund-Modus kennt (Kontakte, Kalender, Anrufliste, Medien, Konten, …). Erteilt, solange die App vorne ist; entzogen 10 s nach dem Verlassen oder beim Bildschirm-Aus (Android beendet die App dann im Hintergrund).
+- Hinweis zur Zwischenablage: `deny` kann eine App beim Start abstürzen lassen — *ignorieren* (stille Blockade) ist die bessere Wahl, davor warnt die App.
 
-- **Weitere Datenschutz-Werkzeuge (neu, noch nicht am Gerät getestet):**
-  - **Änderungsprotokoll** (Menü): jede Änderung dieser App, Berechtigungs- und Netz-Schalter je Eintrag *rückgängig*.
-  - **Profil-Vorlagen** (Reiter Berechtigungen): Spiel / Messenger / Banking per Tipp, als JSON teilbar.
-  - **Netzverkehr** (Menü): Verkehr je App über 7 Tage, Hintergrund getrennt; Apps mit viel Hintergrundverkehr, die man selten öffnet, stehen oben, mit „Hintergrund sperren" per Tipp.
-  - **Aktivität** (Menü): welche Apps das Gerät wecken, Jobs planen oder Sensoren abfragen (aus dumpsys, heuristisch).
-  - **Automatische Regeln** (Menü): nach Zeit (Tage + Fenster, auch über Nacht) oder WLAN (verbunden / nicht), Aktion = Lockdown oder gewählte Apps offline. Der WLAN-Name wird erst gelesen, nachdem du dieser App bei der ersten Nutzung die Standortberechtigung erteilt hast (die App hat selbst keinen Netzzugriff). Verbirgt Android den Namen, solange die App im Hintergrund läuft, wird die Regel übersprungen (nicht abgeschaltet), bis du die App öffnest.
-  - **Arbeitsprofil** (Menü): App Ops Shizuku kann selbst ein verwaltetes Profil anlegen (eigener Profilbesitzer) und Apps hineinverschieben; in ein vorhandenes Profil (z. B. Shelter) verschiebt es Apps auch allein mit Shell-Rechten.
-  - **Platzhalter-Daten statt Sperre (Beta-Patch)**: im neu signierten Klon/Patch eine Null-Werbe-ID und einen festen Ort auf Stadtebene statt der echten Werte liefern, damit Apps, die bei „verweigert" abstürzen, weiterlaufen.
-  - **Diagnose** (Werkzeuge): harmlose Prüfungen zeigen, welche Hebel auf diesem Gerät funktionieren (Permission-Flags, Sperrdialog-Text, Firewall-Kette, dumpsys-Formate, Arbeitsprofil); der Bericht lässt sich als Text teilen.
-  - **Dauerrecht** (Einstellungen): die App erteilt sich einmal über Shizuku `WRITE_SECURE_SETTINGS`; privates DNS und das Entziehen von Bedienungshilfen gehen danach auch nach einem Neustart ohne Shizuku.
-  - **Sicherung** enthält jetzt auch Automatik-Regeln, „Nur während Nutzung", den Quarantäne-Schalter und die Lockdown-Auswahl.
-  - **Neustart-Hinweis**: nach einem Neustart (Shizuku läuft noch nicht) meldet eine Benachrichtigung, dass der eingerichtete Schutz inaktiv ist; nach dem Verbinden bietet eine Leiste an, abgewichene Einstellungen wiederherzustellen.
+#### Über alle Apps (*Werkzeuge*)
+- **Nach Berechtigung**: eine Berechtigung wählen und sehen, welche Apps sie haben und wann sie sie zuletzt benutzt haben; je App umschalten oder allen Nutzer-Apps auf einmal entziehen (System-Apps werden nie angefasst).
+- **Lockdown**: entzieht allen Nutzer-Apps Kamera und Mikrofon (wahlweise Standort) und gibt sie *genau* diesen Apps zurück. Auch als **Schnelleinstellungs-Kachel**.
+- **Quarantäne für neue Apps** (*Einstellungen*, standardmäßig aus): nach dem Einschalten installierte Apps bekommen keine Hintergrunddaten, keine Zwischenablage und keinen Hintergrund-Lauf, bis du sie freigibst.
+- **Automatische Regeln**: nach **Zeit** (Wochentage + Fenster, auch über Nacht) oder **WLAN** (mit einem Netz verbunden / nicht verbunden). Aktion: Lockdown oder gewählte Apps offline nehmen. Der WLAN-Name wird erst gelesen, nachdem du dieser App bei der ersten Nutzung die Standortberechtigung erteilt hast (sie hat selbst keinen Netzzugriff). Verbirgt Android den Namen, solange die App im Hintergrund läuft, wird die Regel übersprungen — nicht abgeschaltet —, bis du die App öffnest. Regeln brauchen ein laufendes Shizuku.
+
+#### Verhalten (Reiter *Verhalten*)
+- App deaktivieren, **einfrieren** (`pm suspend`, mit eigenem Text im Systemdialog), Daten löschen (Bestätigung per Paketname), Standby-Stufe setzen, Akku-Ausnahme (Doze) erteilen/entfernen, „App optimieren" (neu kompilieren).
+- **Lifecycle-Profil**: Akku-Ausnahme + Standby-Stufe + Hintergrund-Ops in einem Schritt, zurücknehmbar. Optional **App beim Bildschirm-Aus anhalten** (solange aktiv, läuft ein Vordergrunddienst).
+- **Nur bei Bedarf:** Die App bleibt geschlossen und gesperrt (`am force-stop` + `pm suspend` oder `pm disable-user` oder **nur beenden** – allein `am force-stop`, damit die App weiter aus jedem Launcher wie Nova startbar ist; der Wächter erkennt den Start und beendet sie nach dem Verlassen wieder) und läuft nur, nachdem du sie über ihre eigene Verknüpfung auf dem Startbildschirm geöffnet hast. Nach dem Verlassen wird sie nach 10 s / 1 Min. / 5 Min. oder nur beim Bildschirm-Aus wieder gesperrt; das Einschalten des Bildschirms gibt sie nie frei. Das Verlassen wird über Nutzungsereignisse erkannt (Nutzungszugriff erteilt sich die App per Shizuku), sonst über `dumpsys activity`. Zum Öffnen muss Shizuku laufen; bei *Deaktivieren* lässt sich die App auch ohne Shizuku in den System-Einstellungen wieder aktivieren. Solange sie gesperrt ist, kommen Nachrichten, Wecker und Hintergrund-Sync der App nicht an. Hinweis zu *Einfrieren*: `pm suspend` sperrt nur das Öffnen; startet das System oder eine andere App sie im Hintergrund (Job, Bluetooth-Gerät, gebundener Dienst), läuft sie trotz Einfrieren. Der Wächter prüft deshalb alle 5 Minuten (nur eingefrorene Apps) und beim Bildschirm-Aus, ob eine eingefrorene App den Beendet-Zustand verlassen hat, und beendet sie erneut; ganz verhindert solche Weckrufe nur *Deaktivieren*. **Eigene Starter** (z. B. AppDialer NXT) können eine eingefrorene App über die exportierte Aktion `de.minipc.appopsshizuku.action.OPEN_ON_DEMAND` (Extra `pkg`) öffnen; der Aufrufer muss `startActivityForResult` nutzen, damit Android meldet, wer anfragt, und jeder neue Starter wird einmal gefragt (*Immer erlauben* / *Nur diesmal* / *Ablehnen*; im Reiter *Verhalten* widerrufbar).
+
+#### Netz & Tracker
+- **Je App** (Reiter *Netz & Tracker*): Hintergrunddaten sperren · App komplett offline nehmen · auf Androids Hintergrund-Sperrliste setzen · **Tracker-Erkennung** (liest das Manifest und durchsucht den Code nach bekannten Bausteinen: Firebase Analytics / DataTransport / Crashlytics, Facebook SDK und Audience Network, AdMob, Google Analytics, Sentry, Mixpanel, Segment, Amplitude, Braze, AppsFlyer, Adjust, Kochava). Jeder Schalter wird durch Zurücklesen geprüft; „Alles zurücksetzen" macht nur rückgängig, was diese App selbst geändert hat.
+- **Netzverkehr** (*Werkzeuge*): Verkehr je App über 7 Tage, Hintergrund getrennt. Apps mit viel Hintergrundverkehr, die man selten öffnet, stehen oben, mit „Hintergrund sperren" per Tipp.
+- **Privates DNS** (*Werkzeuge → Systemweit*): aus / automatisch / Vorlagen (AdGuard, Mullvad adblock, Quad9, Cloudflare) / eigener Host, mit „Zurück auf vorher".
+
+#### Einblick (*Werkzeuge*)
+- **Aktivität**: welche Apps das Gerät wecken, Jobs planen oder Sensoren abfragen (aus `dumpsys`, heuristisch).
+- **Änderungsprotokoll**: jede Änderung dieser App, Berechtigungs- und Netz-Schalter je Eintrag *rückgängig*.
+- **Diagnose**: harmlose Prüfungen zeigen, welche Hebel auf *deinem* Gerät funktionieren (Permission-Flags, Sperrdialog-Text, Firewall-Kette, `dumpsys`-Formate, Arbeitsprofil). Der Bericht lässt sich als Text teilen; er enthält Modell und Android-Version, keine App-Liste und keine persönlichen Daten.
+- **Neustart-Hinweis**: nach einem Neustart (Shizuku läuft noch nicht) meldet eine Benachrichtigung, dass der eingerichtete Schutz inaktiv ist; nach dem Verbinden bietet eine Leiste an, abgewichene Einstellungen wiederherzustellen.
+
+#### Systemweit und mächtige Rechte (*Werkzeuge → Systemweit*, *Arbeitsprofil*)
+- Übersicht **mächtiger Rechte**: Bedienungshilfen, Benachrichtigungszugriff, Tastaturen, Standard-Apps (SMS, Telefon, Assistent, Browser), dauerhaftes VPN und Geräteadministratoren — entziehbar, wo die Shell es darf, sonst ein Knopf zu den Systemeinstellungen.
+- **Dauerrecht** (*Einstellungen*): die App erteilt sich einmal über Shizuku `WRITE_SECURE_SETTINGS`; privates DNS und das Entziehen von Bedienungshilfen gehen danach auch nach einem Neustart ohne Shizuku.
+- **Arbeitsprofil**: die App kann selbst ein verwaltetes Profil anlegen (eigener Profilbesitzer) und Apps hineinverschieben; in ein vorhandenes Profil (z. B. Shelter) verschiebt sie Apps auch allein mit Shell-Rechten. Verschobene Apps sehen weder die Kontakte noch die Dateien des Hauptprofils und starten mit eigenen Daten.
+
+#### Tarnung — Patch und Klon (Beta, Reiter *Tarnung*)
+- (Die Schalter liegen derzeit noch im Bildschirm *Komponenten*.) Patcht die APK einer App auf dem Gerät und signiert sie neu: aus dem Verlauf ausblenden, Launcher-Icon entfernen, Verlaufs-Vorschau schwärzen (`FLAG_SECURE`), VPN-Pflicht, als Taschenrechner tarnen (Vault), app-spezifisches Geräte-Spoofing (Build-Felder, Android-ID, IMEI/IMSI) oder als **parallelen Klon** installieren.
+- **Tracker abschalten**, **Berechtigungen entfernen** (Internet, Werbe-ID, App-Liste, Standort, Telefonstatus, Kontenliste) und **Platzhalter-Daten statt Sperre** (Null-Werbe-ID, fester Ort auf Stadtebene) — Details und Grenzen unter *In Entwicklung*.
+
+#### Einstellungen und Sicherung
+- Shizuku-Status, Quarantäne-Schalter, *Systemfarben (Material You)*, **Dauerrecht**, Export / Import und die App-Version.
+- Die **Sicherung** ist eine JSON-Datei: Privacy-Profile, Verhaltens-Einstellungen, Lifecycle-Profile, Automatik-Regeln, „Nur während Nutzung", der Quarantäne-Schalter und die Lockdown-Auswahl. Ältere Dateien bleiben lesbar; beim Import werden nur bekannte Berechtigungen akzeptiert. Der momentane Gerätezustand (welche Apps gerade in Quarantäne stehen) wird bewusst nicht gesichert. Für Skripte und Tasker geht der Import auch ohne Dateidialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <Pfad>`.
+
+### Sicherheitsprinzipien
+
+- **Keine Internet-Berechtigung**: die App kann nichts irgendwohin senden; ihre Daten liegen im eigenen privaten Speicher.
+- **Nichts wird angenommen**: jede Änderung wird vom Gerät zurückgelesen und nur als erledigt gemeldet, wenn sie wirklich wirkt.
+- **Alles ist umkehrbar**: Änderungsprotokoll mit „Rückgängig", „Alles zurücksetzen" macht nur rückgängig, was diese App selbst geändert hat, die Original-APKs werden vor einem Patch gesichert.
+- **Standort nur bei Bedarf**: die Berechtigung wird erst bei der ersten WLAN-Regel angefragt, nie beim Start.
+- **Quelloffen** unter GPL-3.0.
+
+Was als *Beta* gekennzeichnet oder in den Release-Notizen als neu beschrieben ist, wurde nicht auf jedem Gerät überprüft — mit der *Diagnose* siehst du, welche Hebel auf deinem funktionieren.
 
 ### Ehrliche Grenzen
 
@@ -270,9 +378,11 @@ export ANDROID_SDK_ROOT=$ANDROID_HOME
 
 Das APK liegt danach unter `app/build/outputs/apk/debug/`. Unit-Tests: `./gradlew :app:testDebugUnitTest`. `scripts/release.sh` baut, testet, prüft die Signatur und veröffentlicht ein GitHub-Release (für den Maintainer).
 
-### Farben
+Hinweis: `app/src/main/res/raw/calcyou.apk` (der Taschenrechner-Build für den Vault, siehe *Lizenz*) liegt **nicht** im Repository, weil `*.apk` von Git ignoriert wird. Zum Bauen diese Datei dort ablegen (für die Entwicklung genügt ein Platzhalter; der Vault kann dann seinen Taschenrechner nicht installieren).
 
-Die App nutzt eine **vollständige Material-3-Palette**, systematisch aus einer ruhigen Petrol-Startfarbe abgeleitet (hell und dunkel), Rot bleibt echten Fehlern vorbehalten. Menü der Hauptliste → **Systemfarben (Material You)**: an (Standard) = Farben aus dem Hintergrundbild des Systems (Android 12+), aus = die eigene Petrol-Palette; die Wahl bleibt gespeichert. Auf Android 11 und älter ist der Eintrag ausgegraut. Gemessener Kontrast: schlechtester Textwert 6,49:1 (hell) / 5,46:1 (dunkel) — Ziel war 4,5:1.
+### Design und Farben
+
+Die App nutzt eine **vollständige Material-3-Palette**, systematisch aus einer ruhigen Petrol-Startfarbe abgeleitet (hell und dunkel), Rot bleibt echten Fehlern vorbehalten. *Einstellungen* → **Systemfarben (Material You)**: an (Standard) = Farben aus dem Hintergrundbild des Systems (Android 12+), aus = die eigene Petrol-Palette; die Wahl bleibt gespeichert. Auf Android 11 und älter ist der Eintrag ausgegraut. Gemessener Kontrast: schlechtester Textwert 6,49:1 (hell) / 5,46:1 (dunkel) — Ziel war 4,5:1. App-Liste und Werkzeuge nutzen Verlaufskarten auf einem Sternenhimmel; die Kartenfarbe stammt vom jeweiligen App-Icon und wird so weit abgedunkelt, dass weiße Schrift mindestens 4,5:1 Kontrast hat (per Unit-Test abgesichert).
 
 ### Signatur
 
