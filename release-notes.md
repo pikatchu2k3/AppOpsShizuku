@@ -1,18 +1,23 @@
 ### English
 
-**App Ops Shizuku 1.20.4** — the *Activity* screen now recognises sensor apps on real Android builds.
+**App Ops Shizuku 1.20.5** — automatic rules now get the permissions they actually need, and the app stops doing shell work on the main thread.
 
-**Fixed:** on a OnePlus running Android 17 the diagnostics found **0 sensor apps**. The parser looked for `package=`, which that `dumpsys sensorservice` output does not contain. According to AOSP (`SensorEventConnection.cpp`, `SensorRegistrationInfo.h`) the lines are:
+**Fixed**
 
-- active connection: `com.pkg | WakeLockRefCount 0 | uid 10123 | …`
-- earlier registration: `… result=OK (sensor, package): (Accelerometer, com.pkg)`
+- **WLAN rules never received their location permission.** The app only asked for `ACCESS_FINE_LOCATION`; since Android 12 the system ignores such a request unless `ACCESS_COARSE_LOCATION` is asked for at the same time. The dialog never appeared and the network name stayed unreadable. Both are now requested together.
+- **WLAN rules did not work in the background.** Android hides the network name there without background location. When a WLAN rule is saved, the app grants itself `ACCESS_BACKGROUND_LOCATION` through Shizuku (best effort). Without a WLAN rule the app still holds no location at all — and it still has no internet access.
+- **Hang when saving or toggling a rule.** `AutoRuleManager.evaluate` ran on the main thread (shell calls, up to 3 s waiting for Shizuku). It now runs on a background thread.
+- Dark-theme defaults for 19 colours, `isPackageSuspended` guarded to API 29, `longVersionCode` via `PackageInfoCompat` — lint from 27 down to 3 findings (the remaining ones sit in older code and are untouched here).
 
-Both formats are now parsed; the old `package=` / `pkg=` marker stays as a fallback for older output. A new unit test covers the AOSP formats.
+**Less shell load**
+
+- The drift check runs at most every 10 minutes instead of on every return to the app list (one shell call per plain AppOp in the profile).
+- "Stop only" mode: without usage access the `dumpsys` fallback is polled every 15 s instead of every 3 s.
 
 **Honest limits**
 
-- The fix is verified against the AOSP source and unit tests, **not** on a device with the new output — the report that triggered it came from a single Android 17 device.
-- The activity scan stays heuristic: an app that queried a sensor yesterday but no longer appears in the dump is not listed.
+- **No device run.** Whether the location dialog now appears when creating a WLAN rule, and whether the background location can be granted through Shizuku, has to be confirmed on the phone.
+- The Android behaviour (FINE requires COARSE from API 31) is checked against the documentation, not measured here.
 
 **Tests:** 345 unit tests, 0 failures, 1 skipped (44 test classes).
 
@@ -20,22 +25,27 @@ Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — this 
 
 ### Deutsch
 
-**App Ops Shizuku 1.20.4** — die Seite *Aktivität* erkennt Sensor-Apps jetzt auch auf echten Android-Builds.
+**App Ops Shizuku 1.20.5** — Automatik-Regeln bekommen die Rechte, die sie wirklich brauchen, und die App erledigt keine Shell-Arbeit mehr im Haupt-Thread.
 
-**Behoben:** Auf einem OnePlus mit Android 17 meldete die Diagnose **0 Sensor-Apps**. Der Parser suchte nach `package=`, das steht in dieser `dumpsys sensorservice`-Ausgabe nicht drin. Laut AOSP (`SensorEventConnection.cpp`, `SensorRegistrationInfo.h`) lauten die Zeilen:
+**Behoben**
 
-- aktive Verbindung: `com.pkg | WakeLockRefCount 0 | uid 10123 | …`
-- frühere Registrierung: `… result=OK (sensor, package): (Accelerometer, com.pkg)`
+- **WLAN-Regeln bekamen nie ihre Standortberechtigung.** Die App fragte nur `ACCESS_FINE_LOCATION` an; ab Android 12 ignoriert das System eine solche Anfrage ohne gleichzeitiges `ACCESS_COARSE_LOCATION`. Der Dialog kam nie, der Netznamen blieb unlesbar. Jetzt werden beide zusammen angefragt.
+- **WLAN-Regeln griffen im Hintergrund nicht.** Dort verbirgt Android den Netznamen ohne Hintergrund-Standort. Beim Speichern einer WLAN-Regel erteilt sich die App `ACCESS_BACKGROUND_LOCATION` per Shizuku (Best-Effort). Ohne WLAN-Regel hält die App weiterhin gar keinen Standort — und sie hat weiterhin keinen Internetzugriff.
+- **Hänger beim Speichern oder Umschalten einer Regel.** `AutoRuleManager.evaluate` lief im Haupt-Thread (Shell-Aufrufe, bis zu 3 s Warten auf Shizuku). Läuft jetzt im Hintergrund-Thread.
+- Standardwerte für 19 Farben der dunklen Palette, `isPackageSuspended` mit API-29-Prüfung, `longVersionCode` über `PackageInfoCompat` — Lint von 27 auf 3 Befunde (die restlichen liegen in älterem, hier nicht angefasstem Code).
 
-Beide Formate werden jetzt erkannt; der alte Marker `package=` / `pkg=` bleibt als Rückfall für ältere Ausgaben. Ein neuer Unit-Test deckt die AOSP-Formate ab.
+**Weniger Shell-Last**
+
+- Der Abweichungs-Check läuft höchstens alle 10 Minuten statt bei jeder Rückkehr zur App-Liste (je reiner AppOp im Profil ein Shell-Aufruf).
+- „Nur beenden": ohne Nutzungszugriff wird der `dumpsys`-Rückfall alle 15 s statt alle 3 s abgefragt.
 
 **Ehrliche Grenzen**
 
-- Der Fix ist gegen den AOSP-Quelltext und per Unit-Test belegt, **nicht** auf einem Gerät mit der neuen Ausgabe — der Befund kam von genau einem Android-17-Gerät.
-- Die Aktivitäts-Auswertung bleibt heuristisch: Eine App, die gestern einen Sensor abgefragt hat, im Dump aber nicht mehr auftaucht, wird nicht gelistet.
+- **Kein Lauf auf einem Gerät.** Ob der Standort-Dialog beim Anlegen einer WLAN-Regel jetzt erscheint und ob sich der Hintergrund-Standort per Shizuku erteilen lässt, muss am Telefon bestätigt werden.
+- Das Android-Verhalten (FINE braucht ab API 31 COARSE) ist gegen die Dokumentation geprüft, nicht hier gemessen.
 
 **Tests:** 345 Unit-Tests, 0 Fehler, 1 übersprungen (44 Testklassen).
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — dieses Repository ist **privat**; für Updates über [Obtainium](https://github.com/ImranR98/Obtainium) ist ein GitHub-Token mit Lesezugriff nötig.
 
-<sub>Paket `de.minipc.appopsshizuku` · versionCode 44 · debug-signiert (Zertifikat SHA-256 `652394f7…7226e`, updatefähig über 1.20.3) · targetSdk 35 · Lizenz GPL-3.0</sub>
+<sub>Paket `de.minipc.appopsshizuku` · versionCode 45 · debug-signiert (updatefähig über 1.20.4) · targetSdk 35 · Lizenz GPL-3.0</sub>
