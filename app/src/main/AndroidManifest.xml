@@ -21,6 +21,12 @@
          DIESE App; die App hat selbst keinen Netzzugriff. Wird erst bei der ersten WLAN-Regel
          zur Laufzeit abgefragt, nicht beim Start. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Pflicht-Begleiter: ab Android 12 wird eine Anfrage NUR nach FINE vom System ignoriert. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- WLAN-Regeln werden im Hintergrund ausgewertet (Weckruf); ohne dieses Recht verbirgt Android
+         dort den Netznamen. Wird nie per Dialog erfragt, sondern beim Speichern einer WLAN-Regel
+         per Shizuku fuer die eigene App erteilt (Best-Effort). -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <!-- Nur die ART der Verbindung lesen (WLAN ja/nein) - KEIN Internetzugriff. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Automatik-Regeln: ungefaehre Weckrufe planen (keine Exact-Alarm-Berechtigung noetig). -->

@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         const val FILTER_BLOCKED = 1
         const val FILTER_CHANGED = 2
 
+        private const val DRIFT_INTERVAL_MS = 10 * 60 * 1000L
         private const val PANEL_APPS = 0
         private const val PANEL_TOOLS = 1
         private const val PANEL_SETTINGS = 2
@@ -707,7 +708,12 @@ class MainActivity : AppCompatActivity() {
         executor.execute { runCatching { AutoRuleManager.evaluate(this) } }
         if (manager.isConnected && manager.hasPermission) {
             BootReceiver.clear(this)
-            checkDrift()
+            // Nicht bei jedem Zurueckkehren: je reiner AppOp im Profil kostet das einen Shell-Aufruf
+            val now = android.os.SystemClock.elapsedRealtime()
+            if (lastDriftCheck == 0L || now - lastDriftCheck > DRIFT_INTERVAL_MS) {
+                lastDriftCheck = now
+                checkDrift()
+            }
         } else {
             findViewById<View>(R.id.driftCard).visibility = View.GONE
         }
@@ -720,6 +726,8 @@ class MainActivity : AppCompatActivity() {
      * Gespeichertes Profil mit dem Ist-Zustand vergleichen (nur Apps mit Profil, meist wenige).
      * Zeigt eine Leiste "N Einstellungen nicht mehr aktiv - wiederherstellen". Nichts wird dabei gesetzt.
      */
+    private var lastDriftCheck = 0L
+
     private fun checkDrift() {
         executor.execute {
             val backend = de.minipc.appopsshizuku.shizuku.ShizukuBackend()

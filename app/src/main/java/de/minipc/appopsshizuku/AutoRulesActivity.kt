@@ -117,7 +117,8 @@ class AutoRulesActivity : AppCompatActivity() {
             h.enabled.setOnCheckedChangeListener { _, checked ->
                 h.guard.ifUser {
                     store.put(r.copy(enabled = checked))
-                    AutoRuleManager.evaluate(this@AutoRulesActivity)
+                    val app = applicationContext
+                    Thread { runCatching { AutoRuleManager.evaluate(app) } }.start()
                     reload()
                 }
             }
