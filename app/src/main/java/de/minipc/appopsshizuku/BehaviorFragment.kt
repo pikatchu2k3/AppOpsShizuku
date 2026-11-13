@@ -314,7 +314,7 @@ class BehaviorFragment : Fragment() {
 
     private fun refreshSuspendState() {
         freezeSw.setQuietly(
-            runCatching { requireContext().packageManager.isPackageSuspended(packageName) }
+            runCatching { android.os.Build.VERSION.SDK_INT >= 29 && requireContext().packageManager.isPackageSuspended(packageName) }
                 .getOrDefault(false)
         )
     }

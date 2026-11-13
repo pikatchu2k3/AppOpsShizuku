@@ -201,7 +201,7 @@ class ComponentsActivity : AppCompatActivity() {
     private fun buildDetail(pm: PackageManager, info: ApplicationInfo): String {
         val version = runCatching {
             val pi = pm.getPackageInfo(packageName, 0)
-            "${pi.versionName} (${pi.longVersionCode})"
+            "${pi.versionName} (${androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(pi)})"
         }.getOrElse { "?" }
         val installer = runCatching {
             if (Build.VERSION.SDK_INT >= 30)
@@ -285,7 +285,7 @@ class ComponentsActivity : AppCompatActivity() {
             getString(R.string.components_freeze_warning)
         }
 
-        val suspended = runCatching { packageManager.isPackageSuspended(packageName) }
+        val suspended = runCatching { android.os.Build.VERSION.SDK_INT >= 29 && packageManager.isPackageSuspended(packageName) }
             .getOrDefault(false)
         sw.setQuietly(suspended)
 
@@ -380,7 +380,7 @@ class ComponentsActivity : AppCompatActivity() {
     /** Switch nach dem Freeze-Wechsel neu synchronisieren (Shell-Ergebnis ist massgeblich). */
     private fun refreshSuspendState() {
         freezeSw.setQuietly(
-            runCatching { packageManager.isPackageSuspended(packageName) }.getOrDefault(false)
+            runCatching { android.os.Build.VERSION.SDK_INT >= 29 && packageManager.isPackageSuspended(packageName) }.getOrDefault(false)
         )
     }
 

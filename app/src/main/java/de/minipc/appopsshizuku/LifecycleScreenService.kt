@@ -431,6 +431,11 @@ class LifecycleScreenService : Service() {
     private fun detectStopModeLaunches(backend: de.minipc.appopsshizuku.shizuku.ShellBackend?) {
         val candidates = stopModeApps() - store.onDemandOpen
         if (candidates.isEmpty()) return
+        // Ohne Nutzungszugriff bliebe nur `dumpsys activity` - das alle paar Sekunden ueber die Shell
+        // zu rufen kostet spuerbar Akku. Dann lieber seltener pruefen.
+        if (!OnDemandSupport.hasUsageAccess(this)) {
+            if (System.currentTimeMillis() - stopLastPoll < TimeUnit.SECONDS.toMillis(15)) return
+        }
         val now = System.currentTimeMillis()
         val since = if (stopLastPoll == 0L) now - TimeUnit.SECONDS.toMillis(30) else stopLastPoll - 1_000
         stopLastPoll = now

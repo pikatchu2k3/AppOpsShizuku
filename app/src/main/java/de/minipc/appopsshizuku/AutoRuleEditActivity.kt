@@ -33,6 +33,11 @@ class AutoRuleEditActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ID = "id"
+
+        /** Ab Android 12 muessen FINE und COARSE zusammen angefragt werden, sonst kommt kein Dialog. */
+        private val LOCATION_PERMISSIONS = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+        )
     }
 
     private lateinit var store: AutoRuleStore
@@ -43,8 +48,9 @@ class AutoRuleEditActivity : AppCompatActivity() {
     private val dayChips = mutableListOf<Chip>()
 
     private val requestLocation =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) fillCurrentSsid()
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+            // Der Netzname braucht den GENAUEN Standort; "nur ungefaehr" reicht nicht
+            if (result[Manifest.permission.ACCESS_FINE_LOCATION] == true) fillCurrentSsid()
             else Toast.makeText(this, R.string.rule_wifi_needs_location, Toast.LENGTH_LONG).show()
         }
 
@@ -153,7 +159,7 @@ class AutoRuleEditActivity : AppCompatActivity() {
 
     private fun useCurrentSsid() {
         if (!AutoRuleManager.hasLocationPermission(this)) {
-            requestLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            requestLocation.launch(LOCATION_PERMISSIONS)
             return
         }
         fillCurrentSsid()
@@ -217,7 +223,7 @@ class AutoRuleEditActivity : AppCompatActivity() {
         }
         // WLAN-Regel braucht die Standortberechtigung dieser App, um den Netznamen zu lesen.
         if (!time && !AutoRuleManager.hasLocationPermission(this)) {
-            requestLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            requestLocation.launch(LOCATION_PERMISSIONS)
             Toast.makeText(this, R.string.rule_wifi_needs_location, Toast.LENGTH_LONG).show()
             return
         }
@@ -234,7 +240,14 @@ class AutoRuleEditActivity : AppCompatActivity() {
             packages = pickedApps
         )
         store.put(rule)
-        AutoRuleManager.evaluate(this)
+        val app = applicationContext
+        val wifi = !time
+        Thread {
+            // Hintergrund-Standort fuer die eigene App (nur bei WLAN-Regeln, Best-Effort per Shizuku):
+            // sonst liest der Weckruf im Hintergrund keinen Netznamen.
+            if (wifi) runCatching { AutoRuleManager.grantBackgroundLocation(app) }
+            runCatching { AutoRuleManager.evaluate(app) }
+        }.start()
         finish()
     }
 

@@ -39,6 +39,15 @@ object AutoRuleManager {
         ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
 
+    /** Hintergrund-Standort fuer die EIGENE App per Shizuku erteilen; false = nicht moeglich. */
+    fun grantBackgroundLocation(context: Context): Boolean {
+        val perm = Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        if (context.checkSelfPermission(perm) == PackageManager.PERMISSION_GRANTED) return true
+        if (!hasLocationPermission(context) || !shizukuUsable()) return false
+        ShizukuBackend().exec("pm", "grant", context.packageName, perm)
+        return context.checkSelfPermission(perm) == PackageManager.PERMISSION_GRANTED
+    }
+
     /** Verbundene SSID oder null (nicht verbunden / keine Standortberechtigung / nicht lesbar). */
     fun currentSsid(context: Context): String? {
         if (!hasLocationPermission(context)) return null

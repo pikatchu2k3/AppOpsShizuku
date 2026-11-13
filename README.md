@@ -105,7 +105,7 @@ The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and
 - **No internet permission**: the app cannot send anything anywhere; its data lives in its own private storage.
 - **Nothing is assumed**: every change is read back from the device and reported as done only if it really took effect.
 - **Everything is reversible**: change log with *Undo*, "Reset all" undoes only what this app changed, original APKs are saved before a patch.
-- **Location only on demand**: the permission is requested the first time you create a Wi-Fi rule, never at start.
+- **Location only on demand**: the permission is requested the first time you create a Wi-Fi rule, never at start. Saving a Wi-Fi rule also grants this app background location via Shizuku (best effort), because the rule is evaluated in the background; without Wi-Fi rules no location permission is ever held.
 - **Open source** under GPL-3.0.
 
 Features marked *beta* or described as new in the release notes have not all been verified on every device — use *Diagnostics* to see which levers work on yours.
@@ -312,7 +312,7 @@ Die App hat unten in einer schwebenden Leiste drei Bereiche: **Apps**, **Werkzeu
 - **Keine Internet-Berechtigung**: die App kann nichts irgendwohin senden; ihre Daten liegen im eigenen privaten Speicher.
 - **Nichts wird angenommen**: jede Änderung wird vom Gerät zurückgelesen und nur als erledigt gemeldet, wenn sie wirklich wirkt.
 - **Alles ist umkehrbar**: Änderungsprotokoll mit „Rückgängig", „Alles zurücksetzen" macht nur rückgängig, was diese App selbst geändert hat, die Original-APKs werden vor einem Patch gesichert.
-- **Standort nur bei Bedarf**: die Berechtigung wird erst bei der ersten WLAN-Regel angefragt, nie beim Start.
+- **Standort nur bei Bedarf**: die Berechtigung wird erst bei der ersten WLAN-Regel angefragt, nie beim Start. Beim Speichern einer WLAN-Regel erteilt sich die App zusätzlich per Shizuku den Hintergrund-Standort (Best-Effort), weil die Regel im Hintergrund ausgewertet wird; ohne WLAN-Regeln hält die App nie eine Standortberechtigung.
 - **Quelloffen** unter GPL-3.0.
 
 Was als *Beta* gekennzeichnet oder in den Release-Notizen als neu beschrieben ist, wurde nicht auf jedem Gerät überprüft — mit der *Diagnose* siehst du, welche Hebel auf deinem funktionieren.

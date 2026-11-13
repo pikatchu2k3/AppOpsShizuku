@@ -146,4 +146,26 @@
     <color name="card_stroke">#33FFFFFF</color>
     <color name="card_icon_glass">#26FFFFFF</color>
     <color name="card_icon_stroke">#40FFFFFF</color>
+
+    <!-- Toene, die nur die dunkle Palette nutzt: hier mit gleichem Wert deklariert, damit jede
+         Ressource einen Standardwert hat (Lint MissingDefaultResource). -->
+    <color name="md_secondary_80">#A0CED6</color>
+    <color name="md_secondary_20">#01363D</color>
+    <color name="md_secondary_30">#1F4D54</color>
+    <color name="md_tertiary_80">#A8C8FF</color>
+    <color name="md_tertiary_20">#023259</color>
+    <color name="md_tertiary_30">#194878</color>
+    <color name="md_neutral_6">#0B1516</color>
+    <color name="md_neutral_24">#323B3C</color>
+    <color name="md_neutral_4">#031012</color>
+    <color name="md_neutral_12">#192122</color>
+    <color name="md_neutral_17">#232B2D</color>
+    <color name="md_neutral_22">#2D3638</color>
+    <color name="md_neutral_variant_60">#7F9498</color>
+    <color name="md_error_80">#F2B8B5</color>
+    <color name="md_error_20">#601410</color>
+    <color name="md_error_30">#8C1D18</color>
+    <color name="md_warning_80">#FBBA62</color>
+    <color name="md_warning_20">#442B01</color>
+    <color name="md_warning_30">#633F02</color>
 </resources>
