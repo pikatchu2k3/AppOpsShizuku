@@ -186,6 +186,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         adapter = AppListAdapter { app ->
+            if (app.removed || app.hidden) {
+                confirmRestore(app)
+                return@AppListAdapter
+            }
             startActivity(
                 Intent(this, AppDetailActivity::class.java)
                     .putExtra(AppDetailActivity.EXTRA_PACKAGE, app.packageName)
@@ -204,6 +208,54 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ------------------------------------------------------------------ Kopfzeile
+
+    /** Entfernte App wiederherstellen (cmd package install-existing), mit Rueckfrage. */
+    private fun confirmRestore(app: AppItem) {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.restore_user_title)
+            .setMessage(getString(R.string.restore_user_msg, app.label))
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.restore_user_action) { _, _ ->
+                if (app.hidden) {
+                    // Versteckt als Geraeteinhaber: zeigen geht ohne Shizuku
+                    executor.execute {
+                        val r = DeviceOwnerManager.setHidden(this, app.packageName, false)
+                        handler.post {
+                            Toast.makeText(
+                                this,
+                                if (r.ok) getString(R.string.restore_user_done)
+                                else getString(R.string.remove_user_failed, r.reason ?: "?"),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            loadApps()
+                        }
+                    }
+                    return@setPositiveButton
+                }
+                if (!(manager.isConnected && manager.hasPermission)) {
+                    Toast.makeText(this, R.string.status_no_permission, Toast.LENGTH_LONG).show()
+                    return@setPositiveButton
+                }
+                executor.execute {
+                    val r = UserRemovalManager.restore(this, ShizukuBackend(), app.packageName)
+                    if (r.ok) runCatching {
+                        de.minipc.appopsshizuku.appops.ChangeLog.recordInfo(
+                            this, getString(R.string.log_info_restored_user, app.packageName)
+                        )
+                    }
+                    handler.post {
+                        Toast.makeText(
+                            this,
+                            if (r.ok) getString(R.string.restore_user_done)
+                            else getString(R.string.remove_user_failed, r.reason ?: "?"),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        loadApps()
+                    }
+                }
+            }
+            .show()
+    }
 
     private fun setupHeader() {
         // Erster Buchstabe im Verlauf (Petrol -> Cyan), Rest in der Glas-Schriftfarbe
@@ -403,6 +455,64 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.shizukuHint).setOnClickListener { showPanel(PANEL_SETTINGS) }
         findViewById<View>(R.id.standingButton).setOnClickListener { toggleStanding() }
         renderStanding()
+        findViewById<View>(R.id.ownerButton).setOnClickListener { onOwnerButton() }
+        renderOwner()
+    }
+
+    private fun renderOwner() {
+        val owner = DeviceOwnerManager.isOwner(this)
+        findViewById<TextView>(R.id.ownerStatus).setText(if (owner) R.string.owner_on else R.string.owner_off)
+        findViewById<MaterialButton>(R.id.ownerButton).setText(if (owner) R.string.owner_release else R.string.owner_setup)
+    }
+
+    /** Geraeteinhaber einrichten (mit Erklaerung der Vorbedingungen) oder abgeben. */
+    private fun onOwnerButton() {
+        val dlg = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        if (DeviceOwnerManager.isOwner(this)) {
+            dlg.setTitle(R.string.owner_release)
+                .setMessage(R.string.owner_release_msg)
+                .setNegativeButton(R.string.btn_cancel, null)
+                .setPositiveButton(R.string.owner_release) { _, _ ->
+                    executor.execute {
+                        val ok = DeviceOwnerManager.release(this)
+                        handler.post {
+                            renderOwner(); loadApps()
+                            Toast.makeText(this, if (ok) R.string.owner_released else R.string.standing_failed, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }.show()
+            return
+        }
+        dlg.setTitle(R.string.owner_setup)
+            .setMessage(R.string.owner_setup_msg)
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.owner_setup_action) { _, _ ->
+                if (!(manager.isConnected && manager.hasPermission)) {
+                    Toast.makeText(this, R.string.status_no_permission, Toast.LENGTH_LONG).show()
+                    return@setPositiveButton
+                }
+                executor.execute {
+                    val r = DeviceOwnerManager.setup(this, ShizukuBackend())
+                    handler.post {
+                        renderOwner()
+                        val hint = getString(
+                            when (r.result) {
+                                de.minipc.appopsshizuku.appops.DeviceOwner.SetupResult.OK -> R.string.owner_setup_ok
+                                de.minipc.appopsshizuku.appops.DeviceOwner.SetupResult.ACCOUNTS -> R.string.owner_setup_accounts
+                                de.minipc.appopsshizuku.appops.DeviceOwner.SetupResult.USERS -> R.string.owner_setup_users
+                                de.minipc.appopsshizuku.appops.DeviceOwner.SetupResult.ALREADY_SET -> R.string.owner_setup_already
+                                de.minipc.appopsshizuku.appops.DeviceOwner.SetupResult.OTHER -> R.string.owner_setup_other
+                            }
+                        )
+                        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                            .setTitle(R.string.owner_title)
+                            .setMessage(if (r.result == de.minipc.appopsshizuku.appops.DeviceOwner.SetupResult.OK) hint
+                                else hint + "\n\n" + getString(R.string.owner_device_said, r.raw.take(400)))
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show()
+                    }
+                }
+            }.show()
     }
 
     private fun renderStanding() {
@@ -501,6 +611,28 @@ class MainActivity : AppCompatActivity() {
                     )
                     android.util.Log.d("AppOpsShizuku", "added disabled: $pkg")
                 }
+            }
+
+            // Fuer diesen Nutzer entfernte Apps (pm uninstall --user 0): APK liegt noch im System,
+            // Tipp auf die Karte stellt sie wieder her
+            for (ai in UserRemovalManager.removedApps(this)) {
+                val pkg = ai.packageName
+                if (pkg == packageName || !seen.add(pkg)) continue
+                val label = runCatching { ai.loadLabel(pm).toString() }.getOrDefault(pkg)
+                val icon = runCatching { ai.loadIcon(pm) }.getOrNull()
+                    ?: resources.getDrawable(android.R.drawable.sym_def_app_icon, null)
+                loaded.add(AppItem(pkg, getString(R.string.app_removed_label, label), icon, 0L, 0L, removed = true))
+            }
+
+            // Als Geraeteinhaber versteckte Apps
+            for (pkg in de.minipc.appopsshizuku.appops.HiddenStore(this).all()) {
+                if (pkg == packageName || !seen.add(pkg)) continue
+                @Suppress("DEPRECATION")
+                val ai = runCatching { pm.getApplicationInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES) }.getOrNull()
+                val label = ai?.let { runCatching { it.loadLabel(pm).toString() }.getOrNull() } ?: pkg
+                val icon = ai?.let { runCatching { it.loadIcon(pm) }.getOrNull() }
+                    ?: resources.getDrawable(android.R.drawable.sym_def_app_icon, null)
+                loaded.add(AppItem(pkg, getString(R.string.app_hidden_label, label), icon, 0L, 0L, hidden = true))
             }
 
             // Gestealthte Apps (Launcher-Icon entfernt -> nicht in queryIntentActivities)
