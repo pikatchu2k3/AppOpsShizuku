@@ -1,5 +1,8 @@
 package de.minipc.appopsshizuku
 
+import de.minipc.appopsshizuku.appops.ChangeLog
+import de.minipc.appopsshizuku.appops.DisableChain
+import de.minipc.appopsshizuku.appops.UserRemoval
 import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
@@ -216,6 +219,10 @@ class BehaviorFragment : Fragment() {
         }.getOrDefault(false)
 
         sw.view.isEnabled = !isSelf
+        view.findViewById<View>(R.id.disableRemoveButton).apply {
+            visibility = if (isSystem && !isSelf) View.VISIBLE else View.GONE
+            setOnClickListener { confirmChain(null) }
+        }
         subtitle.text = when {
             isSelf -> getString(R.string.components_disable_own)
             isSystem -> getString(R.string.components_disable_system)
@@ -241,17 +248,36 @@ class BehaviorFragment : Fragment() {
         val state = runCatching {
             requireContext().packageManager.getApplicationEnabledSetting(packageName)
         }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
-        disableSw.setQuietly(state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
-            state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER)
+        disableSw.setQuietly(DisableChain.isDisabledState(state))
     }
+
+    private fun isDisabledNow(): Boolean = DisableChain.isDisabledState(
+        runCatching { requireContext().packageManager.getApplicationEnabledSetting(packageName) }.getOrNull()
+    )
 
     private fun toggleEnabled(enable: Boolean) {
         executor.execute {
             val res = if (enable) backend.exec("pm", "enable", "--user", "0", packageName)
             else backend.exec("pm", "disable-user", "--user", "0", packageName)
+            // Massgeblich ist der zurueckgelesene Zustand, nicht der Exit-Code
+            val effective = isDisabledNow() != enable
+            val reason = UserRemoval.reason(res.stdout + "\n" + res.stderr)
             handler.post {
-                if (res.isFailure()) {
-                    Toast.makeText(requireContext(), R.string.error_operation_failed, Toast.LENGTH_SHORT).show()
+                if (!isAdded) return@post
+                if (!effective && !enable) {
+                    // Deaktivieren abgelehnt/ignoriert (z. B. vom Hersteller geschuetzte App):
+                    // weitere Wege anbieten
+                    refreshEnabledState()
+                    confirmChain(reason ?: res.stdout.trim().ifEmpty { null })
+                    return@post
+                }
+                if (!effective || res.isFailure()) {
+                    Toast.makeText(
+                        requireContext(),
+                        reason?.let { getString(R.string.operation_failed_reason, it) }
+                            ?: getString(R.string.error_operation_failed),
+                        Toast.LENGTH_LONG
+                    ).show()
                 } else {
                     Toast.makeText(
                         requireContext(),
@@ -260,6 +286,156 @@ class BehaviorFragment : Fragment() {
                     ).show()
                 }
                 refreshEnabledState()
+            }
+        }
+    }
+
+    /** Deaktivieren abgelehnt: die Ausweich-Kette anbieten (ab "bis zur Nutzung deaktivieren"). */
+    private fun confirmChain(denied: String?) {
+        val ctx = requireContext()
+        val b = backend
+        executor.execute {
+            val block = UserRemovalManager.blockReason(ctx, b, packageName)
+            handler.post {
+                if (!isAdded) return@post
+                if (block != null) {
+                    confirmRemoveForUser(denied)
+                    return@post
+                }
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.chain_title)
+                    .setMessage(
+                        listOfNotNull(
+                            denied?.let { getString(R.string.disable_denied, it) },
+                            getString(R.string.chain_msg)
+                        ).joinToString("\n\n")
+                    )
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .setPositiveButton(R.string.chain_action) { _, _ -> runChain() }
+                    .show()
+            }
+        }
+    }
+
+    private fun runChain() {
+        val ctx = requireContext().applicationContext
+        val b = backend
+        setLoadingDisable(true)
+        executor.execute {
+            val attempts = UserRemovalManager.runChain(ctx, b, packageName, DisableChain.Step.DISABLE_UNTIL_USED)
+            val winner = DisableChain.winner(attempts)
+            if (winner != null) runCatching {
+                ChangeLog.recordInfo(ctx, ctx.getString(R.string.log_info_chain, packageName, stepName(ctx, winner)))
+            }
+            handler.post {
+                if (!isAdded) return@post
+                setLoadingDisable(false)
+                val lines = attempts.joinToString("\n") { a ->
+                    (if (a.ok) "✓ " else "✗ ") + stepName(ctx, a.step) + (a.reason?.let { " – $it" } ?: "")
+                }
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.chain_result_title)
+                    .setMessage(
+                        getString(
+                            when (winner) {
+                                DisableChain.Step.DISABLE_UNTIL_USED -> R.string.chain_result_until_used
+                                DisableChain.Step.REMOVE_FOR_USER -> R.string.chain_result_removed
+                                DisableChain.Step.HIDE_AS_OWNER -> R.string.chain_result_hidden
+                                DisableChain.Step.NEUTRALIZE -> R.string.chain_result_neutralized
+                                else -> R.string.chain_result_none
+                            }
+                        ) + "\n\n" + lines
+                    )
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        if (winner == DisableChain.Step.REMOVE_FOR_USER || winner == DisableChain.Step.HIDE_AS_OWNER) {
+                            activity?.finish()
+                        }
+                    }
+                    .setCancelable(false)
+                    .show()
+                refreshEnabledState()
+                refreshSuspendState()
+            }
+        }
+    }
+
+    private fun stepName(ctx: android.content.Context, s: DisableChain.Step): String = ctx.getString(
+        when (s) {
+            DisableChain.Step.DISABLE_USER -> R.string.chain_step_disable
+            DisableChain.Step.DISABLE_UNTIL_USED -> R.string.chain_step_until_used
+            DisableChain.Step.REMOVE_FOR_USER -> R.string.chain_step_remove
+            DisableChain.Step.HIDE_AS_OWNER -> R.string.chain_step_hide
+            DisableChain.Step.NEUTRALIZE -> R.string.chain_step_neutralize
+        }
+    )
+
+    private fun setLoadingDisable(on: Boolean) {
+        view?.findViewById<View>(R.id.disableRemoveButton)?.isEnabled = !on
+        disableSw.view.isEnabled = !on && packageName != requireContext().packageName
+    }
+
+    /**
+     * "Fuer diesen Nutzer entfernen" (pm uninstall -k --user 0). [denied] = Grund, falls vorher das
+     * Deaktivieren abgelehnt wurde. Kritische Apps, Startbildschirm und Tastatur werden nie angeboten.
+     */
+    private fun confirmRemoveForUser(denied: String?) {
+        val ctx = requireContext()
+        val b = backend
+        executor.execute {
+            val block = UserRemovalManager.blockReason(ctx, b, packageName)
+            handler.post {
+                if (!isAdded) return@post
+                if (block != null) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.remove_user_title)
+                        .setMessage(
+                            listOfNotNull(
+                                denied?.let { getString(R.string.disable_denied, it) },
+                                getString(
+                                    when (block) {
+                                        UserRemoval.Block.HOME -> R.string.remove_user_block_home
+                                        UserRemoval.Block.KEYBOARD -> R.string.remove_user_block_keyboard
+                                        else -> R.string.remove_user_block_critical
+                                    }
+                                )
+                            ).joinToString("\n\n")
+                        )
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()
+                    return@post
+                }
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.remove_user_title)
+                    .setMessage(
+                        listOfNotNull(
+                            denied?.let { getString(R.string.disable_denied, it) },
+                            getString(R.string.remove_user_msg)
+                        ).joinToString("\n\n")
+                    )
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .setPositiveButton(R.string.remove_user_action) { _, _ -> removeForUser() }
+                    .show()
+            }
+        }
+    }
+
+    private fun removeForUser() {
+        val ctx = requireContext().applicationContext
+        val b = backend
+        executor.execute {
+            val r = UserRemovalManager.remove(ctx, b, packageName)
+            if (r.ok) runCatching {
+                ChangeLog.recordInfo(ctx, ctx.getString(R.string.log_info_removed_user, packageName))
+            }
+            handler.post {
+                Toast.makeText(
+                    ctx,
+                    if (r.ok) ctx.getString(R.string.remove_user_done)
+                    else ctx.getString(R.string.remove_user_failed, r.reason ?: "?"),
+                    Toast.LENGTH_LONG
+                ).show()
+                // Die App gibt es fuer diesen Nutzer nicht mehr: Detailseite schliessen
+                if (r.ok) activity?.finish()
             }
         }
     }
@@ -296,6 +472,10 @@ class BehaviorFragment : Fragment() {
     private fun toggleFreeze(freeze: Boolean) {
         executor.execute {
             val res = if (freeze) backend.suspendPackage(packageName) else backend.unsuspendPackage(packageName)
+            // Auftauen einer neutralisierten App: auch die Hintergrund-Sperren zuruecknehmen
+            if (!freeze && !res.isFailure()) {
+                runCatching { UserRemovalManager.undoNeutralize(requireContext().applicationContext, backend, packageName) }
+            }
             handler.post {
                 if (res.isFailure()) {
                     freezeSw.setQuietly(!freeze)

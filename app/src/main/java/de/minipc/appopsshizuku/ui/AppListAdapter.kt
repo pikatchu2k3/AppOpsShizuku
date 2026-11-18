@@ -20,7 +20,11 @@ data class AppItem(
     /** Fertiger Text der Status-Symbole (leer = nichts von uns geaendert). */
     val badges: String = "",
     /** Linke Verlaufsfarbe der Karte (aus der Icon-Farbe, Kontrast zu Weiss gesichert). */
-    val cardColor: Int = CardColors.cardStart(null)
+    val cardColor: Int = CardColors.cardStart(null),
+    /** Fuer diesen Nutzer entfernt (pm uninstall --user 0) - Tipp bietet Wiederherstellen an. */
+    val removed: Boolean = false,
+    /** Als Geraeteinhaber versteckt - Tipp bietet Wiederherstellen an. */
+    val hidden: Boolean = false
 )
 
 class AppListAdapter(
