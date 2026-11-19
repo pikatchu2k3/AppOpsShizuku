@@ -1,0 +1,19 @@
+name: "Idee / Feature request"
+description: "Vorschlag für eine neue Funktion oder Verbesserung. / Suggest a new feature or improvement."
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: "Was soll die App können? / What should the app do?"
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: "Wofür brauchst du das? / What do you need it for?"
+      description: "Ein konkreter Fall hilft am meisten. / A concrete case helps most."
+  - type: input
+    id: device
+    attributes:
+      label: "Gerät und Android-Version (optional) / Device and Android version (optional)"

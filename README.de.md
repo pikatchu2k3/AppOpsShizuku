@@ -170,6 +170,10 @@ Der Reiter Tarnung (Patch, Klon, Tracker abschalten) ist **in Entwicklung**. Er 
 - Der Klon startet mit **eigenen Daten** (kein Login-/Verlaufs-Transfer).
 - Vor dem Patch wird der Ziel-Paketname geprüft: Ist er von einer anderen App belegt, meldet der Reiter das und es wird nichts gepatcht. Ein früherer Klon dieser App wird an Ort und Stelle aktualisiert.
 
+## Fehler melden
+
+Öffne ein [Issue](https://github.com/pikatchu2k3/AppOpsShizuku/issues/new/choose) mit dem Formular *Fehler melden*. Am meisten hilft der Fehlerbericht aus der App: *Werkzeuge → Diagnose → Fehlerprotokoll → Fehlerbericht teilen* (oder *Als Datei speichern* und anhängen). Lies ihn vor dem Posten durch: Er enthält Gerätemodell, Android-Version und die Paketnamen der Apps, bei denen etwas fehlschlug.
+
 ## Selbst bauen
 
 ```bash

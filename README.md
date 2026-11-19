@@ -170,6 +170,10 @@ The Stealth tab (patch, clone, tracker switch-off) is **in development**. It is 
 - The clone starts with **its own data** (no login/history transfer).
 - Before patching, the target package name is checked: if another app already uses it, the tab says so and nothing is patched. An earlier clone made by this app is updated in place.
 
+## Report a problem
+
+Open an [issue](https://github.com/pikatchu2k3/AppOpsShizuku/issues/new/choose) with the *Bug report* form. Most helpful is the error report from the app: *Tools → Diagnostics → Error log → Share error report* (or *Save as file* and attach it). Read it before you post it: it contains the device model, Android version and the package names of apps where something failed.
+
 ## Build from source
 
 ```bash

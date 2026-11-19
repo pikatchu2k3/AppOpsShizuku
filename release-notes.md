@@ -1,43 +1,67 @@
 ### English
 
-**App Ops Shizuku 1.20.7** — "Only on demand" and "stop when the screen turns off" now work for ordinary system apps too, not just for your own apps.
+**App Ops Shizuku 1.20.8** — backups end up where you can find them, the *Blocked* filter shows what it says, and a new error log helps to report problems.
 
-**What was wrong:** the rule was "never for system apps". That is far too broad: Google Maps, Gmail or the gallery are system apps on most phones, so those two features could not be used for them at all. What matters is not whether an app ships with the phone, but whether the phone stays usable without it.
+**Fixed: backup location**
 
-**What changed**
+*Export* used to write `privacy_profiles.json` into the app's private storage. Without root you could not reach that file, and uninstalling the app deleted it. *Export* now opens the system save dialog (suggested name `appopsshizuku-backup-<date>.json`), so you choose the place, e.g. *Downloads*. "Creating backup …" appears right away, because reading all apps through Shizuku can take a while. Success messages appear under the buttons in *Settings* and disappear after 8 seconds; errors stay until you tap them.
 
-- Both features are now offered for normal system apps (Maps, Gmail, gallery, …).
-- Still never offered, because the phone needs them: System UI, Settings, phone/dialer, SMS, providers, permission controller, the current launcher, the current keyboard, Shizuku and this app — the same protected list that the disable/remove chain uses.
-- The hint text in all nine languages now says that (*"Not for apps the device needs to work …"*) instead of "not for system apps".
+**Fixed: filter *Blocked***
+
+The filter showed almost every app, including apps marked *Unchanged*. It counted every `Uid mode: …: ignore` line from `cmd appops get`, and Android writes such a line for every permission an app was never granted. The filter now uses the same basis as the status line on each card: apps with at least one permission set to *ignore* or *deny* with this app. It works instantly, without scanning every app.
+
+**New: error log**
+
+- Records crashes, failed Shizuku commands and internal errors, only on the device (about 200 KB at most; the same error is written once per 10 minutes).
+- *Tools → Diagnostics → Error log*: number of entries, the latest lines, *Share error report*, *Save as file*, *Clear*. The report contains app version, device model, Android version, the last diagnostics result and the log, including the package names of apps where something failed.
+- After a crash or an error a notification (channel *Errors*) offers *Share* and *Save*; after a crash the app also offers to open Diagnostics on the next start.
+- Still **no internet permission**: nothing is sent automatically, sharing and saving go through the system dialogs.
+
+**Also**
+
+- Bug report and feature request forms on GitHub (*Issues → New issue*), in German and English.
+- README split into English (`README.md`) and German (`README.de.md`) with a language switch at the top, and completed with features that were missing from it.
 
 **Honest limits**
 
-- **No device run.** The decision logic is covered by unit tests (one new test for system apps vs. protected packages), 352 tests in total, but whether OxygenOS actually freezes a given system app, and whether it starts again afterwards, has to be checked on the phone. Maps is the natural first candidate.
-- Freezing a system app can break its background jobs (navigation, location) — that is the point of the feature, but it should be one app at a time.
+- **No device run.** The save dialog, the auto-hiding message, the new filter, the error notification and the crash dialog were built and checked in code and unit tests, not on a phone.
+- The *Blocked* filter now only knows what was blocked **with this app**. A permission you denied in Android's own settings does not put an app into this filter.
 
-**Tests:** 352 unit tests, 0 failures, 1 skipped (45 test classes).
+**Tests:** 354 unit tests in 45 classes, including 7 new ones for the error log.
 
-Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — this repository is **private**; for updates through [Obtainium](https://github.com/ImranR98/Obtainium) you need a GitHub token with read access.
+Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 
 ### Deutsch
 
-**App Ops Shizuku 1.20.7** — „Nur bei Bedarf“ und „beim Bildschirm-Aus anhalten“ gehen jetzt auch für normale System-Apps, nicht mehr nur für eigene Apps.
+**App Ops Shizuku 1.20.8** — Sicherungen landen dort, wo du sie findest, der Filter *Blockiert* zeigt, was er sagt, und ein neues Fehlerprotokoll hilft beim Melden von Problemen.
 
-**Was falsch war:** Die Regel lautete „nie für System-Apps“. Das ist viel zu grob: Google Maps, Gmail oder die Galerie sind auf den meisten Telefonen System-Apps — für die waren beide Funktionen gar nicht nutzbar. Entscheidend ist nicht, ob eine App mit dem Telefon kommt, sondern ob das Telefon ohne sie noch bedienbar ist.
+**Behoben: Speicherort der Sicherung**
 
-**Was sich ändert**
+*Exportieren* schrieb `privacy_profiles.json` bisher in den privaten Speicher der App. Ohne Root kam man an die Datei nicht heran, und beim Deinstallieren war sie weg. Jetzt öffnet *Exportieren* den Speichern-Dialog des Systems (Vorschlag `appopsshizuku-backup-<Datum>.json`), du wählst den Ort, z. B. *Downloads*. Sofort erscheint „Sicherung wird erstellt …“, denn das Einlesen aller Apps über Shizuku kann dauern. Erfolgsmeldungen stehen unter den Knöpfen in den *Einstellungen* und verschwinden nach 8 Sekunden; Fehler bleiben, bis du sie antippst.
 
-- Beide Funktionen werden jetzt für normale System-Apps angeboten (Maps, Gmail, Galerie …).
-- Weiter nie angeboten, weil das Telefon sie braucht: System-UI, Einstellungen, Telefon/Dialer, SMS, Provider, Berechtigungs-Controller, der aktuelle Launcher, die aktuelle Tastatur, Shizuku und diese App — dieselbe geschützte Liste wie bei der Deaktivieren-/Entfernen-Kette.
-- Der Hinweistext sagt das jetzt in allen neun Sprachen („Nicht für Apps, die das Gerät zum Funktionieren braucht …“) statt „Nicht für System-Apps“.
+**Behoben: Filter *Blockiert***
+
+Der Filter zeigte fast jede App, auch solche mit *Unverändert*. Er zählte jede Zeile `Uid mode: …: ignore` aus `cmd appops get`, und die schreibt Android für jede Berechtigung, die eine App nie bekommen hat. Jetzt nutzt der Filter dieselbe Grundlage wie die Statuszeile auf der Karte: Apps, bei denen mindestens eine Berechtigung mit dieser App auf *Ignorieren* oder *Verweigern* steht. Er wirkt sofort, ohne jede App abzufragen.
+
+**Neu: Fehlerprotokoll**
+
+- Zeichnet Abstürze, fehlgeschlagene Shizuku-Befehle und interne Fehler auf, nur auf dem Gerät (höchstens etwa 200 KB; derselbe Fehler wird einmal pro 10 Minuten geschrieben).
+- *Werkzeuge → Diagnose → Fehlerprotokoll*: Anzahl der Einträge, die neuesten Zeilen, *Fehlerbericht teilen*, *Als Datei speichern*, *Leeren*. Der Bericht enthält App-Version, Gerätemodell, Android-Version, das letzte Diagnose-Ergebnis und das Protokoll, auch die Paketnamen der Apps, bei denen etwas fehlschlug.
+- Nach einem Absturz oder Fehler bietet eine Benachrichtigung (Kanal *Fehler*) *Teilen* und *Speichern* an; nach einem Absturz fragt die App beim nächsten Start außerdem, ob sie die Diagnose öffnen soll.
+- Weiterhin **keine Internet-Berechtigung**: Es wird nichts automatisch gesendet, Teilen und Speichern laufen über die System-Dialoge.
+
+**Außerdem**
+
+- Formulare für Fehlermeldungen und Ideen auf GitHub (*Issues → New issue*), auf Deutsch und Englisch.
+- README aufgeteilt in Englisch (`README.md`) und Deutsch (`README.de.md`) mit Sprachumschalter oben, und um fehlende Funktionen ergänzt.
 
 **Ehrliche Grenzen**
 
-- **Kein Gerätelauf.** Die Entscheidungslogik ist durch Unit-Tests abgedeckt (ein neuer Test für System-Apps gegenüber geschützten Paketen), insgesamt 352 Tests — ob OxygenOS eine bestimmte System-App wirklich einfriert und ob sie danach wieder startet, muss am Telefon geprüft werden. Maps ist der naheliegende erste Kandidat.
-- Eine System-App einzufrieren kann ihre Hintergrundarbeit abschneiden (Navigation, Standort) — genau das ist der Zweck, aber bitte eine App nach der anderen.
+- **Kein Gerätelauf.** Speichern-Dialog, das Ausblenden der Meldung, der neue Filter, die Fehler-Benachrichtigung und der Absturz-Dialog sind im Code und mit Unit-Tests geprüft, nicht am Telefon.
+- Der Filter *Blockiert* kennt jetzt nur, was **mit dieser App** gesperrt wurde. Eine Berechtigung, die du in den Android-Einstellungen entzogen hast, bringt eine App nicht in diesen Filter.
 
-**Tests:** 352 Unit-Tests, 0 Fehler, 1 übersprungen (45 Testklassen).
+**Tests:** 354 Unit-Tests in 45 Klassen, davon 7 neue für das Fehlerprotokoll.
 
-Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — dieses Repository ist **privat**; für Updates über [Obtainium](https://github.com/ImranR98/Obtainium) ist ein GitHub-Token mit Lesezugriff nötig.
+Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 
-<sub>Paket `de.minipc.appopsshizuku` · versionCode 47 · debug-signiert (updatefähig über 1.20.6) · targetSdk 35 · Lizenz GPL-3.0</sub>
+<sub>Paket `de.minipc.appopsshizuku` · versionCode 48 · debug-signiert (updatefähig über 1.20.7) · targetSdk 35 · Lizenz GPL-3.0</sub>
