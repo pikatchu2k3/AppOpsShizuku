@@ -100,7 +100,7 @@ Die App hat unten in einer schwebenden Leiste drei Bereiche: **Apps**, **Werkzeu
 
 ### Einstellungen und Sicherung
 - Shizuku-Status, Quarantäne-Schalter, *Systemfarben (Material You)*, **Dauerrecht**, Export / Import und die App-Version.
-- Die **Sicherung** ist eine JSON-Datei: Privacy-Profile, Verhaltens-Einstellungen, Lifecycle-Profile, Automatik-Regeln, „Nur während Nutzung", der Quarantäne-Schalter und die Lockdown-Auswahl. Ältere Dateien bleiben lesbar; beim Import werden nur bekannte Berechtigungen akzeptiert. Der momentane Gerätezustand (welche Apps gerade in Quarantäne stehen) wird bewusst nicht gesichert. Für Skripte und Tasker geht der Import auch ohne Dateidialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <Pfad>`.
+- Die **Sicherung** ist eine JSON-Datei, gespeichert wo du willst (der Speichern-Dialog schlägt `appopsshizuku-backup-<Datum>.json` vor, z. B. in *Downloads*): Privacy-Profile, Verhaltens-Einstellungen, Lifecycle-Profile, Automatik-Regeln, „Nur während Nutzung", der Quarantäne-Schalter und die Lockdown-Auswahl. Ältere Dateien bleiben lesbar; beim Import werden nur bekannte Berechtigungen akzeptiert. Der momentane Gerätezustand (welche Apps gerade in Quarantäne stehen) wird bewusst nicht gesichert. Für Skripte und Tasker geht der Import auch ohne Dateidialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <Pfad>`.
 
 ## Sicherheitsprinzipien
 
@@ -200,17 +200,17 @@ Weil das Repository öffentlich ist, ist der Quellcode zu jedem veröffentlichte
 
 ## Sprachen
 
-Die Oberfläche gibt es auf Englisch (Basis) und in 8 Übersetzungen — je 744 Texte, vollständig (jeder Text übersetzt, keine Lücken).
+Die Oberfläche gibt es auf Englisch (Basis) und in 8 Übersetzungen — je 746 Texte, vollständig (jeder Text übersetzt, keine Lücken).
 
 | Sprache | Locale | Abdeckung |
 |---|---|---|
-| German/Deutsch | `values-de` | 744/744 (100%) |
-| Spanish/Español | `values-es` | 744/744 (100%) |
-| French/Français | `values-fr` | 744/744 (100%) |
-| Hindi/हिन्दी | `values-hi` | 744/744 (100%) |
-| Japanese/日本語 | `values-ja` | 744/744 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 744/744 (100%) |
-| Russian/Русский | `values-ru` | 744/744 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 744/744 (100%) |
+| German/Deutsch | `values-de` | 746/746 (100%) |
+| Spanish/Español | `values-es` | 746/746 (100%) |
+| French/Français | `values-fr` | 746/746 (100%) |
+| Hindi/हिन्दी | `values-hi` | 746/746 (100%) |
+| Japanese/日本語 | `values-ja` | 746/746 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 746/746 (100%) |
+| Russian/Русский | `values-ru` | 746/746 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 746/746 (100%) |
 
 Alle Übersetzungen sind maschinell geprüft (Platzhalter, Pluralformen, XML-Struktur); `R.array.*`-Ressourcen bleiben unberührt. Englisch ist die Basis: Ein Gerät mit nicht unterstützter Sprache zeigt Englisch, nicht Deutsch.

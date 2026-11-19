@@ -100,7 +100,7 @@ The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and
 
 ### Settings and backup
 - Shizuku status, quarantine switch, *System colors (Material You)*, **standing access**, export / import and the app version.
-- **Backup** is one JSON file: privacy profiles, behaviour settings, lifecycle profiles, automatic rules, "only while in use", the quarantine switch and the lockdown selection. Older files stay readable; on import only known permissions are accepted. Live device state (which apps are in quarantine right now) is deliberately not backed up. For scripts and Tasker the import also works without a file dialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <path>`.
+- **Backup** is one JSON file, saved wherever you choose (the system save dialog suggests `appopsshizuku-backup-<date>.json`, e.g. in *Downloads*): privacy profiles, behaviour settings, lifecycle profiles, automatic rules, "only while in use", the quarantine switch and the lockdown selection. Older files stay readable; on import only known permissions are accepted. Live device state (which apps are in quarantine right now) is deliberately not backed up. For scripts and Tasker the import also works without a file dialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <path>`.
 
 ## Safety principles
 
@@ -200,17 +200,17 @@ Because the repository is public, the source that belongs to every released pack
 
 ## Languages
 
-The interface ships in English (base) plus 8 translations — 744 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 746 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
-| German/Deutsch | `values-de` | 744/744 (100%) |
-| Spanish/Español | `values-es` | 744/744 (100%) |
-| French/Français | `values-fr` | 744/744 (100%) |
-| Hindi/हिन्दी | `values-hi` | 744/744 (100%) |
-| Japanese/日本語 | `values-ja` | 744/744 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 744/744 (100%) |
-| Russian/Русский | `values-ru` | 744/744 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 744/744 (100%) |
+| German/Deutsch | `values-de` | 746/746 (100%) |
+| Spanish/Español | `values-es` | 746/746 (100%) |
+| French/Français | `values-fr` | 746/746 (100%) |
+| Hindi/हिन्दी | `values-hi` | 746/746 (100%) |
+| Japanese/日本語 | `values-ja` | 746/746 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 746/746 (100%) |
+| Russian/Русский | `values-ru` | 746/746 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 746/746 (100%) |
 
 All translations are checked by script (placeholders, plural forms, XML structure); `R.array.*` resources are left alone. English is the base, so any device with an unsupported language falls back to English instead of German.
