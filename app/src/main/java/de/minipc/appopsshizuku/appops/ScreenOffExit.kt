@@ -50,9 +50,14 @@ data class ScreenActionResult(
     }
 }
 
-/** Darf fuer diese App Screen-Off-Exit ueberhaupt eingeschaltet werden? */
-fun screenOffAllowed(packageName: String, ownPackage: String, isSystemApp: Boolean): Boolean =
-    packageName != ownPackage && !isSystemApp
+/**
+ * Darf fuer diese App Screen-Off-Exit / "Nur bei Bedarf" ueberhaupt eingeschaltet werden?
+ * [isProtected]: Paket, ohne das das Geraet nicht bedienbar ist (System-UI, Einstellungen, Telefon,
+ * Provider, aktueller Launcher/Tastatur, Shizuku - siehe [UserRemoval.blockReason]). Normale
+ * System-Apps wie Maps sind erlaubt; frueher waren alle System-Apps gesperrt.
+ */
+fun screenOffAllowed(packageName: String, ownPackage: String, isProtected: Boolean): Boolean =
+    packageName != ownPackage && !isProtected
 
 /**
  * Nur Eintraege installierter Apps. Ohne diesen Filter hielte der Eintrag einer
@@ -67,9 +72,9 @@ fun installedOnly(
 fun screenOffServiceNeeded(
     entries: Map<String, LifecycleEntry>,
     ownPackage: String,
-    systemPackages: Set<String>
+    protectedPackages: Set<String>
 ): Boolean = entries.any { (pkg, e) ->
-    (e.screenOffExit == true || e.onDemand == true) && screenOffAllowed(pkg, ownPackage, pkg in systemPackages)
+    (e.screenOffExit == true || e.onDemand == true) && screenOffAllowed(pkg, ownPackage, pkg in protectedPackages)
 }
 
 /**
@@ -80,14 +85,14 @@ fun screenOffServiceNeeded(
  *   eingefroren, sie beim Einschalten "freizugeben" waere falsch.
  * - Bildschirm an: nur Apps freigeben, die WIR eingefroren haben ([suspendedByUs])
  *   und bei denen "wieder freigeben" nicht abgeschaltet ist.
- * - Eigene App und System-Apps: nie.
+ * - Eigene App und geschuetzte Pakete: nie.
  * - Apps im Modus "Nur bei Bedarf": nie hier, die sperrt [OnDemand] selbst.
  */
 fun screenActions(
     entries: Map<String, LifecycleEntry>,
     screenOn: Boolean,
     ownPackage: String,
-    systemPackages: Set<String>,
+    protectedPackages: Set<String>,
     suspendedByUs: Set<String>,
     alreadySuspended: Set<String> = emptySet()
 ): List<ScreenAction> {
@@ -96,7 +101,7 @@ fun screenActions(
         // Nur was WIR eingefroren haben. Auch wenn der Haken inzwischen aus ist (oder der
         // Eintrag fehlt), wird die App freigegeben - sonst bliebe sie ewig eingefroren.
         for (pkg in suspendedByUs.sorted()) {
-            if (!screenOffAllowed(pkg, ownPackage, pkg in systemPackages)) continue
+            if (!screenOffAllowed(pkg, ownPackage, pkg in protectedPackages)) continue
             val e = entries[pkg] ?: LifecycleEntry()
             // "Nur bei Bedarf" gibt beim Bildschirm-An NIE frei (eigene Logik in OnDemand)
             if (e.onDemand == true) continue
@@ -107,7 +112,7 @@ fun screenActions(
     }
     for ((pkg, e) in entries.toSortedMap()) {
         if (e.screenOffExit != true || e.onDemand == true) continue
-        if (!screenOffAllowed(pkg, ownPackage, pkg in systemPackages)) continue
+        if (!screenOffAllowed(pkg, ownPackage, pkg in protectedPackages)) continue
         when (e.screenOffEffect ?: ScreenOffEffect.SUSPEND) {
             ScreenOffEffect.SUSPEND ->
                 if (pkg !in alreadySuspended) out.add(ScreenAction(pkg, ScreenAction.Kind.SUSPEND))

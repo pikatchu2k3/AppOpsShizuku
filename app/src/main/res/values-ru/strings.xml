@@ -200,7 +200,7 @@
     <string name="screen_off_effect_force_stop">Закрыть (force-stop) – приложение завершается и не получает будильники и push-уведомления, пока его снова не откроют; открыть его можно</string>
     <string name="screen_off_effect_suspend">Заморозить – приложение не может запуститься до включения экрана; данные сохраняются</string>
     <string name="screen_off_excluded_own">Не применяется к собственному приложению.</string>
-    <string name="screen_off_excluded_system">Не для системных приложений.</string>
+    <string name="screen_off_excluded_system">Не для приложений, без которых устройство не работает (системный интерфейс, настройки, телефон, лаунчер, клавиатура, Shizuku…).</string>
     <string name="screen_off_last">Последнее: %1$s</string>
     <string name="screen_off_no_shizuku">Невозможно: Shizuku не подключён или не разрешён.</string>
     <string name="screen_off_notif_denied">Уведомления запрещены – служба работает, но уведомление скрыто.</string>

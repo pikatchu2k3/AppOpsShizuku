@@ -200,7 +200,7 @@
     <string name="screen_off_effect_force_stop">बंद करें (force-stop) – ऐप बंद कर दी जाती है और दोबारा खोलने तक उसे अलार्म या पुश संदेश नहीं मिलते; खोलना संभव रहता है</string>
     <string name="screen_off_effect_suspend">फ़्रीज़ – स्क्रीन फिर चालू होने तक ऐप बिल्कुल शुरू नहीं हो सकती; डेटा बना रहता है</string>
     <string name="screen_off_excluded_own">अपने ऐप के लिए नहीं।</string>
-    <string name="screen_off_excluded_system">सिस्टम ऐप्स के लिए नहीं।</string>
+    <string name="screen_off_excluded_system">उन ऐप्स के लिए नहीं जिनकी डिवाइस को चलने के लिए ज़रूरत है (सिस्टम UI, सेटिंग्स, फ़ोन, लॉन्चर, कीबोर्ड, Shizuku …)।</string>
     <string name="screen_off_last">अंतिम: %1$s</string>
     <string name="screen_off_no_shizuku">संभव नहीं: Shizuku कनेक्ट नहीं है या अनुमति नहीं है।</string>
     <string name="screen_off_notif_denied">सूचनाओं की अनुमति नहीं है – सेवा फिर भी चलती है, पर सूचना छिपी रहती है।</string>

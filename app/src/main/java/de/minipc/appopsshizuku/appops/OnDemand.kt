@@ -74,10 +74,10 @@ object OnDemand {
 
     fun graceOf(e: LifecycleEntry): Int = e.onDemandGraceSeconds ?: DEFAULT_GRACE_SECONDS
 
-    /** Apps im Modus "Nur bei Bedarf" (eigene App und System-Apps nie). */
-    fun apps(entries: Map<String, LifecycleEntry>, ownPackage: String, systemPackages: Set<String>): Set<String> =
+    /** Apps im Modus "Nur bei Bedarf" (eigene App und geschuetzte Pakete nie). */
+    fun apps(entries: Map<String, LifecycleEntry>, ownPackage: String, protectedPackages: Set<String>): Set<String> =
         entries.filter { (pkg, e) ->
-            e.onDemand == true && screenOffAllowed(pkg, ownPackage, pkg in systemPackages)
+            e.onDemand == true && screenOffAllowed(pkg, ownPackage, pkg in protectedPackages)
         }.keys
 
     /**

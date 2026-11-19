@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.ApplicationInfo
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
@@ -24,6 +23,7 @@ import de.minipc.appopsshizuku.appops.OnDemand
 import de.minipc.appopsshizuku.appops.OnDemandLock
 import de.minipc.appopsshizuku.appops.OnDemandExecutor
 import de.minipc.appopsshizuku.appops.ScreenOffExecutor
+import de.minipc.appopsshizuku.appops.UserRemoval
 import de.minipc.appopsshizuku.appops.installedOnly
 import de.minipc.appopsshizuku.appops.screenActions
 import de.minipc.appopsshizuku.appops.screenOffServiceNeeded
@@ -103,7 +103,7 @@ class LifecycleScreenService : Service() {
         fun serviceNeeded(context: Context): Boolean {
             val app = context.applicationContext
             val entries = installedEntries(app, LifecycleStore(app))
-            if (screenOffServiceNeeded(entries, app.packageName, systemPackagesOf(app, entries.keys))) return true
+            if (screenOffServiceNeeded(entries, app.packageName, protectedPackagesOf(app, entries.keys))) return true
             val wiu = WhileInUseStore(app)
             return whileInUseApps(app, wiu).isNotEmpty() || wiu.grantedByUs.isNotEmpty()
         }
@@ -119,13 +119,15 @@ class LifecycleScreenService : Service() {
         private fun isInstalled(context: Context, pkg: String): Boolean =
             runCatching { context.packageManager.getApplicationInfo(pkg, 0); true }.getOrDefault(false)
 
-        /** Welche der Pakete sind System-Apps? (auf die wird nie etwas angewendet) */
-        fun systemPackagesOf(context: Context, packages: Collection<String>): Set<String> {
-            val pm = context.packageManager
+        /**
+         * Welche der Pakete sind geschuetzt? (auf die wird nie etwas angewendet: System-UI,
+         * Einstellungen, Telefon, Provider, aktueller Launcher und Tastatur, Shizuku, diese App)
+         */
+        fun protectedPackagesOf(context: Context, packages: Collection<String>): Set<String> {
+            val home = UserRemovalManager.homePackage(context)
+            val keyboard = UserRemovalManager.keyboardPackage(context, null)
             return packages.filter { pkg ->
-                runCatching {
-                    (pm.getApplicationInfo(pkg, 0).flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                }.getOrDefault(false)
+                UserRemoval.blockReason(pkg, context.packageName, home, keyboard) != null
             }.toSet()
         }
     }
@@ -322,13 +324,13 @@ class LifecycleScreenService : Service() {
             return
         }
         val exec = ScreenOffExecutor(backend)
-        val system = systemPackagesOf(this, entries.keys + store.suspendedByUs)
+        val protectedPkgs = protectedPackagesOf(this, entries.keys + store.suspendedByUs)
         val suspendedByUs = store.suspendedByUs
         val alreadySuspended = if (screenOn) emptySet() else entries
             .filter { it.value.screenOffExit == true && it.key !in suspendedByUs }
             .keys.filter { exec.isSuspended(it) }.toSet()
         if (!screenOn) lockOnDemandApps(entries, exec = onDemandExecutor(backend), all = true, reason = label)
-        val actions = screenActions(entries, screenOn, packageName, system, suspendedByUs, alreadySuspended)
+        val actions = screenActions(entries, screenOn, packageName, protectedPkgs, suspendedByUs, alreadySuspended)
         if (actions.isEmpty()) {
             Log.i(TAG, "$label: nichts zu tun")
             return
@@ -365,7 +367,7 @@ class LifecycleScreenService : Service() {
 
     private fun onDemandEntries(): Map<String, LifecycleEntry> {
         val entries = installedEntries(this, store)
-        val apps = OnDemand.apps(entries, packageName, systemPackagesOf(this, entries.keys))
+        val apps = OnDemand.apps(entries, packageName, protectedPackagesOf(this, entries.keys))
         return entries.filterKeys { it in apps }
     }
 
@@ -509,7 +511,7 @@ class LifecycleScreenService : Service() {
         all: Boolean,
         reason: String
     ) {
-        val apps = OnDemand.apps(entries, packageName, systemPackagesOf(this, entries.keys))
+        val apps = OnDemand.apps(entries, packageName, protectedPackagesOf(this, entries.keys))
         val open = store.onDemandOpen
         for (pkg in apps.sorted()) {
             if (!all && pkg in open) continue

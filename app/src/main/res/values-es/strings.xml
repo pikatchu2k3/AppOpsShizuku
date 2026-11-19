@@ -200,7 +200,7 @@
     <string name="screen_off_effect_force_stop">Cerrar (force-stop): la app se cierra y no recibe alarmas ni notificaciones push hasta que se vuelva a abrir; se puede seguir abriendo</string>
     <string name="screen_off_effect_suspend">Congelar: la app no puede iniciarse hasta que la pantalla se encienda; los datos se conservan</string>
     <string name="screen_off_excluded_own">No aplica a la propia app.</string>
-    <string name="screen_off_excluded_system">No para apps del sistema.</string>
+    <string name="screen_off_excluded_system">No para apps que el dispositivo necesita para funcionar (IU del sistema, Ajustes, teléfono, launcher, teclado, Shizuku…).</string>
     <string name="screen_off_last">Última: %1$s</string>
     <string name="screen_off_no_shizuku">No es posible: Shizuku no está conectado o no tiene permiso.</string>
     <string name="screen_off_notif_denied">Las notificaciones no están permitidas: el servicio sigue en marcha, pero la notificación está oculta.</string>

@@ -501,7 +501,7 @@
     <string name="screen_off_effect_force_stop">Close (force stop) – the app is ended and gets no alarms or push messages until it is opened again; opening it stays possible</string>
     <string name="screen_off_effect_suspend">Freeze – the app cannot start at all until the screen is on again; data is kept</string>
     <string name="screen_off_excluded_own">Not for the own app.</string>
-    <string name="screen_off_excluded_system">Not for system apps.</string>
+    <string name="screen_off_excluded_system">Not for apps the device needs to work (System UI, Settings, phone, launcher, keyboard, Shizuku …).</string>
     <string name="screen_off_last">Last: %1$s</string>
     <string name="screen_off_no_shizuku">Not possible: Shizuku is not connected or not allowed.</string>
     <string name="screen_off_notif_denied">Notifications are not allowed – the service still runs, but the notification is hidden.</string>

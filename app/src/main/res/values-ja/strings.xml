@@ -200,7 +200,7 @@
     <string name="screen_off_effect_force_stop">終了（force-stop）– アプリを終了し、再び開くまでアラームやプッシュ通知を受け取りません。開くことはできます</string>
     <string name="screen_off_effect_suspend">フリーズ – 画面が再びオンになるまでアプリは一切起動できません。データは残ります</string>
     <string name="screen_off_excluded_own">自分自身のアプリには適用されません。</string>
-    <string name="screen_off_excluded_system">システムアプリには適用されません。</string>
+    <string name="screen_off_excluded_system">端末の動作に必要なアプリ（システムUI、設定、電話、ランチャー、キーボード、Shizuku など）には適用されません。</string>
     <string name="screen_off_last">前回: %1$s</string>
     <string name="screen_off_no_shizuku">実行できません: Shizuku が未接続か許可されていません。</string>
     <string name="screen_off_notif_denied">通知が許可されていません – サービスは動作しますが、通知は表示されません。</string>

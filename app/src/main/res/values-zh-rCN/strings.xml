@@ -200,7 +200,7 @@
     <string name="screen_off_effect_force_stop">关闭（force-stop）——应用被结束，在再次打开前收不到闹钟和推送消息；仍可正常打开</string>
     <string name="screen_off_effect_suspend">冻结——在屏幕再次点亮前应用完全无法启动；数据保留</string>
     <string name="screen_off_excluded_own">不适用于本应用。</string>
-    <string name="screen_off_excluded_system">不适用于系统应用。</string>
+    <string name="screen_off_excluded_system">不适用于设备正常运行所需的应用（系统界面、设置、电话、启动器、键盘、Shizuku 等）。</string>
     <string name="screen_off_last">上次：%1$s</string>
     <string name="screen_off_no_shizuku">无法执行：Shizuku 未连接或未获授权。</string>
     <string name="screen_off_notif_denied">未允许通知——服务仍在运行，但通知已隐藏。</string>
