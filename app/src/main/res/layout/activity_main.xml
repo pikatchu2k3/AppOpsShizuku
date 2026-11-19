@@ -412,6 +412,16 @@
                                 android:layout_weight="1"
                                 android:text="@string/menu_import_profiles" />
                         </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/settingsBackupStatus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:padding="10dp"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textIsSelectable="true"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <LinearLayout

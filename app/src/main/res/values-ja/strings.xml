@@ -184,7 +184,6 @@
     <string name="probe_timeout">起動チェックを中止: %1$d 秒経っても応答がありませんでした（アプリは正常に起動しませんでした）。確認されていません – パッチ自体は影響を受けていません。</string>
     <string name="profiles_export_empty">保存されたプロファイルがありません</string>
     <string name="profiles_export_fail">エクスポート失敗: %1$s</string>
-    <string name="profiles_export_ok">プロファイル %1$d 件とアプリ設定 %2$d 件をエクスポートしました: privacy_profiles.json（アプリのフォルダ）</string>
     <string name="profiles_import_behavior_need_shizuku">アプリ設定はスキップされました（Shizuku 未接続） – プロファイルのみ適用</string>
     <string name="profiles_import_fail">インポート失敗: %1$s</string>
     <string name="profiles_import_ok">%1$d 件のアプリをインポート、このアプリに %2$d 件の操作を適用</string>
@@ -767,4 +766,7 @@
     <string name="chain_step_hide">デバイスオーナーとして非表示</string>
     <string name="chain_result_hidden">デバイスオーナーとして非表示にしました。アプリ一覧（「非表示」）から復元できます。</string>
     <string name="app_hidden_label">%1$s（非表示）</string>
+    <string name="backup_status_running">バックアップを作成中 … すべてのアプリを読み込んでいます。少し時間がかかることがあります。</string>
+    <string name="backup_status_saved_as">保存先: %1$s</string>
+    <string name="backup_toast_saved">バックアップを保存しました: %1$s</string>
 </resources>

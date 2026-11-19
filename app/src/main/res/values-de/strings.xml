@@ -115,7 +115,6 @@
     <string name="dynamic_color_on">Farben aus dem Hintergrundbild des Systems</string>
     <string name="dynamic_color_off">Feste Petrol-Palette der App</string>
     <string name="profiles_export_empty">Keine gespeicherten Profile vorhanden</string>
-    <string name="profiles_export_ok">%1$d Profile und %2$d App-Einstellungen exportiert: privacy_profiles.json (App-Ordner)</string>
     <string name="profiles_export_fail">Export fehlgeschlagen: %1$s</string>
     <string name="profiles_import_ok">%1$d Apps importiert, %2$d Ops auf diese App angewendet</string>
     <string name="profiles_import_ok_global">%1$d Profile importiert</string>
@@ -793,4 +792,7 @@
     <string name="chain_step_hide">Als Geräteinhaber verstecken</string>
     <string name="chain_result_hidden">Als Geräteinhaber versteckt. Wiederherstellen über die App-Liste („versteckt“).</string>
     <string name="app_hidden_label">%1$s (versteckt)</string>
+    <string name="backup_status_running">Sicherung wird erstellt … alle Apps werden eingelesen, das kann etwas dauern.</string>
+    <string name="backup_status_saved_as">Gespeichert als: %1$s</string>
+    <string name="backup_toast_saved">Sicherung gespeichert: %1$s</string>
 </resources>

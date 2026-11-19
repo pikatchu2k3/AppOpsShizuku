@@ -184,7 +184,6 @@
     <string name="probe_timeout">Пробный запуск прерван: приложение не отвечало в течение %1$d с (запустилось некорректно). НЕ проверено — сам патч не затронут.</string>
     <string name="profiles_export_empty">Нет сохранённых профилей</string>
     <string name="profiles_export_fail">Ошибка экспорта: %1$s</string>
-    <string name="profiles_export_ok">Экспортировано профилей: %1$d, настроек приложений: %2$d — privacy_profiles.json (папка приложения)</string>
     <string name="profiles_import_behavior_need_shizuku">Настройки приложений пропущены (Shizuku не подключён) — применены только профили</string>
     <string name="profiles_import_fail">Ошибка импорта: %1$s</string>
     <string name="profiles_import_ok">Импортировано приложений: %1$d, операций применено к этому приложению: %2$d</string>
@@ -776,4 +775,7 @@
     <string name="chain_step_hide">Скрыть как владелец</string>
     <string name="chain_result_hidden">Скрыто как владелец. Восстановить можно из списка («скрыто»).</string>
     <string name="app_hidden_label">%1$s (скрыто)</string>
+    <string name="backup_status_running">Создаётся резервная копия … читаются все приложения, это может занять время.</string>
+    <string name="backup_status_saved_as">Сохранено как: %1$s</string>
+    <string name="backup_toast_saved">Резервная копия сохранена: %1$s</string>
 </resources>

@@ -85,6 +85,12 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val executor = Executors.newFixedThreadPool(4)
 
+    /** Speichern-Dialog fuer die Sicherung: der Nutzer waehlt den Ort (z. B. Downloads). */
+    private val exportPicker =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+            if (uri != null) exportProfiles(uri)
+        }
+
     /** SAF-Picker fuer den Profil-Import (JSON), global von der Toolbar aus. */
     private val importPicker =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -446,7 +452,10 @@ class MainActivity : AppCompatActivity() {
             dynamic.isChecked = false
             dynamic.setText(R.string.menu_dynamic_color_unavailable)
         }
-        findViewById<View>(R.id.settingExport).setOnClickListener { exportProfiles() }
+        findViewById<View>(R.id.settingExport).setOnClickListener {
+            val day = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+            exportPicker.launch("appopsshizuku-backup-$day.json")
+        }
         findViewById<View>(R.id.settingImport).setOnClickListener {
             importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
         }
@@ -926,8 +935,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Alle gespeicherten Profile als JSON in den App-Ordner schreiben. */
-    private fun exportProfiles() {
+    /** Alle gespeicherten Profile als JSON in die gewaehlte Datei schreiben. */
+    private fun exportProfiles(target: Uri) {
+        // Sofort Rueckmeldung: das Einlesen aller Apps ueber Shizuku kann dauern
+        val button = findViewById<View>(R.id.settingExport)
+        button.isEnabled = false
+        setBackupStatus(getString(R.string.backup_status_running), false)
         executor.execute {
             val result = runCatching {
                 // Einheitliches Backup: Berechtigungsprofile + Verhaltens-Einstellungen
@@ -939,9 +952,10 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     emptyMap()
                 }
-                profileBackup.export(behavior)
+                profileBackup.export(target, behavior)
             }
             handler.post {
+                button.isEnabled = true
                 result.onSuccess { r ->
                     if (r.count == 0 && r.behaviorCount == 0 && r.lifecycleCount == 0 && r.extrasCount == 0) {
                         setBackupStatus(getString(R.string.profiles_export_empty), false)
@@ -950,11 +964,11 @@ class MainActivity : AppCompatActivity() {
                         setBackupStatus(
                             getString(R.string.backup_status_export_ok, r.count, r.behaviorCount) +
                                 "\n" + getString(R.string.backup_status_extras, r.extrasCount) +
-                                "\n" + r.path, false
+                                "\n" + getString(R.string.backup_status_saved_as, r.path), false
                         )
                         Toast.makeText(
                             this,
-                            getString(R.string.profiles_export_ok, r.count, r.behaviorCount),
+                            getString(R.string.backup_toast_saved, r.path),
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -1058,7 +1072,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showBackupStatus(text: String, isError: Boolean) {
-        val view = findViewById<TextView>(R.id.backupStatus) ?: return
+        // Im Apps-Reiter UND direkt unter den Knoepfen in den Einstellungen
+        listOf(R.id.backupStatus, R.id.settingsBackupStatus).forEach { id ->
+            findViewById<TextView>(id)?.let { styleBackupStatus(it, text, isError) }
+        }
+    }
+
+    private fun styleBackupStatus(view: TextView, text: String, isError: Boolean) {
         view.text = text
         view.visibility = View.VISIBLE
         view.setBackgroundColor(

@@ -431,7 +431,6 @@
     <string name="probe_timeout">Start probe aborted: it did not respond after %1$d s (the app did not start cleanly). NOT checked — the patch itself is not affected.</string>
     <string name="profiles_export_empty">No saved profiles available</string>
     <string name="profiles_export_fail">Export failed: %1$s</string>
-    <string name="profiles_export_ok">%1$d profiles and %2$d app settings exported: privacy_profiles.json (app folder)</string>
     <string name="profiles_import_behavior_need_shizuku">App settings skipped (Shizuku not connected) – only profiles applied</string>
     <string name="profiles_import_fail">Import failed: %1$s</string>
     <string name="profiles_import_ok">%1$d apps imported, %2$d ops applied to this app</string>
@@ -771,4 +770,7 @@
     <string name="workprofile_remove_msg">Removes the whole work profile. All data of apps inside it is lost.</string>
     <string name="workprofile_removed">Work profile removed.</string>
     <string name="workprofile_title">Work profile</string>
+    <string name="backup_status_running">Creating backup … reading all apps, this can take a moment.</string>
+    <string name="backup_status_saved_as">Saved as: %1$s</string>
+    <string name="backup_toast_saved">Backup saved: %1$s</string>
 </resources>
