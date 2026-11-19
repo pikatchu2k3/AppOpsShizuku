@@ -330,7 +330,7 @@
     <string name="screen_off_effect_force_stop">Beenden (force-stop) – die App wird geschlossen und bekommt keine Wecker oder Push-Nachrichten, bis sie wieder geöffnet wird; Öffnen bleibt möglich</string>
     <string name="screen_off_release">Beim Einschalten wieder freigeben (sonst bleibt sie eingefroren, bis du sie oben freigibst)</string>
     <string name="screen_off_excluded_own">Nicht für die eigene App.</string>
-    <string name="screen_off_excluded_system">Nicht für System-Apps.</string>
+    <string name="screen_off_excluded_system">Nicht für Apps, die das Gerät zum Funktionieren braucht (System-UI, Einstellungen, Telefon, Launcher, Tastatur, Shizuku …).</string>
     <string name="screen_off_no_shizuku">Nicht möglich: Shizuku ist nicht verbunden oder nicht erlaubt.</string>
     <string name="screen_off_service_running">Dienst läuft. Die Benachrichtigung lässt sich ausblenden (wegwischen oder „Ausblenden“ tippen), der Dienst arbeitet weiter.</string>
     <string name="screen_off_service_failed">Dienst konnte nicht starten: %1$s</string>

@@ -96,6 +96,17 @@ class OnDemandTest {
         assertEquals(-1, dev.indexOf("pm", "enable"))
     }
 
+    @Test fun normaleSystemAppErlaubt_geschuetzteNie() {
+        // Maps ist eine System-App, aber nicht geschuetzt -> erlaubt; System-UI bleibt gesperrt
+        val maps = "com.google.android.apps.maps"
+        val e = LifecycleEntry(onDemand = true)
+        val prot = setOf("com.android.systemui").filter {
+            UserRemoval.blockReason(it, OWN, null, null) != null
+        }.toSet()
+        assertEquals(setOf(maps), OnDemand.apps(mapOf(maps to e, "com.android.systemui" to e), OWN, prot))
+        assertNull(UserRemoval.blockReason(maps, OWN, null, null))
+    }
+
     @Test fun zustandParser() {
         val st = parseLockState("  enabled=1\n    User 0: installed=true suspended=true stopped=false enabled=3 instant=false")
         assertEquals(LockState(suspended = true, disabled = true, stopped = false), st)

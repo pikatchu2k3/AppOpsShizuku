@@ -702,6 +702,10 @@ class BehaviorFragment : Fragment() {
             ApplicationInfo.FLAG_SYSTEM) != 0
     }.getOrDefault(false)
 
+    /** Geschuetztes Paket (System-UI, Einstellungen, Launcher, Tastatur ...) - nie sperren. */
+    private fun isLockProtected(): Boolean =
+        UserRemovalManager.blockReason(requireContext(), null, packageName) != null
+
     private fun bucketButtonId(bucket: Int): Int = when (bucket) {
         BUCKET_WORKING_SET -> R.id.lifecycleBucketWorkingSet
         BUCKET_FREQUENT -> R.id.lifecycleBucketFrequent
@@ -910,7 +914,7 @@ class BehaviorFragment : Fragment() {
 
     private fun refreshScreenOff() {
         val ctx = requireContext()
-        val allowed = screenOffAllowed(packageName, ctx.packageName, isSystemApp())
+        val allowed = screenOffAllowed(packageName, ctx.packageName, isLockProtected())
         val sw = root.findViewById<SwitchMaterial>(R.id.screenOffSwitch)
         val on = sw.isChecked
         // "Nur bei Bedarf" uebernimmt diese App komplett; Ausschalten bleibt trotzdem moeglich
@@ -1124,7 +1128,7 @@ class BehaviorFragment : Fragment() {
         val ctx = requireContext()
         val store = LifecycleStore(ctx)
         val e = store.get(packageName)
-        val allowed = screenOffAllowed(packageName, ctx.packageName, isSystemApp())
+        val allowed = screenOffAllowed(packageName, ctx.packageName, isLockProtected())
         val on = e.onDemand == true
         // Ausschalten muss immer moeglich bleiben, Einschalten nur mit Shizuku
         onDemandSw.view.isEnabled = allowed && (shizukuUsable || on)
