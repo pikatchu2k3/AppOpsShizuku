@@ -527,7 +527,7 @@ class ComponentsActivity : AppCompatActivity() {
                         else R.string.components_no_component_permission,
                         Toast.LENGTH_LONG
                     ).show()
-                    Log.w(TAG, "toggleComponents($enable) Fehler: $lastError")
+                    ErrorLog.w(TAG, "toggleComponents($enable) Fehler: $lastError")
                 }
                 reload()
             }

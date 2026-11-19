@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.stealth
 
+import de.minipc.appopsshizuku.ErrorLog
 import android.util.Log
 import java.io.File
 import java.util.zip.ZipFile
@@ -144,7 +145,7 @@ object DexPatcher {
         } catch (e: Exception) {
             // NICHT stumm verschwinden lassen — ohne Log waere bei einem
             // unerwarteten Fehler nur ein leeres Ergebnis sichtbar.
-            Log.e(TAG, "DexPatcher.patchAll abgebrochen (apk=${apk.name}, launcher=$launcherClass): ${e.javaClass.simpleName}: ${e.message}", e)
+            ErrorLog.e(TAG, "DexPatcher.patchAll abgebrochen (apk=${apk.name}, launcher=$launcherClass): ${e.javaClass.simpleName}: ${e.message}", e)
             return emptyMap()
         }
         return result
@@ -543,12 +544,12 @@ object DexPatcher {
                 try {
                     disassembleInternal(dexFile, outDir, 1)
                 } catch (e2: Exception) {
-                    Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=1, exit=-1)", e2)
+                    ErrorLog.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=1, exit=-1)", e2)
                     false
                 }
             } catch (e: Exception) {
                 val cause = if (e is java.lang.reflect.InvocationTargetException) e.cause else e
-                Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=$jobs, exit=-1): ${cause?.javaClass?.simpleName}: ${cause?.message}", cause ?: e)
+                ErrorLog.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=$jobs, exit=-1): ${cause?.javaClass?.simpleName}: ${cause?.message}", cause ?: e)
                 false
             }
         }
@@ -559,7 +560,7 @@ object DexPatcher {
             false
         } catch (e: Exception) {
             val cause = if (e is java.lang.reflect.InvocationTargetException) e.cause else e
-            Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=1, exit=-1): ${cause?.javaClass?.simpleName}: ${cause?.message}", cause ?: e)
+            ErrorLog.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} (jobs=1, exit=-1): ${cause?.javaClass?.simpleName}: ${cause?.message}", cause ?: e)
             false
         }
     }
@@ -573,13 +574,13 @@ object DexPatcher {
         setField(cmd, "jobs", jobs)
         val exit = invokeRun(cmd)
         if (exit != 0) {
-            Log.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} -> ${outDir.absolutePath} (jobs=$jobs, exit=$exit)")
+            ErrorLog.e(TAG, "baksmali fehlgeschlagen: disassemble ${dexFile.absolutePath} -> ${outDir.absolutePath} (jobs=$jobs, exit=$exit)")
             return false
         }
         // Die Library schreibt Fehler nur auf stderr und run() kann trotzdem
         // "erfolgreich" enden -> Output-Artefakt verifizieren.
         if (outDir.walkTopDown().none { it.isFile }) {
-            Log.e(TAG, "baksmali lieferte kein Ergebnis: disassemble ${dexFile.absolutePath} -> ${outDir.absolutePath} (jobs=$jobs, exit=$exit, keine Smali-Dateien erzeugt)")
+            ErrorLog.e(TAG, "baksmali lieferte kein Ergebnis: disassemble ${dexFile.absolutePath} -> ${outDir.absolutePath} (jobs=$jobs, exit=$exit, keine Smali-Dateien erzeugt)")
             return false
         }
         return true
@@ -598,11 +599,11 @@ object DexPatcher {
                     debug("smali OOM auch bei jobs=1")
                     false
                 } catch (e2: Exception) {
-                    Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=1, exit=-1)", e2)
+                    ErrorLog.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=1, exit=-1)", e2)
                     false
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=$jobs, exit=-1): ${e.javaClass.simpleName}: ${e.message}", e)
+                ErrorLog.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=$jobs, exit=-1): ${e.javaClass.simpleName}: ${e.message}", e)
                 false
             }
         }
@@ -612,7 +613,7 @@ object DexPatcher {
             debug("smali OOM bei jobs=1")
             false
         } catch (e: Exception) {
-            Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=1, exit=-1): ${e.javaClass.simpleName}: ${e.message}", e)
+            ErrorLog.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} (jobs=1, exit=-1): ${e.javaClass.simpleName}: ${e.message}", e)
             false
         }
     }
@@ -626,11 +627,11 @@ object DexPatcher {
         setField(cmd, "jobs", jobs)
         val exit = invokeRun(cmd)
         if (exit != 0) {
-            Log.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} -> ${outDex.absolutePath} (jobs=$jobs, exit=$exit)")
+            ErrorLog.e(TAG, "smali fehlgeschlagen: assemble ${smaliDir.absolutePath} -> ${outDex.absolutePath} (jobs=$jobs, exit=$exit)")
             return false
         }
         if (!outDex.exists() || outDex.length() <= 0L) {
-            Log.e(TAG, "smali lieferte kein Ergebnis: assemble ${smaliDir.absolutePath} -> ${outDex.absolutePath} (jobs=$jobs, exit=$exit, Dex fehlt/leer)")
+            ErrorLog.e(TAG, "smali lieferte kein Ergebnis: assemble ${smaliDir.absolutePath} -> ${outDex.absolutePath} (jobs=$jobs, exit=$exit, Dex fehlt/leer)")
             return false
         }
         return true

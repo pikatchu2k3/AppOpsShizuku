@@ -181,6 +181,17 @@ class MainActivity : AppCompatActivity() {
         listOf(R.id.backupStatus, R.id.settingsBackupStatus).forEach { id ->
             findViewById<View>(id)?.setOnClickListener { dismissBackupStatus() }
         }
+        // Nach einem Absturz einmal anbieten, den Fehlerbericht anzusehen und zu teilen
+        if (savedInstanceState == null && ErrorLog.consumeCrashFlag(this)) {
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.errlog_crash_title)
+                .setMessage(R.string.errlog_crash_msg)
+                .setNegativeButton(R.string.errlog_crash_later, null)
+                .setPositiveButton(R.string.errlog_crash_open) { _, _ ->
+                    startActivity(Intent(this, DiagnosticsActivity::class.java))
+                }
+                .show()
+        }
         manager = ShizukuManager(onStateChanged = { runOnUiThread { updateStatus() } })
         manager.refresh()
 

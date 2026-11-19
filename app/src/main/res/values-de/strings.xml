@@ -794,4 +794,23 @@
     <string name="backup_status_running">Sicherung wird erstellt … alle Apps werden eingelesen, das kann etwas dauern.</string>
     <string name="backup_status_saved_as">Gespeichert als: %1$s</string>
     <string name="backup_toast_saved">Sicherung gespeichert: %1$s</string>
+    <string name="errlog_title">Fehlerprotokoll</string>
+    <string name="errlog_intro">Zeichnet Abstürze, fehlgeschlagene Shizuku-Befehle und interne Fehler auf – nur auf diesem Gerät, es wird nichts gesendet (die App hat keinen Internetzugriff). Um ein Problem zu melden, teile den Bericht oder speichere ihn als Datei. Er enthält Gerätemodell, Android-Version und die Paketnamen der Apps, bei denen etwas fehlschlug; lies ihn vor dem Senden durch.</string>
+    <string name="errlog_empty">Keine Fehler aufgezeichnet.</string>
+    <string name="errlog_count">%1$d Einträge · zuletzt: %2$s</string>
+    <string name="errlog_share">Fehlerbericht teilen</string>
+    <string name="errlog_save">Als Datei speichern</string>
+    <string name="errlog_clear">Leeren</string>
+    <string name="errlog_cleared">Fehlerprotokoll geleert</string>
+    <string name="errlog_saved">Fehlerbericht gespeichert</string>
+    <string name="errlog_crash_title">Die App ist abgestürzt</string>
+    <string name="errlog_crash_msg">App Ops Shizuku ist beim letzten Mal abgestürzt. Die Einzelheiten stehen im Fehlerprotokoll. Dort kannst du den Bericht teilen, um den Fehler zu melden.</string>
+    <string name="errlog_crash_open">Zur Diagnose</string>
+    <string name="errlog_crash_later">Später</string>
+    <string name="errlog_channel">Fehler</string>
+    <string name="errlog_channel_desc">Abstürze und Fehler dieser App, mit Teilen und Speichern. Es wird nichts automatisch gesendet.</string>
+    <string name="errlog_notif_title">Fehler in App Ops Shizuku</string>
+    <string name="errlog_notif_text">Neue Einträge im Fehlerprotokoll: %1$d · %2$s</string>
+    <string name="errlog_action_share">Teilen</string>
+    <string name="errlog_action_save">Speichern</string>
 </resources>

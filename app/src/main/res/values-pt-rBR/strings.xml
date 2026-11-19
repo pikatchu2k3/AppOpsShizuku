@@ -771,4 +771,23 @@
     <string name="backup_status_running">Criando backup … lendo todos os apps, isso pode levar um momento.</string>
     <string name="backup_status_saved_as">Salvo como: %1$s</string>
     <string name="backup_toast_saved">Backup salvo: %1$s</string>
+    <string name="errlog_title">Registro de erros</string>
+    <string name="errlog_intro">Registra travamentos, comandos do Shizuku que falharam e erros internos – apenas neste aparelho, nada é enviado (o app não tem acesso à internet). Para relatar um problema, compartilhe o relatório ou salve-o como arquivo. Ele contém o modelo, a versão do Android e os nomes de pacote dos apps em que algo falhou; leia-o antes de enviar.</string>
+    <string name="errlog_empty">Nenhum erro registrado.</string>
+    <string name="errlog_count">%1$d entradas · último: %2$s</string>
+    <string name="errlog_share">Compartilhar relatório de erros</string>
+    <string name="errlog_save">Salvar como arquivo</string>
+    <string name="errlog_clear">Limpar</string>
+    <string name="errlog_cleared">Registro de erros limpo</string>
+    <string name="errlog_saved">Relatório de erros salvo</string>
+    <string name="errlog_crash_title">O app travou</string>
+    <string name="errlog_crash_msg">O App Ops Shizuku travou da última vez. Os detalhes estão no registro de erros, onde você pode compartilhar o relatório para relatar o problema.</string>
+    <string name="errlog_crash_open">Abrir diagnóstico</string>
+    <string name="errlog_crash_later">Depois</string>
+    <string name="errlog_channel">Erros</string>
+    <string name="errlog_channel_desc">Travamentos e erros deste app, com compartilhar e salvar. Nada é enviado automaticamente.</string>
+    <string name="errlog_notif_title">Erro no App Ops Shizuku</string>
+    <string name="errlog_notif_text">Novas entradas no registro de erros: %1$d · %2$s</string>
+    <string name="errlog_action_share">Compartilhar</string>
+    <string name="errlog_action_save">Salvar</string>
 </resources>

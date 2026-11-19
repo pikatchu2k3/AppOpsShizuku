@@ -773,4 +773,23 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="backup_status_running">Creando copia de seguridad … leyendo todas las apps, puede tardar un poco.</string>
     <string name="backup_status_saved_as">Guardado como: %1$s</string>
     <string name="backup_toast_saved">Copia guardada: %1$s</string>
+    <string name="errlog_title">Registro de errores</string>
+    <string name="errlog_intro">Registra cierres inesperados, comandos de Shizuku fallidos y errores internos, solo en este dispositivo; no se envía nada (la app no tiene acceso a internet). Para informar de un problema, comparte el informe o guárdalo como archivo. Contiene el modelo, la versión de Android y los nombres de paquete de las apps donde algo falló; léelo antes de enviarlo.</string>
+    <string name="errlog_empty">No hay errores registrados.</string>
+    <string name="errlog_count">%1$d entradas · último: %2$s</string>
+    <string name="errlog_share">Compartir informe de errores</string>
+    <string name="errlog_save">Guardar como archivo</string>
+    <string name="errlog_clear">Vaciar</string>
+    <string name="errlog_cleared">Registro de errores vaciado</string>
+    <string name="errlog_saved">Informe de errores guardado</string>
+    <string name="errlog_crash_title">La app se cerró inesperadamente</string>
+    <string name="errlog_crash_msg">App Ops Shizuku se cerró inesperadamente la última vez. Los detalles están en el registro de errores, donde puedes compartir el informe para avisar del problema.</string>
+    <string name="errlog_crash_open">Abrir diagnóstico</string>
+    <string name="errlog_crash_later">Más tarde</string>
+    <string name="errlog_channel">Errores</string>
+    <string name="errlog_channel_desc">Cierres y errores de esta app, con compartir y guardar. No se envía nada automáticamente.</string>
+    <string name="errlog_notif_title">Error en App Ops Shizuku</string>
+    <string name="errlog_notif_text">Nuevas entradas en el registro de errores: %1$d · %2$s</string>
+    <string name="errlog_action_share">Compartir</string>
+    <string name="errlog_action_save">Guardar</string>
 </resources>

@@ -777,4 +777,23 @@
     <string name="backup_status_running">Создаётся резервная копия … читаются все приложения, это может занять время.</string>
     <string name="backup_status_saved_as">Сохранено как: %1$s</string>
     <string name="backup_toast_saved">Резервная копия сохранена: %1$s</string>
+    <string name="errlog_title">Журнал ошибок</string>
+    <string name="errlog_intro">Записывает сбои, неудачные команды Shizuku и внутренние ошибки – только на этом устройстве, ничего не отправляется (у приложения нет доступа к интернету). Чтобы сообщить о проблеме, поделитесь отчётом или сохраните его в файл. В нём есть модель устройства, версия Android и имена пакетов приложений, где что-то не удалось; прочитайте его перед отправкой.</string>
+    <string name="errlog_empty">Ошибок не записано.</string>
+    <string name="errlog_count">Записей: %1$d · последняя: %2$s</string>
+    <string name="errlog_share">Поделиться отчётом об ошибках</string>
+    <string name="errlog_save">Сохранить в файл</string>
+    <string name="errlog_clear">Очистить</string>
+    <string name="errlog_cleared">Журнал ошибок очищен</string>
+    <string name="errlog_saved">Отчёт об ошибках сохранён</string>
+    <string name="errlog_crash_title">Приложение завершилось сбоем</string>
+    <string name="errlog_crash_msg">В прошлый раз App Ops Shizuku завершилось сбоем. Подробности – в журнале ошибок, оттуда можно поделиться отчётом, чтобы сообщить о проблеме.</string>
+    <string name="errlog_crash_open">Открыть диагностику</string>
+    <string name="errlog_crash_later">Позже</string>
+    <string name="errlog_channel">Ошибки</string>
+    <string name="errlog_channel_desc">Сбои и ошибки этого приложения, с кнопками «Поделиться» и «Сохранить». Ничего не отправляется автоматически.</string>
+    <string name="errlog_notif_title">Ошибка в App Ops Shizuku</string>
+    <string name="errlog_notif_text">Новых записей в журнале ошибок: %1$d · %2$s</string>
+    <string name="errlog_action_share">Поделиться</string>
+    <string name="errlog_action_save">Сохранить</string>
 </resources>

@@ -87,6 +87,7 @@ The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and
 - **Activity**: which apps wake the device, schedule jobs or read sensors (parsed from `dumpsys`, heuristic).
 - **Change log**: every change this app makes, with *Undo* per entry for permission and network toggles.
 - **Diagnostics**: harmless checks showing which levers work on *your* device (permission flags, freeze-dialog text, firewall chain, `dumpsys` formats, work profile). The report can be shared as text; it contains model and Android version, no app list and no personal data.
+- **Error log** (*Tools → Diagnostics*): records crashes, failed Shizuku commands and internal errors, only on the device (max. ~200 KB, oldest entries drop out, repeats within 10 minutes are written once). After a crash or error a notification offers *Share* and *Save*; after a crash the app also offers to open Diagnostics on the next start. The report contains app version, device model, Android version, the last diagnostics result and the log, including the package names of apps where something failed. Nothing is sent automatically (no internet permission); you decide where it goes. The notification channel *Errors* can be switched off in the system settings.
 - **Restart notice**: after a reboot (Shizuku not running yet) a notification says that the configured protection is inactive; once connected, a bar offers to restore settings that drifted.
 
 ### System-wide and powerful access (*Tools → System-wide*, *Work profile*)
@@ -200,17 +201,17 @@ Because the repository is public, the source that belongs to every released pack
 
 ## Languages
 
-The interface ships in English (base) plus 8 translations — 745 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 764 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
-| German/Deutsch | `values-de` | 745/745 (100%) |
-| Spanish/Español | `values-es` | 745/745 (100%) |
-| French/Français | `values-fr` | 745/745 (100%) |
-| Hindi/हिन्दी | `values-hi` | 745/745 (100%) |
-| Japanese/日本語 | `values-ja` | 745/745 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 745/745 (100%) |
-| Russian/Русский | `values-ru` | 745/745 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 745/745 (100%) |
+| German/Deutsch | `values-de` | 764/764 (100%) |
+| Spanish/Español | `values-es` | 764/764 (100%) |
+| French/Français | `values-fr` | 764/764 (100%) |
+| Hindi/हिन्दी | `values-hi` | 764/764 (100%) |
+| Japanese/日本語 | `values-ja` | 764/764 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 764/764 (100%) |
+| Russian/Русский | `values-ru` | 764/764 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 764/764 (100%) |
 
 All translations are checked by script (placeholders, plural forms, XML structure); `R.array.*` resources are left alone. English is the base, so any device with an unsupported language falls back to English instead of German.

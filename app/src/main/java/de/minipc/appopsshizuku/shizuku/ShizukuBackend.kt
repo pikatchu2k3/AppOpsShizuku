@@ -60,7 +60,10 @@ class ShizukuBackend : ShellBackend {
      * `sh -c "cat > /data/local/tmp/x.apk"`). Stdin bleibt dafuer offen,
      * die Bytes werden geschrieben und der Stream geschlossen.
      */
-    override fun execWithStdin(stdin: ByteArray, vararg args: String): ShellResult {
+    override fun execWithStdin(stdin: ByteArray, vararg args: String): ShellResult =
+        execWithStdinRaw(stdin, *args).also { de.minipc.appopsshizuku.ErrorLog.shell(args, it) }
+
+    private fun execWithStdinRaw(stdin: ByteArray, vararg args: String): ShellResult {
         if (!hasPermission()) {
             return ShellResult(1, "", "keine Shizuku-Berechtigung")
         }
@@ -122,7 +125,10 @@ class ShizukuBackend : ShellBackend {
     }
 
     /** Wie [exec], aber mit konfigurierbarem Timeout (fuer grosse Base64-Outputs). */
-    override fun execTimeout(timeoutSeconds: Long, vararg args: String): ShellResult {
+    override fun execTimeout(timeoutSeconds: Long, vararg args: String): ShellResult =
+        execTimeoutRaw(timeoutSeconds, *args).also { de.minipc.appopsshizuku.ErrorLog.shell(args, it) }
+
+    private fun execTimeoutRaw(timeoutSeconds: Long, vararg args: String): ShellResult {
         if (!hasPermission()) {
             return ShellResult(1, "", "keine Shizuku-Berechtigung")
         }

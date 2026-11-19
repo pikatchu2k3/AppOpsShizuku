@@ -772,4 +772,23 @@
     <string name="backup_status_running">Creating backup … reading all apps, this can take a moment.</string>
     <string name="backup_status_saved_as">Saved as: %1$s</string>
     <string name="backup_toast_saved">Backup saved: %1$s</string>
+    <string name="errlog_title">Error log</string>
+    <string name="errlog_intro">Records crashes, failed Shizuku commands and internal errors – only on this device, nothing is sent (the app has no internet access). To report a problem, share the report or save it as a file. It contains device model, Android version and the package names of apps where something failed; read it before you send it.</string>
+    <string name="errlog_empty">No errors recorded.</string>
+    <string name="errlog_count">%1$d entries · last: %2$s</string>
+    <string name="errlog_share">Share error report</string>
+    <string name="errlog_save">Save as file</string>
+    <string name="errlog_clear">Clear</string>
+    <string name="errlog_cleared">Error log cleared</string>
+    <string name="errlog_saved">Error report saved</string>
+    <string name="errlog_crash_title">The app crashed</string>
+    <string name="errlog_crash_msg">App Ops Shizuku crashed last time. The details are in the error log. You can share the report there to report the problem.</string>
+    <string name="errlog_crash_open">Open diagnostics</string>
+    <string name="errlog_crash_later">Later</string>
+    <string name="errlog_channel">Errors</string>
+    <string name="errlog_channel_desc">Crashes and errors of this app, with share and save. Nothing is sent automatically.</string>
+    <string name="errlog_notif_title">Error in App Ops Shizuku</string>
+    <string name="errlog_notif_text">New error log entries: %1$d · %2$s</string>
+    <string name="errlog_action_share">Share</string>
+    <string name="errlog_action_save">Save</string>
 </resources>

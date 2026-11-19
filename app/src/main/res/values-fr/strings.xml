@@ -771,4 +771,23 @@
     <string name="backup_status_running">Création de la sauvegarde … lecture de toutes les applis, cela peut prendre un moment.</string>
     <string name="backup_status_saved_as">Enregistré sous : %1$s</string>
     <string name="backup_toast_saved">Sauvegarde enregistrée : %1$s</string>
+    <string name="errlog_title">Journal des erreurs</string>
+    <string name="errlog_intro">Enregistre les plantages, les commandes Shizuku échouées et les erreurs internes – uniquement sur cet appareil, rien n\'est envoyé (l\'appli n\'a pas d\'accès Internet). Pour signaler un problème, partagez le rapport ou enregistrez-le dans un fichier. Il contient le modèle, la version d\'Android et les noms de paquet des applis concernées ; relisez-le avant de l\'envoyer.</string>
+    <string name="errlog_empty">Aucune erreur enregistrée.</string>
+    <string name="errlog_count">%1$d entrées · dernière : %2$s</string>
+    <string name="errlog_share">Partager le rapport d\'erreurs</string>
+    <string name="errlog_save">Enregistrer dans un fichier</string>
+    <string name="errlog_clear">Vider</string>
+    <string name="errlog_cleared">Journal des erreurs vidé</string>
+    <string name="errlog_saved">Rapport d\'erreurs enregistré</string>
+    <string name="errlog_crash_title">L\'appli a planté</string>
+    <string name="errlog_crash_msg">App Ops Shizuku a planté la dernière fois. Les détails se trouvent dans le journal des erreurs, d\'où vous pouvez partager le rapport pour signaler le problème.</string>
+    <string name="errlog_crash_open">Ouvrir le diagnostic</string>
+    <string name="errlog_crash_later">Plus tard</string>
+    <string name="errlog_channel">Erreurs</string>
+    <string name="errlog_channel_desc">Plantages et erreurs de cette appli, avec partage et enregistrement. Rien n\'est envoyé automatiquement.</string>
+    <string name="errlog_notif_title">Erreur dans App Ops Shizuku</string>
+    <string name="errlog_notif_text">Nouvelles entrées du journal des erreurs : %1$d · %2$s</string>
+    <string name="errlog_action_share">Partager</string>
+    <string name="errlog_action_save">Enregistrer</string>
 </resources>

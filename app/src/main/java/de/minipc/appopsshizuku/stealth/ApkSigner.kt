@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.stealth
 
+import de.minipc.appopsshizuku.ErrorLog
 import android.content.Context
 import android.util.Log
 import com.android.apksig.ApkSigner
@@ -56,7 +57,7 @@ object ApkSigner {
                 cachedCert = kp.second
                 return kp
             } catch (e: Exception) {
-                Log.e(TAG, "Persistenter Signaturschlüssel unlesbar ($KEY_FILE/$CERT_FILE), generiere neu", e)
+                ErrorLog.e(TAG, "Persistenter Signaturschlüssel unlesbar ($KEY_FILE/$CERT_FILE), generiere neu", e)
                 keyFile.delete()
                 certFile.delete()
             }
@@ -85,7 +86,7 @@ object ApkSigner {
             FileOutputStream(keyFile).use { it.write(kp.private.encoded) }
             FileOutputStream(certFile).use { it.write(cert.encoded) }
         } catch (e: Exception) {
-            Log.e(TAG, "Signaturschlüssel konnte nicht persistiert werden", e)
+            ErrorLog.e(TAG, "Signaturschlüssel konnte nicht persistiert werden", e)
         }
 
         cachedKeyPair = kp

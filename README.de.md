@@ -87,6 +87,7 @@ Die App hat unten in einer schwebenden Leiste drei Bereiche: **Apps**, **Werkzeu
 - **Aktivität**: welche Apps das Gerät wecken, Jobs planen oder Sensoren abfragen (aus `dumpsys`, heuristisch).
 - **Änderungsprotokoll**: jede Änderung dieser App, Berechtigungs- und Netz-Schalter je Eintrag *rückgängig*.
 - **Diagnose**: harmlose Prüfungen zeigen, welche Hebel auf *deinem* Gerät funktionieren (Permission-Flags, Sperrdialog-Text, Firewall-Kette, `dumpsys`-Formate, Arbeitsprofil). Der Bericht lässt sich als Text teilen; er enthält Modell und Android-Version, keine App-Liste und keine persönlichen Daten.
+- **Fehlerprotokoll** (*Werkzeuge → Diagnose*): zeichnet Abstürze, fehlgeschlagene Shizuku-Befehle und interne Fehler auf, nur auf dem Gerät (höchstens ~200 KB, die ältesten Einträge fallen heraus, Wiederholungen innerhalb von 10 Minuten werden einmal geschrieben). Nach einem Absturz oder Fehler bietet eine Benachrichtigung *Teilen* und *Speichern* an; nach einem Absturz fragt die App beim nächsten Start außerdem, ob du zur Diagnose willst. Der Bericht enthält App-Version, Gerätemodell, Android-Version, das letzte Diagnose-Ergebnis und das Protokoll, auch die Paketnamen der Apps, bei denen etwas fehlschlug. Es wird nichts automatisch gesendet (keine Internet-Berechtigung); du entscheidest, wohin er geht. Der Benachrichtigungskanal *Fehler* lässt sich in den Systemeinstellungen abschalten.
 - **Neustart-Hinweis**: nach einem Neustart (Shizuku läuft noch nicht) meldet eine Benachrichtigung, dass der eingerichtete Schutz inaktiv ist; nach dem Verbinden bietet eine Leiste an, abgewichene Einstellungen wiederherzustellen.
 
 ### Systemweit und mächtige Rechte (*Werkzeuge → Systemweit*, *Arbeitsprofil*)
@@ -200,17 +201,17 @@ Weil das Repository öffentlich ist, ist der Quellcode zu jedem veröffentlichte
 
 ## Sprachen
 
-Die Oberfläche gibt es auf Englisch (Basis) und in 8 Übersetzungen — je 745 Texte, vollständig (jeder Text übersetzt, keine Lücken).
+Die Oberfläche gibt es auf Englisch (Basis) und in 8 Übersetzungen — je 764 Texte, vollständig (jeder Text übersetzt, keine Lücken).
 
 | Sprache | Locale | Abdeckung |
 |---|---|---|
-| German/Deutsch | `values-de` | 745/745 (100%) |
-| Spanish/Español | `values-es` | 745/745 (100%) |
-| French/Français | `values-fr` | 745/745 (100%) |
-| Hindi/हिन्दी | `values-hi` | 745/745 (100%) |
-| Japanese/日本語 | `values-ja` | 745/745 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 745/745 (100%) |
-| Russian/Русский | `values-ru` | 745/745 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 745/745 (100%) |
+| German/Deutsch | `values-de` | 764/764 (100%) |
+| Spanish/Español | `values-es` | 764/764 (100%) |
+| French/Français | `values-fr` | 764/764 (100%) |
+| Hindi/हिन्दी | `values-hi` | 764/764 (100%) |
+| Japanese/日本語 | `values-ja` | 764/764 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 764/764 (100%) |
+| Russian/Русский | `values-ru` | 764/764 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 764/764 (100%) |
 
 Alle Übersetzungen sind maschinell geprüft (Platzhalter, Pluralformen, XML-Struktur); `R.array.*`-Ressourcen bleiben unberührt. Englisch ist die Basis: Ein Gerät mit nicht unterstützter Sprache zeigt Englisch, nicht Deutsch.

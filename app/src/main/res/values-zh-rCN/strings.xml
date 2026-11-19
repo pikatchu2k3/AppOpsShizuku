@@ -768,4 +768,23 @@
     <string name="backup_status_running">正在创建备份 … 正在读取所有应用，可能需要一点时间。</string>
     <string name="backup_status_saved_as">已保存为：%1$s</string>
     <string name="backup_toast_saved">备份已保存：%1$s</string>
+    <string name="errlog_title">错误日志</string>
+    <string name="errlog_intro">记录崩溃、失败的 Shizuku 命令和内部错误——仅保存在本设备上，不会发送任何内容（本应用没有网络权限）。要报告问题，请分享报告或保存为文件。报告包含设备型号、Android 版本以及出错应用的包名；发送前请先阅读。</string>
+    <string name="errlog_empty">没有记录到错误。</string>
+    <string name="errlog_count">%1$d 条 · 最近：%2$s</string>
+    <string name="errlog_share">分享错误报告</string>
+    <string name="errlog_save">保存为文件</string>
+    <string name="errlog_clear">清空</string>
+    <string name="errlog_cleared">错误日志已清空</string>
+    <string name="errlog_saved">错误报告已保存</string>
+    <string name="errlog_crash_title">应用已崩溃</string>
+    <string name="errlog_crash_msg">App Ops Shizuku 上次崩溃了。详细信息在错误日志中，你可以在那里分享报告来反馈问题。</string>
+    <string name="errlog_crash_open">打开诊断</string>
+    <string name="errlog_crash_later">稍后</string>
+    <string name="errlog_channel">错误</string>
+    <string name="errlog_channel_desc">本应用的崩溃和错误，可分享或保存。不会自动发送任何内容。</string>
+    <string name="errlog_notif_title">App Ops Shizuku 出错</string>
+    <string name="errlog_notif_text">错误日志新增 %1$d 条 · %2$s</string>
+    <string name="errlog_action_share">分享</string>
+    <string name="errlog_action_save">保存</string>
 </resources>
