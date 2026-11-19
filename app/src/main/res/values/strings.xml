@@ -496,7 +496,6 @@
     <string name="rules_empty">No rules yet.</string>
     <string name="rules_intro">Rules run by time or Wi-Fi and need Shizuku to take effect. Wi-Fi rules may lag up to ~15 min (no always-on service).</string>
     <string name="rules_title">Automatic rules</string>
-    <string name="scanning_apps">Checking permissions…</string>
     <string name="screen_off_effect_force_stop">Close (force stop) – the app is ended and gets no alarms or push messages until it is opened again; opening it stays possible</string>
     <string name="screen_off_effect_suspend">Freeze – the app cannot start at all until the screen is on again; data is kept</string>
     <string name="screen_off_excluded_own">Not for the own app.</string>

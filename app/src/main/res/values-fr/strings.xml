@@ -195,7 +195,6 @@
     <string name="restore_all_confirm_title">Tout remettre par défaut ?</string>
     <string name="restore_done">Toutes les entrées remises par défaut</string>
     <string name="restore_partial">Remises par défaut, %1$d entrées non appliquées.</string>
-    <string name="scanning_apps">Vérification des autorisations…</string>
     <string name="screen_off_effect_force_stop">Fermer (force-stop) – l\'app est arrêtée et ne reçoit ni alarmes ni notifications push jusqu\'à sa prochaine ouverture ; l\'ouvrir reste possible</string>
     <string name="screen_off_effect_suspend">Geler – l\'app ne peut pas démarrer du tout jusqu\'au rallumage de l\'écran ; les données sont conservées</string>
     <string name="screen_off_excluded_own">Non applicable à l\'application elle-même.</string>

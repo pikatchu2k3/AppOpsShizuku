@@ -195,7 +195,6 @@
     <string name="restore_all_confirm_title">全部恢复默认？</string>
     <string name="restore_done">所有条目已恢复默认</string>
     <string name="restore_partial">已恢复默认，%1$d 项未应用。</string>
-    <string name="scanning_apps">正在检查权限…</string>
     <string name="screen_off_effect_force_stop">关闭（force-stop）——应用被结束，在再次打开前收不到闹钟和推送消息；仍可正常打开</string>
     <string name="screen_off_effect_suspend">冻结——在屏幕再次点亮前应用完全无法启动；数据保留</string>
     <string name="screen_off_excluded_own">不适用于本应用。</string>

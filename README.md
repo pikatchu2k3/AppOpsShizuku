@@ -49,7 +49,7 @@ The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and
 ## Features
 
 ### App list
-- Live search (label and package name), sorting by name / install date / update date, filters *All*, *Blocked* and *Changed*.
+- Live search (label and package name), sorting by name / install date / update date, filters *All*, *Blocked* (at least one permission set to ignore/deny with this app) and *Changed* (anything this app changed on it).
 - A **status line** on every card shows what this app changed on it: blocked permissions, offline, no background data, only on demand, only while in use, quarantine. It is read from the app's own records, so no shell call is needed.
 - Gradient cards in the colour of each app icon on a calm star-field background (light and dark). A notice appears while Shizuku is not connected.
 
@@ -200,17 +200,17 @@ Because the repository is public, the source that belongs to every released pack
 
 ## Languages
 
-The interface ships in English (base) plus 8 translations — 746 strings each, complete (every string translated, no gaps).
+The interface ships in English (base) plus 8 translations — 745 strings each, complete (every string translated, no gaps).
 
 | Language | Locale | Coverage |
 |---|---|---|
-| German/Deutsch | `values-de` | 746/746 (100%) |
-| Spanish/Español | `values-es` | 746/746 (100%) |
-| French/Français | `values-fr` | 746/746 (100%) |
-| Hindi/हिन्दी | `values-hi` | 746/746 (100%) |
-| Japanese/日本語 | `values-ja` | 746/746 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 746/746 (100%) |
-| Russian/Русский | `values-ru` | 746/746 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 746/746 (100%) |
+| German/Deutsch | `values-de` | 745/745 (100%) |
+| Spanish/Español | `values-es` | 745/745 (100%) |
+| French/Français | `values-fr` | 745/745 (100%) |
+| Hindi/हिन्दी | `values-hi` | 745/745 (100%) |
+| Japanese/日本語 | `values-ja` | 745/745 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 745/745 (100%) |
+| Russian/Русский | `values-ru` | 745/745 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 745/745 (100%) |
 
 All translations are checked by script (placeholders, plural forms, XML structure); `R.array.*` resources are left alone. English is the base, so any device with an unsupported language falls back to English instead of German.

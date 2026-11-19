@@ -195,7 +195,6 @@
     <string name="restore_all_confirm_title">¿Todo a predeterminado?</string>
     <string name="restore_done">Todas las entradas restablecidas al valor predeterminado</string>
     <string name="restore_partial">Restablecido a predeterminado; %1$d entradas no aplicadas.</string>
-    <string name="scanning_apps">Comprobando permisos…</string>
     <string name="screen_off_effect_force_stop">Cerrar (force-stop): la app se cierra y no recibe alarmas ni notificaciones push hasta que se vuelva a abrir; se puede seguir abriendo</string>
     <string name="screen_off_effect_suspend">Congelar: la app no puede iniciarse hasta que la pantalla se encienda; los datos se conservan</string>
     <string name="screen_off_excluded_own">No aplica a la propia app.</string>

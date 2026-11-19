@@ -77,7 +77,6 @@ class MainActivity : AppCompatActivity() {
         private const val PANEL_SETTINGS = 2
 
         /** Gleichzeitige Shell-Aufrufe beim Blockiert-Scan. */
-        private const val SCAN_THREADS = 4
     }
 
     private lateinit var manager: ShizukuManager
@@ -106,7 +105,6 @@ class MainActivity : AppCompatActivity() {
     private var filterMode = FILTER_ALL
 
     /** Cache: Paketname -> hat mind. eine blockierte Op (ignore/deny auf UID-Ebene) */
-    private val blockedCache = mutableMapOf<String, Boolean>()
 
     /** Cache: Paketname -> Kartenfarbe (Icon-Analyse nur einmal je App). */
     private val cardColorCache = java.util.concurrent.ConcurrentHashMap<String, Int>()
@@ -170,12 +168,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Letzte Backup-Meldung wieder anzeigen (bleibt auch nach App-Neustart lesbar)
+        // Nur eine FEHLER-Meldung bleibt ueber einen Neustart stehen (bis man sie antippt);
+        // Erfolgsmeldungen verschwinden von selbst und werden nicht wieder angezeigt.
         getSharedPreferences(PREFS_BACKUP, MODE_PRIVATE).let { prefs ->
             val last = prefs.getString(KEY_BACKUP_TEXT, null)
-            if (!last.isNullOrBlank()) {
-                showBackupStatus(last, prefs.getBoolean(KEY_BACKUP_ERROR, false))
+            if (!last.isNullOrBlank() && prefs.getBoolean(KEY_BACKUP_ERROR, false)) {
+                showBackupStatus(last, isError = true, onApps = true)
+            } else if (!last.isNullOrBlank()) {
+                prefs.edit().clear().apply()
             }
+        }
+        listOf(R.id.backupStatus, R.id.settingsBackupStatus).forEach { id ->
+            findViewById<View>(id)?.setOnClickListener { dismissBackupStatus() }
         }
         manager = ShizukuManager(onStateChanged = { runOnUiThread { updateStatus() } })
         manager.refresh()
@@ -341,7 +345,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 in 100..199 -> { sortMode = item.itemId - 100; applyFilterAndSort() }
                 in 200..299 -> setFilter(item.itemId - 200)
-                300 -> { blockedCache.clear(); loadApps() }
+                300 -> loadApps()
             }
             true
         }
@@ -359,7 +363,7 @@ class MainActivity : AppCompatActivity() {
             pill.visibility = View.VISIBLE
         }
         setHeaderButtonActive(R.id.btnTune, mode != FILTER_ALL)
-        if (mode == FILTER_BLOCKED && blockedCache.isEmpty()) scanBlockedState() else applyFilterAndSort()
+        applyFilterAndSort()
     }
 
     // ------------------------------------------------------------------ Navigation
@@ -726,7 +730,9 @@ class MainActivity : AppCompatActivity() {
             val total = r.applied.size + r.failed.size
             if (total == 0) return@execute
             handler.post {
-                setBackupStatus(getString(R.string.quarantine_report, total, r.failed.size), r.failed.isNotEmpty())
+                setBackupStatus(
+                    getString(R.string.quarantine_report, total, r.failed.size), r.failed.isNotEmpty(), onApps = true
+                )
                 loadApps()
             }
         }
@@ -760,7 +766,7 @@ class MainActivity : AppCompatActivity() {
         val filtered = allApps.filter { app ->
             when {
                 q.isNotEmpty() && !app.label.lowercase().contains(q) && !app.packageName.lowercase().contains(q) -> false
-                filterMode == FILTER_BLOCKED -> blockedCache[app.packageName] == true
+                filterMode == FILTER_BLOCKED -> isBlockedByUs(app.packageName)
                 filterMode == FILTER_CHANGED -> app.badges.isNotEmpty()
                 else -> true
             }
@@ -775,36 +781,16 @@ class MainActivity : AppCompatActivity() {
             if (sorted.isEmpty()) View.VISIBLE else View.GONE
     }
 
-    /** Scannt alle Apps (ein cmd appops get pro App) und cached, welche blockierte Ops haben. */
-    private fun scanBlockedState() {
-        val pm = packageManager
-        val backend = if (manager.isConnected && manager.hasPermission) ShizukuBackend() else NoopBackend()
-        if (backend is NoopBackend) {
-            Toast.makeText(this, R.string.status_no_permission, Toast.LENGTH_LONG).show()
-            setFilter(FILTER_ALL)
-            return
-        }
-        Toast.makeText(this, R.string.scanning_apps, Toast.LENGTH_SHORT).show()
-        val list = allApps
-        executor.execute {
-            // Parallel statt nacheinander: ein Shell-Aufruf je App, 4 gleichzeitig. Bei 200 Apps
-            // war der serielle Scan deutlich spuerbar; die Binder-Aufrufe vertragen das problemlos.
-            val pool = Executors.newFixedThreadPool(SCAN_THREADS)
-            try {
-                pool.invokeAll(list.map { app ->
-                    java.util.concurrent.Callable {
-                        val res = backend.exec("cmd", "appops", "get", app.packageName)
-                        val blocked = res.exitCode == 0 &&
-                            de.minipc.appopsshizuku.appops.BlockedScan.hasBlockedOp(res.stdout)
-                        synchronized(blockedCache) { blockedCache[app.packageName] = blocked }
-                    }
-                })
-            } finally {
-                pool.shutdown()
-            }
-            handler.post { applyFilterAndSort() }
-        }
-    }
+    /**
+     * Filter "Blockiert": dieselbe Grundlage wie die Statuszeile der Karte ("N blockiert") -
+     * Berechtigungen, die in dieser App auf Ignorieren/Verweigern gestellt wurden.
+     * Frueher wurde jede App per `cmd appops get` abgefragt und jede Zeile "Uid mode: X: ignore"
+     * gezaehlt. Die setzt Android aber selbst fuer jede nicht erteilte Berechtigung, deshalb
+     * erschien fast jede App als blockiert, auch solche mit "Unveraendert".
+     */
+    private fun isBlockedByUs(pkg: String): Boolean = runCatching {
+        profileStoreForBadges.getProfile(pkg).values.any { it == "deny" || it == "ignore" }
+    }.getOrDefault(false)
 
     /**
      * Shizuku-Berechtigung anfragen. Der Dialog wird vom Shizuku-Server als
@@ -940,7 +926,7 @@ class MainActivity : AppCompatActivity() {
         // Sofort Rueckmeldung: das Einlesen aller Apps ueber Shizuku kann dauern
         val button = findViewById<View>(R.id.settingExport)
         button.isEnabled = false
-        setBackupStatus(getString(R.string.backup_status_running), false)
+        setBackupStatus(getString(R.string.backup_status_running), false, autoHide = false)
         executor.execute {
             val result = runCatching {
                 // Einheitliches Backup: Berechtigungsprofile + Verhaltens-Einstellungen
@@ -1057,25 +1043,49 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Laufende Nummer der Meldung: das verzoegerte Ausblenden trifft nur die eigene Meldung. */
+    private var backupStatusToken = 0
+
     /**
-     * Bleibende Rueckmeldung fuer Export/Import: sichtbar oben im Hauptbildschirm UND im
-     * App-Speicher abgelegt - so ist auch ein Fehlergrund noch lesbar, wenn der Toast weg ist.
+     * Meldung zu Sicherung/Import/Quarantaene.
+     * - Erfolg: erscheint unter den Knoepfen in den Einstellungen und verschwindet nach 8 s.
+     * - Fehler: auch oben im Apps-Reiter, bleibt (auch nach Neustart), bis man sie antippt.
+     * [onApps] zeigt eine Erfolgsmeldung ausnahmsweise auch im Apps-Reiter (Quarantaene-Bericht).
      */
-    private fun setBackupStatus(message: String, isError: Boolean) {
+    private fun setBackupStatus(
+        message: String,
+        isError: Boolean,
+        autoHide: Boolean = !isError,
+        onApps: Boolean = isError
+    ) {
         val stamp = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMANY).format(Date())
         val text = "$message\n$stamp"
-        getSharedPreferences(PREFS_BACKUP, MODE_PRIVATE).edit()
-            .putString(KEY_BACKUP_TEXT, text)
-            .putBoolean(KEY_BACKUP_ERROR, isError)
-            .apply()
-        showBackupStatus(text, isError)
+        getSharedPreferences(PREFS_BACKUP, MODE_PRIVATE).edit().apply {
+            if (isError) putString(KEY_BACKUP_TEXT, text).putBoolean(KEY_BACKUP_ERROR, true) else clear()
+        }.apply()
+        showBackupStatus(text, isError, onApps)
+        val token = ++backupStatusToken
+        if (autoHide) handler.postDelayed({ if (token == backupStatusToken) hideBackupStatus() }, 8000)
     }
 
-    private fun showBackupStatus(text: String, isError: Boolean) {
-        // Im Apps-Reiter UND direkt unter den Knoepfen in den Einstellungen
-        listOf(R.id.backupStatus, R.id.settingsBackupStatus).forEach { id ->
-            findViewById<TextView>(id)?.let { styleBackupStatus(it, text, isError) }
+    private fun showBackupStatus(text: String, isError: Boolean, onApps: Boolean) {
+        findViewById<TextView>(R.id.settingsBackupStatus)?.let { styleBackupStatus(it, text, isError) }
+        findViewById<TextView>(R.id.backupStatus)?.let {
+            if (onApps) styleBackupStatus(it, text, isError) else it.visibility = View.GONE
         }
+    }
+
+    private fun hideBackupStatus() {
+        listOf(R.id.backupStatus, R.id.settingsBackupStatus).forEach { id ->
+            findViewById<View>(id)?.visibility = View.GONE
+        }
+    }
+
+    /** Antippen: Meldung weg, auch die gespeicherte Fehlermeldung. */
+    private fun dismissBackupStatus() {
+        backupStatusToken++
+        getSharedPreferences(PREFS_BACKUP, MODE_PRIVATE).edit().clear().apply()
+        hideBackupStatus()
     }
 
     private fun styleBackupStatus(view: TextView, text: String, isError: Boolean) {

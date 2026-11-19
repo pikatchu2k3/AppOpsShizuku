@@ -195,7 +195,6 @@
     <string name="restore_all_confirm_title">Tudo para o padrão?</string>
     <string name="restore_done">Todas as entradas definidas como padrão</string>
     <string name="restore_partial">Definidas como padrão, %1$d entradas não aplicadas.</string>
-    <string name="scanning_apps">Verificando permissões…</string>
     <string name="screen_off_effect_force_stop">Fechar (force-stop) – o app é encerrado e não recebe alarmes nem notificações push até ser aberto de novo; abrir continua possível</string>
     <string name="screen_off_effect_suspend">Congelar – o app não consegue iniciar até a tela acender de novo; os dados são mantidos</string>
     <string name="screen_off_excluded_own">Não se aplica ao próprio app.</string>

@@ -58,7 +58,6 @@
     <string name="restore_all_confirm_msg">Reine Einträge gehen auf Standard zurück. Bei Berechtigungen wird die Berechtigung entzogen — die App fragt beim nächsten Start selbst wieder danach. Es wird nie eine Berechtigung automatisch erteilt.</string>
     <string name="restore_all_action">Auf Standard</string>
     <string name="no_apps">Keine Apps gefunden</string>
-    <string name="scanning_apps">Berechtigungen werden geprüft…</string>
     <string name="sort_name">Name</string>
     <string name="sort_install">Installationsdatum</string>
     <string name="sort_update">Aktualisierungsdatum</string>

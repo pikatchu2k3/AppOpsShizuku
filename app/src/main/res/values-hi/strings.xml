@@ -195,7 +195,6 @@
     <string name="restore_all_confirm_title">सभी डिफ़ॉल्ट पर?</string>
     <string name="restore_done">सभी प्रविष्टियाँ डिफ़ॉल्ट पर सेट</string>
     <string name="restore_partial">डिफ़ॉल्ट पर सेट, %1$d प्रविष्टियाँ लागू नहीं हुईं।</string>
-    <string name="scanning_apps">अनुमतियाँ जाँची जा रही हैं…</string>
     <string name="screen_off_effect_force_stop">बंद करें (force-stop) – ऐप बंद कर दी जाती है और दोबारा खोलने तक उसे अलार्म या पुश संदेश नहीं मिलते; खोलना संभव रहता है</string>
     <string name="screen_off_effect_suspend">फ़्रीज़ – स्क्रीन फिर चालू होने तक ऐप बिल्कुल शुरू नहीं हो सकती; डेटा बना रहता है</string>
     <string name="screen_off_excluded_own">अपने ऐप के लिए नहीं।</string>

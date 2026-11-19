@@ -195,7 +195,6 @@
     <string name="restore_all_confirm_title">すべて初期値に戻しますか？</string>
     <string name="restore_done">すべての項目を初期値に戻しました</string>
     <string name="restore_partial">初期値に戻しました、%1$d 件は適用されませんでした。</string>
-    <string name="scanning_apps">権限を確認中…</string>
     <string name="screen_off_effect_force_stop">終了（force-stop）– アプリを終了し、再び開くまでアラームやプッシュ通知を受け取りません。開くことはできます</string>
     <string name="screen_off_effect_suspend">フリーズ – 画面が再びオンになるまでアプリは一切起動できません。データは残ります</string>
     <string name="screen_off_excluded_own">自分自身のアプリには適用されません。</string>

@@ -195,7 +195,6 @@
     <string name="restore_all_confirm_title">Все по умолчанию?</string>
     <string name="restore_done">Все значения установлены по умолчанию</string>
     <string name="restore_partial">Установлено по умолчанию, не применено записей: %1$d.</string>
-    <string name="scanning_apps">Проверка разрешений…</string>
     <string name="screen_off_effect_force_stop">Закрыть (force-stop) – приложение завершается и не получает будильники и push-уведомления, пока его снова не откроют; открыть его можно</string>
     <string name="screen_off_effect_suspend">Заморозить – приложение не может запуститься до включения экрана; данные сохраняются</string>
     <string name="screen_off_excluded_own">Не применяется к собственному приложению.</string>

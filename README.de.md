@@ -49,7 +49,7 @@ Die App hat unten in einer schwebenden Leiste drei Bereiche: **Apps**, **Werkzeu
 ## Funktionen
 
 ### App-Liste
-- Live-Suche (Name und Paketname), Sortierung nach Name / Installations- / Aktualisierungsdatum, Filter *Alle*, *Blockiert* und *Geändert*.
+- Live-Suche (Name und Paketname), Sortierung nach Name / Installations- / Aktualisierungsdatum, Filter *Alle*, *Blockiert* (mindestens eine Berechtigung mit dieser App auf Ignorieren/Verweigern gestellt) und *Geändert* (irgendetwas von dieser App geändert).
 - Eine **Statuszeile** auf jeder Karte zeigt, was diese App an ihr geändert hat: blockierte Berechtigungen, offline, keine Hintergrunddaten, nur bei Bedarf, nur während Nutzung, Quarantäne. Sie kommt aus den eigenen Speichern der App, ein Shell-Aufruf ist nicht nötig.
 - Verlaufskarten in der Farbe des jeweiligen App-Icons auf einem ruhigen Sternenhimmel (hell und dunkel). Solange Shizuku nicht verbunden ist, erscheint ein Hinweis.
 
@@ -200,17 +200,17 @@ Weil das Repository öffentlich ist, ist der Quellcode zu jedem veröffentlichte
 
 ## Sprachen
 
-Die Oberfläche gibt es auf Englisch (Basis) und in 8 Übersetzungen — je 746 Texte, vollständig (jeder Text übersetzt, keine Lücken).
+Die Oberfläche gibt es auf Englisch (Basis) und in 8 Übersetzungen — je 745 Texte, vollständig (jeder Text übersetzt, keine Lücken).
 
 | Sprache | Locale | Abdeckung |
 |---|---|---|
-| German/Deutsch | `values-de` | 746/746 (100%) |
-| Spanish/Español | `values-es` | 746/746 (100%) |
-| French/Français | `values-fr` | 746/746 (100%) |
-| Hindi/हिन्दी | `values-hi` | 746/746 (100%) |
-| Japanese/日本語 | `values-ja` | 746/746 (100%) |
-| Portuguese (Brazil) | `values-pt-rBR` | 746/746 (100%) |
-| Russian/Русский | `values-ru` | 746/746 (100%) |
-| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 746/746 (100%) |
+| German/Deutsch | `values-de` | 745/745 (100%) |
+| Spanish/Español | `values-es` | 745/745 (100%) |
+| French/Français | `values-fr` | 745/745 (100%) |
+| Hindi/हिन्दी | `values-hi` | 745/745 (100%) |
+| Japanese/日本語 | `values-ja` | 745/745 (100%) |
+| Portuguese (Brazil) | `values-pt-rBR` | 745/745 (100%) |
+| Russian/Русский | `values-ru` | 745/745 (100%) |
+| Chinese (Simplified)/简体中文 | `values-zh-rCN` | 745/745 (100%) |
 
 Alle Übersetzungen sind maschinell geprüft (Platzhalter, Pluralformen, XML-Struktur); `R.array.*`-Ressourcen bleiben unberührt. Englisch ist die Basis: Ein Gerät mit nicht unterstützter Sprache zeigt Englisch, nicht Deutsch.
