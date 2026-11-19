@@ -1,61 +1,43 @@
 ### English
 
-**App Ops Shizuku 1.20.6** — when the manufacturer blocks disabling an app, the app now tries other ways and tells you honestly which one worked.
+**App Ops Shizuku 1.20.7** — "Only on demand" and "stop when the screen turns off" now work for ordinary system apps too, not just for your own apps.
 
-**New: "Can't be disabled? Try other ways …"**
+**What was wrong:** the rule was "never for system apps". That is far too broad: Google Maps, Gmail or the gallery are system apps on most phones, so those two features could not be used for them at all. What matters is not whether an app ships with the phone, but whether the phone stays usable without it.
 
-Every disable is now read back from the device. If it did not take effect (typical for OnePlus/OxygenOS, which answers `pm disable-user` with *new state: default*), the new button runs a chain and stops at the first step that really works:
+**What changed**
 
-1. `pm disable-until-used` — a different disabled state.
-2. **Remove for this user** (`pm uninstall -k --user 0`) — the APK and its data stay on the device; the app shows up as *(removed)* in the list and is restored with one tap (`cmd package install-existing`).
-3. **Hide as device owner** — only if device owner has been set up (see below).
-4. **Neutralize** — freeze, force-stop, deny background ops, standby bucket *restricted*.
-
-Each step is shown with ✓/✗ and the device's own reason. System UI, Settings, phone, providers, permission controller, the current launcher and keyboard, Shizuku and this app are never offered.
-
-**New: device owner (optional, in Settings)**
-
-`dpm set-device-owner` from the shell lets this app hide packages through `DevicePolicyManager.setApplicationHidden` — a different code path that some manufacturers do not block. Android only allows it when there are **no accounts** and **no second user or work profile** on the device. The app removes nothing by itself and shows the device's exact answer. *Give up* first unhides every app it hid, then releases device owner. The same is possible from a PC: `scripts/device-owner.sh check|set|remove` (adb).
+- Both features are now offered for normal system apps (Maps, Gmail, gallery, …).
+- Still never offered, because the phone needs them: System UI, Settings, phone/dialer, SMS, providers, permission controller, the current launcher, the current keyboard, Shizuku and this app — the same protected list that the disable/remove chain uses.
+- The hint text in all nine languages now says that (*"Not for apps the device needs to work …"*) instead of "not for system apps".
 
 **Honest limits**
 
-- **No device run.** The chain, the removal and the restore are verified by unit tests (the decision logic) and by reading the code paths — none of it ran on a phone here. Whether OxygenOS refuses step 1 on your device, and whether removal or device owner gets through, has to be confirmed there.
-- Removing a system app can break other functions; the confirmation says so, and restoring is one tap.
-- A PC does not give more rights than Shizuku: adb runs as the same shell user. Without root, device owner is the only real step up.
-- Neutralize is weaker than disabling: the system can still start a frozen app in the background.
+- **No device run.** The decision logic is covered by unit tests (one new test for system apps vs. protected packages), 352 tests in total, but whether OxygenOS actually freezes a given system app, and whether it starts again afterwards, has to be checked on the phone. Maps is the natural first candidate.
+- Freezing a system app can break its background jobs (navigation, location) — that is the point of the feature, but it should be one app at a time.
 
-**Tests:** 351 unit tests, 0 failures, 1 skipped (45 test classes).
+**Tests:** 352 unit tests, 0 failures, 1 skipped (45 test classes).
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — this repository is **private**; for updates through [Obtainium](https://github.com/ImranR98/Obtainium) you need a GitHub token with read access.
 
 ### Deutsch
 
-**App Ops Shizuku 1.20.6** — wenn der Hersteller das Deaktivieren sperrt, versucht die App jetzt andere Wege und sagt ehrlich, welcher gewirkt hat.
+**App Ops Shizuku 1.20.7** — „Nur bei Bedarf“ und „beim Bildschirm-Aus anhalten“ gehen jetzt auch für normale System-Apps, nicht mehr nur für eigene Apps.
 
-**Neu: „Lässt sich nicht deaktivieren? Andere Wege …“**
+**Was falsch war:** Die Regel lautete „nie für System-Apps“. Das ist viel zu grob: Google Maps, Gmail oder die Galerie sind auf den meisten Telefonen System-Apps — für die waren beide Funktionen gar nicht nutzbar. Entscheidend ist nicht, ob eine App mit dem Telefon kommt, sondern ob das Telefon ohne sie noch bedienbar ist.
 
-Jedes Deaktivieren wird jetzt vom Gerät zurückgelesen. Hat es nicht gewirkt (typisch bei OnePlus/OxygenOS: `pm disable-user` antwortet mit *new state: default*), startet der neue Knopf eine Kette und stoppt beim ersten Schritt, der wirklich greift:
+**Was sich ändert**
 
-1. `pm disable-until-used` — ein anderer Deaktiviert-Zustand.
-2. **Für diesen Nutzer entfernen** (`pm uninstall -k --user 0`) — APK und Daten bleiben auf dem Gerät; die App erscheint als *(entfernt)* in der Liste und wird mit einem Tipp wiederhergestellt (`cmd package install-existing`).
-3. **Als Geräteinhaber verstecken** — nur wenn der Geräteinhaber eingerichtet ist (siehe unten).
-4. **Neutralisieren** — einfrieren, beenden, Hintergrund-Ops verweigert, Standby-Stufe *eingeschränkt*.
-
-Jeder Schritt wird mit ✓/✗ und dem Grund des Geräts angezeigt. System-UI, Einstellungen, Telefon, Provider, Berechtigungs-Controller, der aktuelle Launcher und die Tastatur, Shizuku und diese App werden nie angeboten.
-
-**Neu: Geräteinhaber (optional, in den Einstellungen)**
-
-`dpm set-device-owner` aus der Shell erlaubt dieser App, Apps über `DevicePolicyManager.setApplicationHidden` zu verstecken — ein anderer Weg, den manche Hersteller nicht sperren. Android lässt das nur zu, wenn **keine Konten** und **kein zweiter Nutzer bzw. Arbeitsprofil** auf dem Gerät sind. Die App entfernt von sich aus nichts und zeigt die genaue Antwort des Geräts. *Abgeben* holt zuerst alle versteckten Apps zurück und gibt dann den Geräteinhaber ab. Dasselbe geht vom PC: `scripts/device-owner.sh check|set|remove` (adb).
+- Beide Funktionen werden jetzt für normale System-Apps angeboten (Maps, Gmail, Galerie …).
+- Weiter nie angeboten, weil das Telefon sie braucht: System-UI, Einstellungen, Telefon/Dialer, SMS, Provider, Berechtigungs-Controller, der aktuelle Launcher, die aktuelle Tastatur, Shizuku und diese App — dieselbe geschützte Liste wie bei der Deaktivieren-/Entfernen-Kette.
+- Der Hinweistext sagt das jetzt in allen neun Sprachen („Nicht für Apps, die das Gerät zum Funktionieren braucht …“) statt „Nicht für System-Apps“.
 
 **Ehrliche Grenzen**
 
-- **Kein Gerätelauf.** Kette, Entfernen und Wiederherstellen sind durch Unit-Tests (die Entscheidungslogik) und das Nachlesen der Codepfade belegt — auf einem Handy lief davon hier nichts. Ob OxygenOS Schritt 1 auf deinem Gerät ablehnt und ob Entfernen oder Geräteinhaber durchkommt, muss dort bestätigt werden.
-- Das Entfernen einer System-App kann andere Funktionen beeinträchtigen; die Bestätigung sagt das, und Wiederherstellen ist ein Tipp.
-- Ein PC gibt keine höheren Rechte als Shizuku: adb läuft als derselbe Shell-Nutzer. Ohne Root ist der Geräteinhaber die einzige echte Stufe nach oben.
-- Neutralisieren ist schwächer als Deaktivieren: das System kann eine eingefrorene App weiter im Hintergrund starten.
+- **Kein Gerätelauf.** Die Entscheidungslogik ist durch Unit-Tests abgedeckt (ein neuer Test für System-Apps gegenüber geschützten Paketen), insgesamt 352 Tests — ob OxygenOS eine bestimmte System-App wirklich einfriert und ob sie danach wieder startet, muss am Telefon geprüft werden. Maps ist der naheliegende erste Kandidat.
+- Eine System-App einzufrieren kann ihre Hintergrundarbeit abschneiden (Navigation, Standort) — genau das ist der Zweck, aber bitte eine App nach der anderen.
 
-**Tests:** 351 Unit-Tests, 0 Fehler, 1 übersprungen (45 Testklassen).
+**Tests:** 352 Unit-Tests, 0 Fehler, 1 übersprungen (45 Testklassen).
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest — dieses Repository ist **privat**; für Updates über [Obtainium](https://github.com/ImranR98/Obtainium) ist ein GitHub-Token mit Lesezugriff nötig.
 
-<sub>Paket `de.minipc.appopsshizuku` · versionCode 46 · debug-signiert (updatefähig über 1.20.5) · targetSdk 35 · Lizenz GPL-3.0</sub>
+<sub>Paket `de.minipc.appopsshizuku` · versionCode 47 · debug-signiert (updatefähig über 1.20.6) · targetSdk 35 · Lizenz GPL-3.0</sub>
