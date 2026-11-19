@@ -184,7 +184,6 @@
     <string name="probe_timeout">Teste de inicialização interrompido: não respondeu após %1$d s (o app não iniciou corretamente). NÃO verificado – a correção em si não é afetada.</string>
     <string name="profiles_export_empty">Nenhum perfil salvo disponível</string>
     <string name="profiles_export_fail">Falha na exportação: %1$s</string>
-    <string name="profiles_export_ok">%1$d perfis e %2$d configurações de apps exportados: privacy_profiles.json (pasta do app)</string>
     <string name="profiles_import_behavior_need_shizuku">Configurações de apps ignoradas (Shizuku não conectado) – apenas perfis aplicados</string>
     <string name="profiles_import_fail">Falha na importação: %1$s</string>
     <string name="profiles_import_ok">%1$d apps importados, %2$d operações aplicadas a este app</string>
@@ -196,7 +195,6 @@
     <string name="restore_all_confirm_title">Tudo para o padrão?</string>
     <string name="restore_done">Todas as entradas definidas como padrão</string>
     <string name="restore_partial">Definidas como padrão, %1$d entradas não aplicadas.</string>
-    <string name="scanning_apps">Verificando permissões…</string>
     <string name="screen_off_effect_force_stop">Fechar (force-stop) – o app é encerrado e não recebe alarmes nem notificações push até ser aberto de novo; abrir continua possível</string>
     <string name="screen_off_effect_suspend">Congelar – o app não consegue iniciar até a tela acender de novo; os dados são mantidos</string>
     <string name="screen_off_excluded_own">Não se aplica ao próprio app.</string>
@@ -770,4 +768,26 @@
     <string name="chain_step_hide">Ocultar como proprietário</string>
     <string name="chain_result_hidden">Ocultado como proprietário. Restaure pela lista (\"oculto\").</string>
     <string name="app_hidden_label">%1$s (oculto)</string>
+    <string name="backup_status_running">Criando backup … lendo todos os apps, isso pode levar um momento.</string>
+    <string name="backup_status_saved_as">Salvo como: %1$s</string>
+    <string name="backup_toast_saved">Backup salvo: %1$s</string>
+    <string name="errlog_title">Registro de erros</string>
+    <string name="errlog_intro">Registra travamentos, comandos do Shizuku que falharam e erros internos – apenas neste aparelho, nada é enviado (o app não tem acesso à internet). Para relatar um problema, compartilhe o relatório ou salve-o como arquivo. Ele contém o modelo, a versão do Android e os nomes de pacote dos apps em que algo falhou; leia-o antes de enviar.</string>
+    <string name="errlog_empty">Nenhum erro registrado.</string>
+    <string name="errlog_count">%1$d entradas · último: %2$s</string>
+    <string name="errlog_share">Compartilhar relatório de erros</string>
+    <string name="errlog_save">Salvar como arquivo</string>
+    <string name="errlog_clear">Limpar</string>
+    <string name="errlog_cleared">Registro de erros limpo</string>
+    <string name="errlog_saved">Relatório de erros salvo</string>
+    <string name="errlog_crash_title">O app travou</string>
+    <string name="errlog_crash_msg">O App Ops Shizuku travou da última vez. Os detalhes estão no registro de erros, onde você pode compartilhar o relatório para relatar o problema.</string>
+    <string name="errlog_crash_open">Abrir diagnóstico</string>
+    <string name="errlog_crash_later">Depois</string>
+    <string name="errlog_channel">Erros</string>
+    <string name="errlog_channel_desc">Travamentos e erros deste app, com compartilhar e salvar. Nada é enviado automaticamente.</string>
+    <string name="errlog_notif_title">Erro no App Ops Shizuku</string>
+    <string name="errlog_notif_text">Novas entradas no registro de erros: %1$d · %2$s</string>
+    <string name="errlog_action_share">Compartilhar</string>
+    <string name="errlog_action_save">Salvar</string>
 </resources>

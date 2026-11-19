@@ -1,0 +1,74 @@
+name: "Fehler melden / Bug report"
+description: "Etwas funktioniert nicht oder die App stürzt ab. / Something does not work or the app crashes."
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Deutsch:** Danke fürs Melden! Am meisten hilft der Fehlerbericht aus der App:
+        *Werkzeuge → Diagnose → Fehlerprotokoll → Fehlerbericht teilen* (oder *Als Datei speichern* und die Datei hier anhängen).
+        Nach einem Absturz bietet auch die Benachrichtigung „Teilen“ an. Die App sendet nichts selbst – sie hat keine Internet-Berechtigung.
+
+        **English:** Thanks for reporting! The error report from the app helps most:
+        *Tools → Diagnostics → Error log → Share error report* (or *Save as file* and attach the file here).
+        After a crash, the notification offers "Share" too. The app never sends anything itself – it has no internet permission.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: "Was ist passiert? / What happened?"
+      description: "Was hast du erwartet, was ist stattdessen passiert? / What did you expect, and what happened instead?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Schritte zum Nachstellen / Steps to reproduce"
+      placeholder: |
+        1. App → Maps → Verhalten / Behavior
+        2. „Nur bei Bedarf“ einschalten / turn on "Only on demand"
+        3. …
+    validations:
+      required: true
+
+  - type: input
+    id: app_version
+    attributes:
+      label: "App-Version / App version"
+      description: "Einstellungen, ganz unten / Settings, at the bottom"
+      placeholder: "1.20.8"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: "Gerät und Android-Version / Device and Android version"
+      placeholder: "OnePlus 12, OxygenOS 15, Android 15"
+    validations:
+      required: true
+
+  - type: input
+    id: shizuku
+    attributes:
+      label: "Shizuku-Version und Startart / Shizuku version and how it was started"
+      placeholder: "13.5.4, Wireless-Debugging / wireless debugging"
+
+  - type: textarea
+    id: report
+    attributes:
+      label: "Fehlerbericht aus der App / Error report from the app"
+      description: |
+        Bericht hier einfügen oder als Datei anhängen. Er enthält Gerätemodell, Android-Version und die Paketnamen der Apps, bei denen etwas fehlschlug – bitte vorher durchlesen.
+        Paste the report here or attach it as a file. It contains the device model, Android version and the package names of apps where something failed – please read it first.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Bestätigung / Confirmation"
+      options:
+        - label: "Ich habe den Bericht gelesen; er enthält nichts, was ich nicht teilen möchte. / I have read the report; it contains nothing I do not want to share."
+          required: true
+        - label: "Ich habe nach einem bestehenden Issue zum selben Problem gesucht. / I searched for an existing issue about the same problem."

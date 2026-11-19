@@ -394,7 +394,7 @@ class StealthPatchService : Service() {
                         // Einweg-Artefakte — nur die Originale braucht der Restore.
                         // Ergebnis nicht blockierend (Originale bleiben sonst im Cache).
                         if (!stealer.relocateOriginals(workDir, pkg)) {
-                            Log.w(TAG, "relocateOriginals fehlgeschlagen für $pkg (Originale bleiben im Cache)")
+                            ErrorLog.w(TAG, "relocateOriginals fehlgeschlagen für $pkg (Originale bleiben im Cache)")
                         }
                         var msg = if (cloneNewPkg != null) {
                             getString(R.string.stealth_success_clone, cloneNewPkg)
@@ -415,7 +415,7 @@ class StealthPatchService : Service() {
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Patch fehlgeschlagen", e)
+            ErrorLog.e(TAG, "Patch fehlgeschlagen", e)
             finish(false, e.message ?: "Unbekannter Fehler")
         }
     }
@@ -560,7 +560,7 @@ class StealthPatchService : Service() {
                 }
                 val result = stealer.installApk(apk, VAULT_CALC_PACKAGE, allowAutoUninstall = false)
                 if (!result.success) {
-                    Log.w(TAG, "CalcYou-Auto-Install fehlgeschlagen: ${result.message}")
+                    ErrorLog.w(TAG, "CalcYou-Auto-Install fehlgeschlagen: ${result.message}")
                 } else {
                     Log.d(TAG, "CalcYou (Vault) automatisch installiert")
                 }
@@ -569,7 +569,7 @@ class StealthPatchService : Service() {
                 apk.delete()
             }
         } catch (e: Exception) {
-            Log.w(TAG, "CalcYou-Auto-Install Fehler", e)
+            ErrorLog.w(TAG, "CalcYou-Auto-Install Fehler", e)
         }
     }
 

@@ -184,7 +184,6 @@
     <string name="probe_timeout">Test de démarrage interrompu : pas de réponse après %1$d s (l\'application n\'a pas démarré proprement). NON vérifié — le patch lui-même n\'est pas concerné.</string>
     <string name="profiles_export_empty">Aucun profil enregistré disponible</string>
     <string name="profiles_export_fail">Échec de l\'exportation : %1$s</string>
-    <string name="profiles_export_ok">%1$d profils et %2$d paramètres d\'application exportés : privacy_profiles.json (dossier de l\'application)</string>
     <string name="profiles_import_behavior_need_shizuku">Paramètres d\'application ignorés (Shizuku non connecté) – seuls les profils ont été appliqués</string>
     <string name="profiles_import_fail">Échec de l\'importation : %1$s</string>
     <string name="profiles_import_ok">%1$d applications importées, %2$d opérations appliquées à cette application</string>
@@ -196,7 +195,6 @@
     <string name="restore_all_confirm_title">Tout remettre par défaut ?</string>
     <string name="restore_done">Toutes les entrées remises par défaut</string>
     <string name="restore_partial">Remises par défaut, %1$d entrées non appliquées.</string>
-    <string name="scanning_apps">Vérification des autorisations…</string>
     <string name="screen_off_effect_force_stop">Fermer (force-stop) – l\'app est arrêtée et ne reçoit ni alarmes ni notifications push jusqu\'à sa prochaine ouverture ; l\'ouvrir reste possible</string>
     <string name="screen_off_effect_suspend">Geler – l\'app ne peut pas démarrer du tout jusqu\'au rallumage de l\'écran ; les données sont conservées</string>
     <string name="screen_off_excluded_own">Non applicable à l\'application elle-même.</string>
@@ -770,4 +768,26 @@
     <string name="chain_step_hide">Masquer en tant que propriétaire</string>
     <string name="chain_result_hidden">Masquée en tant que propriétaire. Restauration depuis la liste (« masquée »).</string>
     <string name="app_hidden_label">%1$s (masquée)</string>
+    <string name="backup_status_running">Création de la sauvegarde … lecture de toutes les applis, cela peut prendre un moment.</string>
+    <string name="backup_status_saved_as">Enregistré sous : %1$s</string>
+    <string name="backup_toast_saved">Sauvegarde enregistrée : %1$s</string>
+    <string name="errlog_title">Journal des erreurs</string>
+    <string name="errlog_intro">Enregistre les plantages, les commandes Shizuku échouées et les erreurs internes – uniquement sur cet appareil, rien n\'est envoyé (l\'appli n\'a pas d\'accès Internet). Pour signaler un problème, partagez le rapport ou enregistrez-le dans un fichier. Il contient le modèle, la version d\'Android et les noms de paquet des applis concernées ; relisez-le avant de l\'envoyer.</string>
+    <string name="errlog_empty">Aucune erreur enregistrée.</string>
+    <string name="errlog_count">%1$d entrées · dernière : %2$s</string>
+    <string name="errlog_share">Partager le rapport d\'erreurs</string>
+    <string name="errlog_save">Enregistrer dans un fichier</string>
+    <string name="errlog_clear">Vider</string>
+    <string name="errlog_cleared">Journal des erreurs vidé</string>
+    <string name="errlog_saved">Rapport d\'erreurs enregistré</string>
+    <string name="errlog_crash_title">L\'appli a planté</string>
+    <string name="errlog_crash_msg">App Ops Shizuku a planté la dernière fois. Les détails se trouvent dans le journal des erreurs, d\'où vous pouvez partager le rapport pour signaler le problème.</string>
+    <string name="errlog_crash_open">Ouvrir le diagnostic</string>
+    <string name="errlog_crash_later">Plus tard</string>
+    <string name="errlog_channel">Erreurs</string>
+    <string name="errlog_channel_desc">Plantages et erreurs de cette appli, avec partage et enregistrement. Rien n\'est envoyé automatiquement.</string>
+    <string name="errlog_notif_title">Erreur dans App Ops Shizuku</string>
+    <string name="errlog_notif_text">Nouvelles entrées du journal des erreurs : %1$d · %2$s</string>
+    <string name="errlog_action_share">Partager</string>
+    <string name="errlog_action_save">Enregistrer</string>
 </resources>

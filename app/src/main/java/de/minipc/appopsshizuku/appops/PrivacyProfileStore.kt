@@ -2,12 +2,11 @@ package de.minipc.appopsshizuku.appops
 
 import android.content.Context
 import org.json.JSONObject
-import java.io.File
 
 /**
  * Persistenz fuer Privacy-Profile (13 Ops pro App) in SharedPreferences
  * ("privacy_profiles", Schluessel = Paketname, Wert = {opName: mode}).
- * Export/Import als JSON-Datei (filesDir/privacy_profiles.json), Format:
+ * Export/Import als JSON-Datei (Speicherort waehlt der Nutzer, siehe ProfileBackup), Format:
  * [{"packageName": "...", "opModes": {"CAMERA": "deny", ...}}, ...]
  * — fuer Backup und Klon-Backup (der Klon hat eigene Daten).
  */
@@ -15,11 +14,8 @@ class PrivacyProfileStore(context: Context) {
 
     private val prefs =
         context.getSharedPreferences("privacy_profiles", Context.MODE_PRIVATE)
-    private val exportDir = context.filesDir
 
     /** Export-Ziel im App-Speicher. */
-    fun exportFile(): File = File(exportDir, FILE_NAME)
-
     /** Letzten gesetzten Modus einer Op merken (auch "default"). */
     fun setOpMode(packageName: String, opName: String, mode: String) {
         // Leeres/ungueltiges JSON absichern: ohne gespeichertes Profil liefert
@@ -68,8 +64,6 @@ class PrivacyProfileStore(context: Context) {
         prefs.getString(packageName, null).orEmpty()
 
     companion object {
-        const val FILE_NAME = "privacy_profiles.json"
-
         /** Profile -> JSON-Text: Array aus {packageName, opModes}. */
         fun toJson(profiles: Map<String, Map<String, String>>): String {
             val array = org.json.JSONArray()

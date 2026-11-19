@@ -184,7 +184,6 @@
     <string name="probe_timeout">स्टार्ट प्रोब रोका गया: %1$d सेकंड बाद प्रतिक्रिया नहीं दी (ऐप ठीक से शुरू नहीं हुआ)। जाँचा नहीं गया — पैच स्वयं प्रभावित नहीं है।</string>
     <string name="profiles_export_empty">कोई सहेजी गई प्रोफ़ाइल उपलब्ध नहीं</string>
     <string name="profiles_export_fail">निर्यात विफल: %1$s</string>
-    <string name="profiles_export_ok">%1$d प्रोफ़ाइल और %2$d ऐप सेटिंग निर्यात हुईं: privacy_profiles.json (ऐप फ़ोल्डर)</string>
     <string name="profiles_import_behavior_need_shizuku">ऐप सेटिंग छोड़ी गईं (Shizuku कनेक्ट नहीं) – केवल प्रोफ़ाइल लागू हुईं</string>
     <string name="profiles_import_fail">आयात विफल: %1$s</string>
     <string name="profiles_import_ok">%1$d ऐप आयात किए गए, इस ऐप पर %2$d ऑप लागू</string>
@@ -196,7 +195,6 @@
     <string name="restore_all_confirm_title">सभी डिफ़ॉल्ट पर?</string>
     <string name="restore_done">सभी प्रविष्टियाँ डिफ़ॉल्ट पर सेट</string>
     <string name="restore_partial">डिफ़ॉल्ट पर सेट, %1$d प्रविष्टियाँ लागू नहीं हुईं।</string>
-    <string name="scanning_apps">अनुमतियाँ जाँची जा रही हैं…</string>
     <string name="screen_off_effect_force_stop">बंद करें (force-stop) – ऐप बंद कर दी जाती है और दोबारा खोलने तक उसे अलार्म या पुश संदेश नहीं मिलते; खोलना संभव रहता है</string>
     <string name="screen_off_effect_suspend">फ़्रीज़ – स्क्रीन फिर चालू होने तक ऐप बिल्कुल शुरू नहीं हो सकती; डेटा बना रहता है</string>
     <string name="screen_off_excluded_own">अपने ऐप के लिए नहीं।</string>
@@ -770,4 +768,26 @@
     <string name="chain_step_hide">डिवाइस स्वामी के रूप में छिपाएं</string>
     <string name="chain_result_hidden">डिवाइस स्वामी के रूप में छिपाया गया। ऐप सूची से वापस लाएं (\"छिपा\")।</string>
     <string name="app_hidden_label">%1$s (छिपा)</string>
+    <string name="backup_status_running">बैकअप बन रहा है … सभी ऐप्स पढ़े जा रहे हैं, इसमें थोड़ा समय लग सकता है।</string>
+    <string name="backup_status_saved_as">इस नाम से सहेजा गया: %1$s</string>
+    <string name="backup_toast_saved">बैकअप सहेजा गया: %1$s</string>
+    <string name="errlog_title">त्रुटि लॉग</string>
+    <string name="errlog_intro">क्रैश, विफल Shizuku कमांड और आंतरिक त्रुटियाँ दर्ज करता है – केवल इसी डिवाइस पर, कुछ भी भेजा नहीं जाता (ऐप के पास इंटरनेट एक्सेस नहीं है)। समस्या बताने के लिए रिपोर्ट शेयर करें या फ़ाइल के रूप में सहेजें। इसमें डिवाइस मॉडल, Android संस्करण और उन ऐप्स के पैकेज नाम होते हैं जहाँ कुछ विफल हुआ; भेजने से पहले पढ़ लें।</string>
+    <string name="errlog_empty">कोई त्रुटि दर्ज नहीं।</string>
+    <string name="errlog_count">%1$d प्रविष्टियाँ · अंतिम: %2$s</string>
+    <string name="errlog_share">त्रुटि रिपोर्ट शेयर करें</string>
+    <string name="errlog_save">फ़ाइल के रूप में सहेजें</string>
+    <string name="errlog_clear">साफ़ करें</string>
+    <string name="errlog_cleared">त्रुटि लॉग साफ़ किया गया</string>
+    <string name="errlog_saved">त्रुटि रिपोर्ट सहेजी गई</string>
+    <string name="errlog_crash_title">ऐप क्रैश हो गया</string>
+    <string name="errlog_crash_msg">App Ops Shizuku पिछली बार क्रैश हो गया था। विवरण त्रुटि लॉग में है, जहाँ से आप समस्या बताने के लिए रिपोर्ट शेयर कर सकते हैं।</string>
+    <string name="errlog_crash_open">डायग्नोस्टिक्स खोलें</string>
+    <string name="errlog_crash_later">बाद में</string>
+    <string name="errlog_channel">त्रुटियाँ</string>
+    <string name="errlog_channel_desc">इस ऐप के क्रैश और त्रुटियाँ, शेयर और सहेजने के विकल्प के साथ। कुछ भी अपने आप नहीं भेजा जाता।</string>
+    <string name="errlog_notif_title">App Ops Shizuku में त्रुटि</string>
+    <string name="errlog_notif_text">त्रुटि लॉग में नई प्रविष्टियाँ: %1$d · %2$s</string>
+    <string name="errlog_action_share">शेयर करें</string>
+    <string name="errlog_action_save">सहेजें</string>
 </resources>

@@ -2,6 +2,7 @@ package de.minipc.appopsshizuku.appops
 
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -40,10 +41,12 @@ class ProfileBackup(context: Context) {
     )
 
     /**
-     * Schreibt Profile UND Verhaltens-Einstellungen als JSON in den App-Ordner.
-     * count == 0 && behaviorCount == 0 bedeutet: nichts zu sichern gewesen.
+     * Schreibt Profile UND Verhaltens-Einstellungen als JSON in die vom Nutzer gewaehlte Datei
+     * (SAF-URI aus dem Speichern-Dialog). Frueher landete die Datei in filesDir - dort kommt
+     * man ohne Root nicht heran und sie verschwindet beim Deinstallieren.
+     * count == 0 && behaviorCount == 0 bedeutet: nichts zu sichern gewesen (dann wird nichts geschrieben).
      */
-    fun export(behavior: Map<String, BehaviorState> = emptyMap()): ExportResult {
+    fun export(target: Uri, behavior: Map<String, BehaviorState> = emptyMap()): ExportResult {
         val profiles = store.allProfiles()
         val behaviorJson = behaviorStateToJson(behavior)
         val lifecycleJson = lifecycleToJson(lifecycleStore.all())
@@ -51,16 +54,25 @@ class ProfileBackup(context: Context) {
         if (profiles.isEmpty() && behaviorJson.length() == 0 && lifecycleJson.length() == 0 && extras.isEmpty) {
             return ExportResult(0, 0, "")
         }
-        val file = store.exportFile()
         val doc = JSONObject()
             .put("version", 2)
             .put("profiles", JSONArray(PrivacyProfileStore.toJson(profiles)))
             .put("behavior", behaviorJson)
             .put("lifecycle", lifecycleJson)
             .put("extras", extras.toJson())
-        file.writeText(doc.toString(2))
-        return ExportResult(profiles.size, behaviorJson.length(), file.absolutePath, lifecycleJson.length(), extras.count)
+        // "wt": vorhandene Datei abschneiden, sonst bleiben bei kuerzerem Inhalt Reste stehen
+        val out = appContext.contentResolver.openOutputStream(target, "wt")
+            ?: throw IllegalStateException("Datei nicht beschreibbar")
+        out.bufferedWriter(Charsets.UTF_8).use { it.write(doc.toString(2)) }
+        return ExportResult(profiles.size, behaviorJson.length(), displayName(target), lifecycleJson.length(), extras.count)
     }
+
+    /** Lesbarer Dateiname der gewaehlten Datei (z. B. "appops-sicherung-2026-11-19.json"). */
+    private fun displayName(uri: Uri): String = runCatching {
+        appContext.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+            if (c.moveToFirst()) c.getString(0) else null
+        }
+    }.getOrNull() ?: uri.lastPathSegment ?: uri.toString()
 
     /**
      * Liest die JSON-Datei aus der SAF-URI und merged die Profile in die Prefs.

@@ -91,7 +91,7 @@ class LifecycleScreenService : Service() {
                 .exceptionOrNull()
                 ?.let {
                     // z. B. ForegroundServiceStartNotAllowedException, wenn die App im Hintergrund ist
-                    Log.w(TAG, "Dienst-Start nicht moeglich: $it")
+                    ErrorLog.w(TAG, "Dienst-Start nicht moeglich: $it")
                     it.message ?: it.javaClass.simpleName
                 }
         }
@@ -246,7 +246,7 @@ class LifecycleScreenService : Service() {
             }
         }
         if (started.isFailure) {
-            Log.w(TAG, "startForeground fehlgeschlagen: ${started.exceptionOrNull()}")
+            ErrorLog.w(TAG, "startForeground fehlgeschlagen: ${started.exceptionOrNull()}")
             stopSelf()
             return START_NOT_STICKY
         }
@@ -281,7 +281,7 @@ class LifecycleScreenService : Service() {
         executor.execute { onDemandSweep() }
         if (wakeGuard == null) {
             wakeGuard = executor.scheduleWithFixedDelay({ runCatching { wakeGuardTick() }.onFailure {
-                Log.w(TAG, "Weck-Waechter fehlgeschlagen: $it")
+                ErrorLog.w(TAG, "Weck-Waechter fehlgeschlagen: $it")
             } }, WAKE_GUARD_SECONDS, WAKE_GUARD_SECONDS, TimeUnit.SECONDS)
         }
         executor.execute { whileInUseSweep() }
@@ -308,7 +308,7 @@ class LifecycleScreenService : Service() {
         // (sonst wuerde schon auf dem Sperrbildschirm wieder erteilt)
         if (!screenOn) wiuForeground.clear()
         // "Nur waehrend Nutzung": beim Bildschirm-Aus sofort zuruecknehmen, beim An wieder beobachten
-        runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
+        runCatching { whileInUseTick() }.onFailure { ErrorLog.w(TAG, "Nur waehrend Nutzung: $it") }
         updateWiuPoll()
         if (!screenOn) stopLastPoll = 0L
         updatePoll() // "Nur beenden"-Apps nur bei eingeschaltetem Bildschirm beobachten
@@ -458,7 +458,7 @@ class LifecycleScreenService : Service() {
         if (needed && poll == null) {
             pollShizukuReported = false
             poll = executor.scheduleWithFixedDelay({ runCatching { pollTick() }.onFailure {
-                Log.w(TAG, "Abfrage fehlgeschlagen: $it")
+                ErrorLog.w(TAG, "Abfrage fehlgeschlagen: $it")
             } }, POLL_SECONDS, POLL_SECONDS, TimeUnit.SECONDS)
         } else if (!needed) {
             poll?.cancel(false)
@@ -563,7 +563,7 @@ class LifecycleScreenService : Service() {
     // ------------------------------------------------------------------ Nur waehrend Nutzung
 
     private fun whileInUseSweep() {
-        runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
+        runCatching { whileInUseTick() }.onFailure { ErrorLog.w(TAG, "Nur waehrend Nutzung: $it") }
         updateWiuPoll()
     }
 
@@ -571,7 +571,7 @@ class LifecycleScreenService : Service() {
         val needed = screenOn && (whileInUseApps(this, wiuStore).isNotEmpty() || wiuStore.grantedByUs.isNotEmpty())
         if (needed && wiuPoll == null) {
             wiuPoll = executor.scheduleWithFixedDelay({
-                runCatching { whileInUseTick() }.onFailure { Log.w(TAG, "Nur waehrend Nutzung: $it") }
+                runCatching { whileInUseTick() }.onFailure { ErrorLog.w(TAG, "Nur waehrend Nutzung: $it") }
             }, POLL_SECONDS, POLL_SECONDS, TimeUnit.SECONDS)
         } else if (!needed) {
             wiuPoll?.cancel(false)

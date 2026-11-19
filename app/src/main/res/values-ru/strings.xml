@@ -184,7 +184,6 @@
     <string name="probe_timeout">Пробный запуск прерван: приложение не отвечало в течение %1$d с (запустилось некорректно). НЕ проверено — сам патч не затронут.</string>
     <string name="profiles_export_empty">Нет сохранённых профилей</string>
     <string name="profiles_export_fail">Ошибка экспорта: %1$s</string>
-    <string name="profiles_export_ok">Экспортировано профилей: %1$d, настроек приложений: %2$d — privacy_profiles.json (папка приложения)</string>
     <string name="profiles_import_behavior_need_shizuku">Настройки приложений пропущены (Shizuku не подключён) — применены только профили</string>
     <string name="profiles_import_fail">Ошибка импорта: %1$s</string>
     <string name="profiles_import_ok">Импортировано приложений: %1$d, операций применено к этому приложению: %2$d</string>
@@ -196,7 +195,6 @@
     <string name="restore_all_confirm_title">Все по умолчанию?</string>
     <string name="restore_done">Все значения установлены по умолчанию</string>
     <string name="restore_partial">Установлено по умолчанию, не применено записей: %1$d.</string>
-    <string name="scanning_apps">Проверка разрешений…</string>
     <string name="screen_off_effect_force_stop">Закрыть (force-stop) – приложение завершается и не получает будильники и push-уведомления, пока его снова не откроют; открыть его можно</string>
     <string name="screen_off_effect_suspend">Заморозить – приложение не может запуститься до включения экрана; данные сохраняются</string>
     <string name="screen_off_excluded_own">Не применяется к собственному приложению.</string>
@@ -776,4 +774,26 @@
     <string name="chain_step_hide">Скрыть как владелец</string>
     <string name="chain_result_hidden">Скрыто как владелец. Восстановить можно из списка («скрыто»).</string>
     <string name="app_hidden_label">%1$s (скрыто)</string>
+    <string name="backup_status_running">Создаётся резервная копия … читаются все приложения, это может занять время.</string>
+    <string name="backup_status_saved_as">Сохранено как: %1$s</string>
+    <string name="backup_toast_saved">Резервная копия сохранена: %1$s</string>
+    <string name="errlog_title">Журнал ошибок</string>
+    <string name="errlog_intro">Записывает сбои, неудачные команды Shizuku и внутренние ошибки – только на этом устройстве, ничего не отправляется (у приложения нет доступа к интернету). Чтобы сообщить о проблеме, поделитесь отчётом или сохраните его в файл. В нём есть модель устройства, версия Android и имена пакетов приложений, где что-то не удалось; прочитайте его перед отправкой.</string>
+    <string name="errlog_empty">Ошибок не записано.</string>
+    <string name="errlog_count">Записей: %1$d · последняя: %2$s</string>
+    <string name="errlog_share">Поделиться отчётом об ошибках</string>
+    <string name="errlog_save">Сохранить в файл</string>
+    <string name="errlog_clear">Очистить</string>
+    <string name="errlog_cleared">Журнал ошибок очищен</string>
+    <string name="errlog_saved">Отчёт об ошибках сохранён</string>
+    <string name="errlog_crash_title">Приложение завершилось сбоем</string>
+    <string name="errlog_crash_msg">В прошлый раз App Ops Shizuku завершилось сбоем. Подробности – в журнале ошибок, оттуда можно поделиться отчётом, чтобы сообщить о проблеме.</string>
+    <string name="errlog_crash_open">Открыть диагностику</string>
+    <string name="errlog_crash_later">Позже</string>
+    <string name="errlog_channel">Ошибки</string>
+    <string name="errlog_channel_desc">Сбои и ошибки этого приложения, с кнопками «Поделиться» и «Сохранить». Ничего не отправляется автоматически.</string>
+    <string name="errlog_notif_title">Ошибка в App Ops Shizuku</string>
+    <string name="errlog_notif_text">Новых записей в журнале ошибок: %1$d · %2$s</string>
+    <string name="errlog_action_share">Поделиться</string>
+    <string name="errlog_action_save">Сохранить</string>
 </resources>

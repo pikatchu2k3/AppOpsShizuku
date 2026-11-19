@@ -74,7 +74,7 @@ class OnDemandLaunchActivity : AppCompatActivity() {
         when (OnDemandCallers.decide(caller, packageName, pkg, store.onDemandCallers)) {
             OnDemandCallers.Decision.ALLOW -> proceed(pkg)
             OnDemandCallers.Decision.DENY -> {
-                Log.w(TAG, "Fremder Start von $pkg abgelehnt (Aufrufer: $caller)")
+                ErrorLog.w(TAG, "Fremder Start von $pkg abgelehnt (Aufrufer: $caller)")
                 Toast.makeText(this, R.string.ondemand_caller_unknown, Toast.LENGTH_LONG).show()
                 finish()
             }

@@ -1,6 +1,10 @@
 package de.minipc.appopsshizuku
 
 import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import de.minipc.appopsshizuku.appops.ErrorLogFormat
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -40,6 +44,12 @@ class DiagnosticsActivity : AppCompatActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private var lastReport: String? = null
 
+    /** Speichern-Dialog fuer den Fehlerbericht (Textdatei, Ort waehlt der Nutzer). */
+    private val savePicker =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
+            if (uri != null) saveReport(uri)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -55,7 +65,19 @@ class DiagnosticsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         findViewById<MaterialButton>(R.id.diagRun).setOnClickListener { run() }
         findViewById<MaterialButton>(R.id.diagShare).setOnClickListener { share() }
+        findViewById<MaterialButton>(R.id.errlogShare).setOnClickListener { shareErrorReport() }
+        findViewById<MaterialButton>(R.id.errlogSave).setOnClickListener {
+            val day = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ROOT).format(java.util.Date())
+            savePicker.launch("appopsshizuku-fehlerbericht-$day.txt")
+        }
+        findViewById<MaterialButton>(R.id.errlogClear).setOnClickListener {
+            ErrorLog.clear()
+            Toast.makeText(this, R.string.errlog_cleared, Toast.LENGTH_SHORT).show()
+            renderErrorLog()
+        }
+        renderErrorLog()
         run()
+        handleNotificationAction(intent)
     }
 
     override fun onDestroy() { executor.shutdown(); super.onDestroy() }
@@ -69,7 +91,8 @@ class DiagnosticsActivity : AppCompatActivity() {
         findViewById<LinearProgressIndicator>(R.id.loadingBar).visibility = View.VISIBLE
         findViewById<MaterialButton>(R.id.diagRun).isEnabled = false
         executor.execute {
-            val lines = probe()
+            // Die Proben testen absichtlich Befehle, die fehlschlagen duerfen - nicht ins Protokoll
+            val lines = ErrorLog.quietly { probe() }
             val header = "App Ops Shizuku ${versionName()} · ${Build.MANUFACTURER} ${Build.MODEL} · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})"
             val report = Diagnostics.report(header, lines)
             handler.post {
@@ -172,6 +195,77 @@ class DiagnosticsActivity : AppCompatActivity() {
             val detail = if (r.detail.isNotBlank()) " (${r.detail})" else ""
             list.addView(row("$mark  $label$detail", onGlass))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ErrorLog.markSeen(this)
+        renderErrorLog()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleNotificationAction(intent)
+    }
+
+    /** "Teilen" / "Speichern" aus der Fehler-Benachrichtigung. */
+    private fun handleNotificationAction(intent: Intent?) {
+        when (intent?.getStringExtra(ErrorLog.EXTRA_ACTION)) {
+            ErrorLog.ACTION_SHARE -> shareErrorReport()
+            ErrorLog.ACTION_SAVE -> findViewById<MaterialButton>(R.id.errlogSave).performClick()
+        }
+        intent?.removeExtra(ErrorLog.EXTRA_ACTION)
+    }
+
+    /** Stand des Fehlerprotokolls: Anzahl, letzter Eintrag, Vorschau der neuesten Zeilen. */
+    private fun renderErrorLog() {
+        val log = ErrorLog.read()
+        val n = ErrorLogFormat.count(log)
+        findViewById<TextView>(R.id.errlogState).text =
+            if (n == 0) getString(R.string.errlog_empty)
+            else getString(R.string.errlog_count, n, ErrorLogFormat.lastTimestamp(log) ?: "?")
+        findViewById<TextView>(R.id.errlogPreview).apply {
+            text = log.lines().takeLast(12).joinToString("\n")
+            visibility = if (n == 0) View.GONE else View.VISIBLE
+        }
+        findViewById<MaterialButton>(R.id.errlogSave).isEnabled = n > 0
+        findViewById<MaterialButton>(R.id.errlogClear).isEnabled = n > 0
+    }
+
+    /** Bericht = Geraetekopf + letzte Diagnose (falls gelaufen) + Fehlerprotokoll. */
+    private fun errorReport(): String {
+        val log = ErrorLog.read()
+        return buildString {
+            append(ErrorLog.header(this@DiagnosticsActivity)).append("\n\n")
+            lastReport?.let { append("=== ").append(getString(R.string.diag_title)).append(" ===\n").append(it).append("\n\n") }
+            append("=== ").append(getString(R.string.errlog_title)).append(" ===\n")
+            append(if (log.isBlank()) getString(R.string.errlog_empty) else ErrorLogFormat.forShare(log))
+        }
+    }
+
+    private fun shareErrorReport() {
+        startActivity(
+            Intent.createChooser(
+                Intent(Intent.ACTION_SEND)
+                    .setType("text/plain")
+                    .putExtra(Intent.EXTRA_SUBJECT, "App Ops Shizuku – " + getString(R.string.errlog_title))
+                    .putExtra(Intent.EXTRA_TEXT, errorReport()),
+                getString(R.string.errlog_share)
+            )
+        )
+    }
+
+    private fun saveReport(uri: Uri) {
+        val ok = runCatching {
+            contentResolver.openOutputStream(uri, "wt")?.bufferedWriter(Charsets.UTF_8)?.use { it.write(errorReport()) }
+                ?: error("Datei nicht beschreibbar")
+        }
+        Toast.makeText(
+            this,
+            if (ok.isSuccess) getString(R.string.errlog_saved)
+            else getString(R.string.profiles_export_fail, ok.exceptionOrNull()?.message ?: "?"),
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     private fun share() {

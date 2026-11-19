@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.stealth
 
+import de.minipc.appopsshizuku.ErrorLog
 import android.content.Context
 import android.util.Base64
 import android.util.Log
@@ -204,7 +205,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
                 outFiles.add(target)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "extractApk: Transfer fehlgeschlagen", e)
+            ErrorLog.e(TAG, "extractApk: Transfer fehlgeschlagen", e)
             ok = false
         } finally {
             tmpFiles.forEach { backend.exec("rm", "-f", it) }
@@ -264,7 +265,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
                         f.delete()
                         true
                     } catch (e: Exception) {
-                        Log.e(TAG, "relocateOriginals: Kopie von ${f.name} fehlgeschlagen", e)
+                        ErrorLog.e(TAG, "relocateOriginals: Kopie von ${f.name} fehlgeschlagen", e)
                         false
                     }
                 }
@@ -276,7 +277,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
             workDir.delete()
             true
         } catch (e: Exception) {
-            Log.e(TAG, "relocateOriginals fehlgeschlagen", e)
+            ErrorLog.e(TAG, "relocateOriginals fehlgeschlagen", e)
             false
         }
     }
@@ -385,7 +386,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
             // NICHT stumm schlucken — die Ursache muss ins Logcat, sonst sieht der
             // User nur „Fehler beim Patchen des Manifests" ohne Details
             // (realer Diagnose-Fall 08/2026).
-            Log.e(TAG, "buildStealthApk fehlgeschlagen (efr=$excludeFromRecents " +
+            ErrorLog.e(TAG, "buildStealthApk fehlgeschlagen (efr=$excludeFromRecents " +
                 "icon=$removeLauncherIcon secure=$secureSnapshot vpn=$requireVpn vault=$vaultCalc)", e)
             null
         }
@@ -452,7 +453,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
                 signedSplit.setReadable(true, false)
                 result.add(signedSplit)
             } catch (e: Exception) {
-                Log.e(TAG, "buildStealthApkWithSplits: Split $i fehlgeschlagen", e)
+                ErrorLog.e(TAG, "buildStealthApkWithSplits: Split $i fehlgeschlagen", e)
                 return null
             }
         }
@@ -524,7 +525,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
                 if (!writeOk) break
             }
         } catch (e: Exception) {
-            Log.e(TAG, "installApk: Transfer fehlgeschlagen", e)
+            ErrorLog.e(TAG, "installApk: Transfer fehlgeschlagen", e)
             writeOk = false
         }
         if (!writeOk) {

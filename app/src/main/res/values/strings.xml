@@ -431,7 +431,6 @@
     <string name="probe_timeout">Start probe aborted: it did not respond after %1$d s (the app did not start cleanly). NOT checked — the patch itself is not affected.</string>
     <string name="profiles_export_empty">No saved profiles available</string>
     <string name="profiles_export_fail">Export failed: %1$s</string>
-    <string name="profiles_export_ok">%1$d profiles and %2$d app settings exported: privacy_profiles.json (app folder)</string>
     <string name="profiles_import_behavior_need_shizuku">App settings skipped (Shizuku not connected) – only profiles applied</string>
     <string name="profiles_import_fail">Import failed: %1$s</string>
     <string name="profiles_import_ok">%1$d apps imported, %2$d ops applied to this app</string>
@@ -497,7 +496,6 @@
     <string name="rules_empty">No rules yet.</string>
     <string name="rules_intro">Rules run by time or Wi-Fi and need Shizuku to take effect. Wi-Fi rules may lag up to ~15 min (no always-on service).</string>
     <string name="rules_title">Automatic rules</string>
-    <string name="scanning_apps">Checking permissions…</string>
     <string name="screen_off_effect_force_stop">Close (force stop) – the app is ended and gets no alarms or push messages until it is opened again; opening it stays possible</string>
     <string name="screen_off_effect_suspend">Freeze – the app cannot start at all until the screen is on again; data is kept</string>
     <string name="screen_off_excluded_own">Not for the own app.</string>
@@ -771,4 +769,26 @@
     <string name="workprofile_remove_msg">Removes the whole work profile. All data of apps inside it is lost.</string>
     <string name="workprofile_removed">Work profile removed.</string>
     <string name="workprofile_title">Work profile</string>
+    <string name="backup_status_running">Creating backup … reading all apps, this can take a moment.</string>
+    <string name="backup_status_saved_as">Saved as: %1$s</string>
+    <string name="backup_toast_saved">Backup saved: %1$s</string>
+    <string name="errlog_title">Error log</string>
+    <string name="errlog_intro">Records crashes, failed Shizuku commands and internal errors – only on this device, nothing is sent (the app has no internet access). To report a problem, share the report or save it as a file. It contains device model, Android version and the package names of apps where something failed; read it before you send it.</string>
+    <string name="errlog_empty">No errors recorded.</string>
+    <string name="errlog_count">%1$d entries · last: %2$s</string>
+    <string name="errlog_share">Share error report</string>
+    <string name="errlog_save">Save as file</string>
+    <string name="errlog_clear">Clear</string>
+    <string name="errlog_cleared">Error log cleared</string>
+    <string name="errlog_saved">Error report saved</string>
+    <string name="errlog_crash_title">The app crashed</string>
+    <string name="errlog_crash_msg">App Ops Shizuku crashed last time. The details are in the error log. You can share the report there to report the problem.</string>
+    <string name="errlog_crash_open">Open diagnostics</string>
+    <string name="errlog_crash_later">Later</string>
+    <string name="errlog_channel">Errors</string>
+    <string name="errlog_channel_desc">Crashes and errors of this app, with share and save. Nothing is sent automatically.</string>
+    <string name="errlog_notif_title">Error in App Ops Shizuku</string>
+    <string name="errlog_notif_text">New error log entries: %1$d · %2$s</string>
+    <string name="errlog_action_share">Share</string>
+    <string name="errlog_action_save">Save</string>
 </resources>
