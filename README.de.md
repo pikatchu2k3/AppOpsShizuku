@@ -16,7 +16,7 @@ Ohne Shizuku *zeigt* die App nur an und schaltet nichts.
 
 APK aus dem [neuesten GitHub-Release](https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest) laden.
 
-Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obtainium) eintragen (Quelle: *GitHub Releases*, URL `https://github.com/pikatchu2k3/AppOpsShizuku`). Die Signatur bleibt gleich, deshalb wird ein Update direkt über die installierte App eingespielt, die Daten bleiben erhalten. Das Repository ist derzeit **privat**: Obtainium (und jeder Download außerhalb deines eigenen GitHub-Kontos) braucht ein GitHub-Token mit Lesezugriff darauf.
+Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obtainium) eintragen (Quelle: *GitHub Releases*, URL `https://github.com/pikatchu2k3/AppOpsShizuku`). Die Signatur bleibt gleich, deshalb wird ein Update direkt über die installierte App eingespielt, die Daten bleiben erhalten.
 
 ## Auf einen Blick
 
