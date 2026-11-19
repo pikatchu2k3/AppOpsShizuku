@@ -25,22 +25,65 @@ data class BehaviorState(
  * Ehrlichkeitsregel wie im Reiter "Verhalten": nach jeder Aenderung wird der
  * Zustand neu gelesen; passt er nicht, landet ein Klartext-Fehler im Ergebnis.
  */
-class BehaviorBackup(private val backend: ShellBackend) {
+class BehaviorBackup(
+    private val backend: ShellBackend,
+    /**
+     * Eingefroren-Zustand ohne Shell (ApplicationInfo.FLAG_SUSPENDED ueber den PackageManager);
+     * null = unbekannt, dann wird per `dumpsys package` nachgelesen.
+     */
+    private val suspendedLookup: ((String) -> Boolean?)? = null
+) {
 
-    /** Zustand aller uebergebenen Pakete einsammeln (fuer den Export). */
+    /**
+     * Zustand aller uebergebenen Pakete einsammeln (fuer den Export).
+     *
+     * Frueher zwei Shell-Aufrufe JE App nacheinander (Standby-Stufe + `dumpsys package`) -
+     * bei 377 Apps rund 750 Prozesse, der Export dauerte entsprechend. Jetzt:
+     * - Standby-Stufen aller Apps mit EINEM `cmd activity get-standby-bucket` (ohne Paket),
+     * - eingefroren ueber [suspendedLookup] (kein Shell-Aufruf),
+     * - deaktiviert und Akku-Ausnahme wie bisher je ein Aufruf fuer alle.
+     * Was dabei fehlt, wird einzeln nachgelesen, [PARALLEL] Aufrufe gleichzeitig.
+     */
     fun collect(packages: Collection<String>): Map<String, BehaviorState> {
         val disabled = disabledPackages()
         val whitelist = backend.exec("dumpsys", "deviceidle", "whitelist").stdout
-        val out = mutableMapOf<String, BehaviorState>()
+        val buckets = parseStandbyBuckets(backend.exec("cmd", "activity", "get-standby-bucket").stdout)
+        val suspended = packages.associateWith { pkg -> runCatching { suspendedLookup?.invoke(pkg) }.getOrNull() }
+
+        // Nur fuer Apps, die die Sammel-Abfragen nicht beantwortet haben
+        val missing = packages.filter { it !in buckets || suspended[it] == null }
+        val single = HashMap<String, Pair<Int?, Boolean?>>()
+        if (missing.isNotEmpty()) {
+            val pool = java.util.concurrent.Executors.newFixedThreadPool(PARALLEL)
+            try {
+                pool.invokeAll(missing.map { pkg ->
+                    java.util.concurrent.Callable {
+                        val b = if (pkg in buckets) buckets[pkg] else readStandbyBucket(pkg)
+                        val f = suspended[pkg] ?: readSuspendedOrNull(pkg)
+                        synchronized(single) { single[pkg] = b to f }
+                    }
+                })
+            } finally {
+                pool.shutdown()
+            }
+        }
+
+        val out = LinkedHashMap<String, BehaviorState>()
         for (pkg in packages) {
+            val fallback = single[pkg]
             out[pkg] = BehaviorState(
-                standbyBucket = readStandbyBucket(pkg),
+                standbyBucket = buckets[pkg] ?: fallback?.first,
                 batteryExempt = whitelistContains(whitelist, pkg),
-                frozen = readSuspended(pkg),
+                frozen = suspended[pkg] ?: fallback?.second,
                 disabled = disabled.contains(pkg)
             )
         }
         return out
+    }
+
+    companion object {
+        /** Gleichzeitige Einzel-Abfragen, wenn die Sammel-Abfrage nicht reicht. */
+        const val PARALLEL = 4
     }
 
     fun toJson(states: Map<String, BehaviorState>): JSONObject = behaviorStateToJson(states)
@@ -128,8 +171,10 @@ class BehaviorBackup(private val backend: ShellBackend) {
     private fun readBatteryExempt(packageName: String): Boolean =
         whitelistContains(backend.exec("dumpsys", "deviceidle", "whitelist").stdout, packageName)
 
-    private fun readSuspended(packageName: String): Boolean =
-        parseSuspended(backend.exec("dumpsys", "package", packageName).stdout) ?: false
+    private fun readSuspended(packageName: String): Boolean = readSuspendedOrNull(packageName) ?: false
+
+    private fun readSuspendedOrNull(packageName: String): Boolean? =
+        parseSuspended(backend.exec("dumpsys", "package", packageName).stdout)
 
     private fun readDisabled(packageName: String): Boolean =
         disabledPackages().contains(packageName)
@@ -187,6 +232,18 @@ fun standbyName(bucket: Int): String? = when (bucket) {
 /** Erste Zahl aus der Ausgabe von `cmd activity get-standby-bucket <pkg>`. */
 fun standbyBucketOf(stdout: String): Int? =
     stdout.trim().lineSequence().firstOrNull()?.trim()?.toIntOrNull()
+
+/**
+ * Ausgabe von `cmd activity get-standby-bucket` OHNE Paket: eine Zeile je App, `paket: stufe`
+ * (AOSP ActivityManagerShellCommand.runGetStandbyBucket). Zeilen in anderem Format werden
+ * uebersprungen; ein leeres Ergebnis heisst "nicht unterstuetzt" -> Einzelabfragen.
+ */
+fun parseStandbyBuckets(stdout: String): Map<String, Int> {
+    val line = Regex("""^\s*([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+)\s*:\s*(\d+)\s*$""")
+    return stdout.lineSequence().mapNotNull { l ->
+        line.find(l)?.let { it.groupValues[1] to it.groupValues[2].toInt() }
+    }.toMap()
+}
 
 /** `suspended=true|false` aus `dumpsys package <pkg>`; null, wenn nicht enthalten. */
 fun parseSuspended(dumpsys: String): Boolean? {

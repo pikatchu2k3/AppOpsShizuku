@@ -944,7 +944,13 @@ class MainActivity : AppCompatActivity() {
                 // (Standby-Stufe, Akku-Ausnahme, eingefroren, deaktiviert) in EINER Datei.
                 val behavior = if (manager.isConnected && manager.hasPermission && allApps.isNotEmpty()) {
                     runCatching {
-                        BehaviorBackup(ShizukuBackend()).collect(allApps.map { it.packageName })
+                        // Eingefroren direkt aus dem PackageManager lesen (kein Shell-Aufruf je App)
+                        BehaviorBackup(ShizukuBackend()) { pkg ->
+                            runCatching {
+                                (packageManager.getApplicationInfo(pkg, 0).flags and
+                                    android.content.pm.ApplicationInfo.FLAG_SUSPENDED) != 0
+                            }.getOrNull()
+                        }.collect(allApps.map { it.packageName })
                     }.getOrDefault(emptyMap())
                 } else {
                     emptyMap()
