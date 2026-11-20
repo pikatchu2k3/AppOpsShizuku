@@ -1,71 +1,49 @@
 ### English
 
-**App Ops Shizuku 1.20.8** — backups are faster and end up where you can find them, the *Blocked* filter shows what it says, and a new error log helps to report problems.
+**App Ops Shizuku 1.20.9** — the backup export no longer takes minutes.
 
-**Fixed: backup location**
+**Faster backup export**
 
-*Export* used to write `privacy_profiles.json` into the app's private storage. Without root you could not reach that file, and uninstalling the app deleted it. *Export* now opens the system save dialog (suggested name `appopsshizuku-backup-<date>.json`), so you choose the place, e.g. *Downloads*. "Creating backup …" appears right away, because reading all apps through Shizuku can take a while. Success messages appear under the buttons in *Settings* and disappear after 8 seconds; errors stay until you tap them.
+*Export* used to run two Shizuku commands per app, one after the other: `am get-standby-bucket <package>` and `dumpsys package <package>`. With 377 installed apps that was about 750 shell processes, and the dialog sat on "Creating backup …" for a long time. Now:
 
-**Faster export:** the export used to run two Shizuku commands per app, one after the other (about 750 for 377 apps). It now reads the standby buckets of all apps with one command and the frozen state directly from Android without any shell command, so the export needs three commands regardless of how many apps are installed. Devices that do not support the combined query fall back to single queries, four at a time.
+- The standby bucket of all apps is read with a single `cmd activity get-standby-bucket` without a package name — one process for the whole list.
+- The frozen state comes from Android itself (`ApplicationInfo.FLAG_SUSPENDED` through the package manager), with no shell command at all. Where the system does not report it, the app falls back to `dumpsys package` for that app only.
+- Disabled apps and the battery whitelist were already one query each.
 
-**Fixed: filter *Blocked***
-
-The filter showed almost every app, including apps marked *Unchanged*. It counted every `Uid mode: …: ignore` line from `cmd appops get`, and Android writes such a line for every permission an app was never granted. The filter now uses the same basis as the status line on each card: apps with at least one permission set to *ignore* or *deny* with this app. It works instantly, without scanning every app.
-
-**New: error log**
-
-- Records crashes, failed Shizuku commands and internal errors, only on the device (about 200 KB at most; the same error is written once per 10 minutes).
-- *Tools → Diagnostics → Error log*: number of entries, the latest lines, *Share error report*, *Save as file*, *Clear*. The report contains app version, device model, Android version, the last diagnostics result and the log, including the package names of apps where something failed.
-- After a crash or an error a notification (channel *Errors*) offers *Share* and *Save*; after a crash the app also offers to open Diagnostics on the next start.
-- Still **no internet permission**: nothing is sent automatically, sharing and saving go through the system dialogs.
-
-**Also**
-
-- Bug report and feature request forms on GitHub (*Issues → New issue*), in German and English.
-- README split into English (`README.md`) and German (`README.de.md`) with a language switch at the top, and completed with features that were missing from it.
+The export therefore needs three Shizuku commands no matter how many apps are installed. On devices that do not answer the combined query, the missing apps are read individually, four at a time — never a few hundred processes at once.
 
 **Honest limits**
 
-- **No device run.** The combined standby query, the save dialog, the auto-hiding message, the new filter, the error notification and the crash dialog were built and checked in code and unit tests, not on a phone.
-- The *Blocked* filter now only knows what was blocked **with this app**. A permission you denied in Android's own settings does not put an app into this filter.
+- **No device run.** The combined standby query, the package-manager lookup for the frozen state and the fallback are covered by unit tests, not on a phone. The exact behaviour on OnePlus/HyperOS energy savers is still unmeasured.
+- The backup contains what the device reports. If a manufacturer answers `get-standby-bucket` in a different format, the value for that app stays empty in the export and is refilled on import.
+- Everything from 1.20.8 stays as it was: the save dialog for the backup file, the *Blocked* filter, the error log, both READMEs.
 
-**Tests:** 358 unit tests in 46 classes, including 7 new ones for the error log and 4 for the faster export.
+**Tests:** 358 unit tests in 46 classes, including 4 new ones for the batch export.
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 
 ### Deutsch
 
-**App Ops Shizuku 1.20.8** — Sicherungen sind schneller und landen dort, wo du sie findest, der Filter *Blockiert* zeigt, was er sagt, und ein neues Fehlerprotokoll hilft beim Melden von Problemen.
+**App Ops Shizuku 1.20.9** — der Export der Sicherung dauert nicht mehr Minuten.
 
-**Behoben: Speicherort der Sicherung**
+**Schnellerer Export der Sicherung**
 
-*Exportieren* schrieb `privacy_profiles.json` bisher in den privaten Speicher der App. Ohne Root kam man an die Datei nicht heran, und beim Deinstallieren war sie weg. Jetzt öffnet *Exportieren* den Speichern-Dialog des Systems (Vorschlag `appopsshizuku-backup-<Datum>.json`), du wählst den Ort, z. B. *Downloads*. Sofort erscheint „Sicherung wird erstellt …“, denn das Einlesen aller Apps über Shizuku kann dauern. Erfolgsmeldungen stehen unter den Knöpfen in den *Einstellungen* und verschwinden nach 8 Sekunden; Fehler bleiben, bis du sie antippst.
+*Exportieren* lief bisher mit zwei Shizuku-Befehlen je App, nacheinander: `am get-standby-bucket <Paket>` und `dumpsys package <Paket>`. Bei 377 installierten Apps waren das rund 750 Shell-Prozesse, und der Dialog stand lange auf „Sicherung wird erstellt …“. Jetzt:
 
-**Schnellerer Export:** Der Export lief bisher mit zwei Shizuku-Befehlen je App, nacheinander (bei 377 Apps rund 750). Jetzt liest er die Standby-Stufen aller Apps mit einem Befehl und den Eingefroren-Zustand direkt von Android, ganz ohne Shell-Befehl. Damit braucht der Export drei Befehle, egal wie viele Apps installiert sind. Geräte, die die Sammelabfrage nicht kennen, fragen einzeln ab, vier gleichzeitig.
+- Die Standby-Stufe aller Apps wird mit einem einzigen `cmd activity get-standby-bucket` ohne Paketnamen gelesen — ein Prozess für die ganze Liste.
+- Der Eingefroren-Zustand kommt direkt von Android (`ApplicationInfo.FLAG_SUSPENDED` über den PackageManager), ganz ohne Shell-Befehl. Meldet das System ihn nicht, liest die App nur für diese eine App per `dumpsys package` nach.
+- Deaktivierte Apps und die Akku-Ausnahme waren schon vorher je eine Abfrage für alle.
 
-**Behoben: Filter *Blockiert***
-
-Der Filter zeigte fast jede App, auch solche mit *Unverändert*. Er zählte jede Zeile `Uid mode: …: ignore` aus `cmd appops get`, und die schreibt Android für jede Berechtigung, die eine App nie bekommen hat. Jetzt nutzt der Filter dieselbe Grundlage wie die Statuszeile auf der Karte: Apps, bei denen mindestens eine Berechtigung mit dieser App auf *Ignorieren* oder *Verweigern* steht. Er wirkt sofort, ohne jede App abzufragen.
-
-**Neu: Fehlerprotokoll**
-
-- Zeichnet Abstürze, fehlgeschlagene Shizuku-Befehle und interne Fehler auf, nur auf dem Gerät (höchstens etwa 200 KB; derselbe Fehler wird einmal pro 10 Minuten geschrieben).
-- *Werkzeuge → Diagnose → Fehlerprotokoll*: Anzahl der Einträge, die neuesten Zeilen, *Fehlerbericht teilen*, *Als Datei speichern*, *Leeren*. Der Bericht enthält App-Version, Gerätemodell, Android-Version, das letzte Diagnose-Ergebnis und das Protokoll, auch die Paketnamen der Apps, bei denen etwas fehlschlug.
-- Nach einem Absturz oder Fehler bietet eine Benachrichtigung (Kanal *Fehler*) *Teilen* und *Speichern* an; nach einem Absturz fragt die App beim nächsten Start außerdem, ob sie die Diagnose öffnen soll.
-- Weiterhin **keine Internet-Berechtigung**: Es wird nichts automatisch gesendet, Teilen und Speichern laufen über die System-Dialoge.
-
-**Außerdem**
-
-- Formulare für Fehlermeldungen und Ideen auf GitHub (*Issues → New issue*), auf Deutsch und Englisch.
-- README aufgeteilt in Englisch (`README.md`) und Deutsch (`README.de.md`) mit Sprachumschalter oben, und um fehlende Funktionen ergänzt.
+Damit braucht der Export drei Shizuku-Befehle, egal wie viele Apps installiert sind. Auf Geräten, die die Sammelabfrage nicht beantworten, werden die fehlenden Apps einzeln gelesen, vier gleichzeitig — nie ein paar hundert Prozesse auf einmal.
 
 **Ehrliche Grenzen**
 
-- **Kein Gerätelauf.** Die Sammelabfrage der Standby-Stufen, der Speichern-Dialog, das Ausblenden der Meldung, der neue Filter, die Fehler-Benachrichtigung und der Absturz-Dialog sind im Code und mit Unit-Tests geprüft, nicht am Telefon.
-- Der Filter *Blockiert* kennt jetzt nur, was **mit dieser App** gesperrt wurde. Eine Berechtigung, die du in den Android-Einstellungen entzogen hast, bringt eine App nicht in diesen Filter.
+- **Kein Gerätelauf.** Die Sammelabfrage der Standby-Stufen, der Blick in den PackageManager für den Eingefroren-Zustand und der Rückfall auf Einzelabfragen sind mit Unit-Tests geprüft, nicht am Telefon. Das genaue Verhalten auf OnePlus-/HyperOS-Energiesparern ist weiter ungemessen.
+- Die Sicherung enthält, was das Gerät meldet. Antwortet ein Hersteller bei `get-standby-bucket` in einem anderen Format, bleibt der Wert für diese App im Export leer und wird beim Import nachgezogen.
+- Alles aus 1.20.8 bleibt, wie es war: Speichern-Dialog für die Sicherungsdatei, Filter *Blockiert*, Fehlerprotokoll, beide READMEs.
 
-**Tests:** 358 Unit-Tests in 46 Klassen, davon 7 neue für das Fehlerprotokoll und 4 für den schnelleren Export.
+**Tests:** 358 Unit-Tests in 46 Klassen, davon 4 neue für den Sammel-Export.
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 
-<sub>Paket `de.minipc.appopsshizuku` · versionCode 48 · debug-signiert (updatefähig über 1.20.7) · targetSdk 35 · Lizenz GPL-3.0</sub>
+<sub>Paket `de.minipc.appopsshizuku` · versionCode 49 · debug-signiert (updatefähig über 1.20.8) · targetSdk 35 · Lizenz GPL-3.0</sub>
