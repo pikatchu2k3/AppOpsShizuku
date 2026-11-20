@@ -126,3 +126,66 @@ class ProfileBackupDocumentTest {
         assertTrue(behavior.isEmpty())
     }
 }
+
+/** Export-Sammlung: Sammel-Abfragen statt zwei Shell-Aufrufen je App. */
+class BehaviorBackupCollectTest {
+
+    private class Shell(private val bucketList: String) : de.minipc.appopsshizuku.shizuku.ShellBackend {
+        val calls = java.util.Collections.synchronizedList(mutableListOf<List<String>>())
+        override fun isAvailable() = true
+        override fun hasPermission() = true
+        override fun exec(vararg args: String): de.minipc.appopsshizuku.shizuku.ShellResult {
+            val a = args.toList()
+            calls.add(a)
+            val out = when {
+                a == listOf("pm", "list", "packages", "-d") -> "package:com.off\n"
+                a == listOf("dumpsys", "deviceidle", "whitelist") -> "user,com.exempt,10123\n"
+                a == listOf("cmd", "activity", "get-standby-bucket") -> bucketList
+                a.take(3) == listOf("cmd", "activity", "get-standby-bucket") -> "40\n"
+                a.take(2) == listOf("dumpsys", "package") -> "User 0: installed=true suspended=true stopped=true"
+                else -> ""
+            }
+            return de.minipc.appopsshizuku.shizuku.ShellResult(0, out, "")
+        }
+    }
+
+    private val pkgs = listOf("com.a", "com.off", "com.exempt")
+
+    @Test
+    fun sammelAbfrage_dreiAufrufeEgalWievieleApps() {
+        val shell = Shell("com.a: 10\ncom.off: 45\ncom.exempt: 5\n")
+        val r = BehaviorBackup(shell) { it == "com.a" }.collect(pkgs)
+        assertEquals(3, shell.calls.size)
+        assertEquals(BehaviorState(10, false, true, false), r["com.a"])
+        assertEquals(BehaviorState(45, false, false, true), r["com.off"])
+        assertEquals(BehaviorState(5, true, false, false), r["com.exempt"])
+    }
+
+    @Test
+    fun ohneSammelformat_nurFehlendeEinzelnNachlesen() {
+        // Geraet kennt die Sammel-Ausgabe nicht: Einzelabfragen, eingefroren weiter ohne Shell
+        val shell = Shell("")
+        val r = BehaviorBackup(shell) { false }.collect(pkgs)
+        assertEquals(40, r["com.a"]!!.standbyBucket)
+        assertEquals(false, r["com.a"]!!.frozen)
+        assertEquals(0, shell.calls.count { it.take(2) == listOf("dumpsys", "package") })
+        assertEquals(3, shell.calls.count { it.size == 4 && it[2] == "get-standby-bucket" })
+    }
+
+    @Test
+    fun ohneSuspendLookup_wieBisherPerDumpsys() {
+        val shell = Shell("com.a: 10\ncom.off: 45\ncom.exempt: 5\n")
+        val r = BehaviorBackup(shell).collect(pkgs)
+        assertEquals(true, r["com.a"]!!.frozen)
+        assertEquals(3, shell.calls.count { it.take(2) == listOf("dumpsys", "package") })
+    }
+
+    @Test
+    fun sammelParser_ueberspringtFremdeZeilen() {
+        assertEquals(
+            mapOf("com.a" to 10, "org.x.y" to 40),
+            parseStandbyBuckets("com.a: 10\n\nWarnung: irgendwas\norg.x.y:40\nkein paket: 5\n")
+        )
+        assertTrue(parseStandbyBuckets("Exception occurred").isEmpty())
+    }
+}

@@ -1,10 +1,12 @@
 ### English
 
-**App Ops Shizuku 1.20.8** — backups end up where you can find them, the *Blocked* filter shows what it says, and a new error log helps to report problems.
+**App Ops Shizuku 1.20.8** — backups are faster and end up where you can find them, the *Blocked* filter shows what it says, and a new error log helps to report problems.
 
 **Fixed: backup location**
 
 *Export* used to write `privacy_profiles.json` into the app's private storage. Without root you could not reach that file, and uninstalling the app deleted it. *Export* now opens the system save dialog (suggested name `appopsshizuku-backup-<date>.json`), so you choose the place, e.g. *Downloads*. "Creating backup …" appears right away, because reading all apps through Shizuku can take a while. Success messages appear under the buttons in *Settings* and disappear after 8 seconds; errors stay until you tap them.
+
+**Faster export:** the export used to run two Shizuku commands per app, one after the other (about 750 for 377 apps). It now reads the standby buckets of all apps with one command and the frozen state directly from Android without any shell command, so the export needs three commands regardless of how many apps are installed. Devices that do not support the combined query fall back to single queries, four at a time.
 
 **Fixed: filter *Blocked***
 
@@ -24,20 +26,22 @@ The filter showed almost every app, including apps marked *Unchanged*. It counte
 
 **Honest limits**
 
-- **No device run.** The save dialog, the auto-hiding message, the new filter, the error notification and the crash dialog were built and checked in code and unit tests, not on a phone.
+- **No device run.** The combined standby query, the save dialog, the auto-hiding message, the new filter, the error notification and the crash dialog were built and checked in code and unit tests, not on a phone.
 - The *Blocked* filter now only knows what was blocked **with this app**. A permission you denied in Android's own settings does not put an app into this filter.
 
-**Tests:** 354 unit tests in 45 classes, including 7 new ones for the error log.
+**Tests:** 358 unit tests in 46 classes, including 7 new ones for the error log and 4 for the faster export.
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 
 ### Deutsch
 
-**App Ops Shizuku 1.20.8** — Sicherungen landen dort, wo du sie findest, der Filter *Blockiert* zeigt, was er sagt, und ein neues Fehlerprotokoll hilft beim Melden von Problemen.
+**App Ops Shizuku 1.20.8** — Sicherungen sind schneller und landen dort, wo du sie findest, der Filter *Blockiert* zeigt, was er sagt, und ein neues Fehlerprotokoll hilft beim Melden von Problemen.
 
 **Behoben: Speicherort der Sicherung**
 
 *Exportieren* schrieb `privacy_profiles.json` bisher in den privaten Speicher der App. Ohne Root kam man an die Datei nicht heran, und beim Deinstallieren war sie weg. Jetzt öffnet *Exportieren* den Speichern-Dialog des Systems (Vorschlag `appopsshizuku-backup-<Datum>.json`), du wählst den Ort, z. B. *Downloads*. Sofort erscheint „Sicherung wird erstellt …“, denn das Einlesen aller Apps über Shizuku kann dauern. Erfolgsmeldungen stehen unter den Knöpfen in den *Einstellungen* und verschwinden nach 8 Sekunden; Fehler bleiben, bis du sie antippst.
+
+**Schnellerer Export:** Der Export lief bisher mit zwei Shizuku-Befehlen je App, nacheinander (bei 377 Apps rund 750). Jetzt liest er die Standby-Stufen aller Apps mit einem Befehl und den Eingefroren-Zustand direkt von Android, ganz ohne Shell-Befehl. Damit braucht der Export drei Befehle, egal wie viele Apps installiert sind. Geräte, die die Sammelabfrage nicht kennen, fragen einzeln ab, vier gleichzeitig.
 
 **Behoben: Filter *Blockiert***
 
@@ -57,10 +61,10 @@ Der Filter zeigte fast jede App, auch solche mit *Unverändert*. Er zählte jede
 
 **Ehrliche Grenzen**
 
-- **Kein Gerätelauf.** Speichern-Dialog, das Ausblenden der Meldung, der neue Filter, die Fehler-Benachrichtigung und der Absturz-Dialog sind im Code und mit Unit-Tests geprüft, nicht am Telefon.
+- **Kein Gerätelauf.** Die Sammelabfrage der Standby-Stufen, der Speichern-Dialog, das Ausblenden der Meldung, der neue Filter, die Fehler-Benachrichtigung und der Absturz-Dialog sind im Code und mit Unit-Tests geprüft, nicht am Telefon.
 - Der Filter *Blockiert* kennt jetzt nur, was **mit dieser App** gesperrt wurde. Eine Berechtigung, die du in den Android-Einstellungen entzogen hast, bringt eine App nicht in diesen Filter.
 
-**Tests:** 354 Unit-Tests in 45 Klassen, davon 7 neue für das Fehlerprotokoll.
+**Tests:** 358 Unit-Tests in 46 Klassen, davon 7 neue für das Fehlerprotokoll und 4 für den schnelleren Export.
 
 Download: https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest
 
