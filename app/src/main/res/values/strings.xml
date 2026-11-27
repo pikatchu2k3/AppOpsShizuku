@@ -512,6 +512,8 @@
     <string name="rules_empty">No rules yet.</string>
     <string name="rules_intro">Rules run by time or Wi-Fi and need Shizuku to take effect. Wi-Fi rules may lag up to ~15 min (no always-on service).</string>
     <string name="rules_title">Automatic rules</string>
+    <string name="screen_event_off">Screen off</string>
+    <string name="screen_event_on">Screen on</string>
     <string name="screen_off_effect_force_stop">Close (force stop) – the app is ended and gets no alarms or push messages until it is opened again; opening it stays possible</string>
     <string name="screen_off_effect_suspend">Freeze – the app cannot start at all until the screen is on again; data is kept</string>
     <string name="screen_off_excluded_own">Not for the own app.</string>
@@ -525,12 +527,16 @@
     <string name="screen_off_switch">Pause when screen turns off</string>
     <string name="screen_off_text">The opposite of the profile above: the app is stopped as soon as the screen turns off, so it cannot keep running in the background. Android only tells a running app about screen on/off, so while at least one app has this option, a service with a notification runs. You can hide the notification; the service keeps working. Default: off.</string>
     <string name="screen_off_title">Pause when screen turns off</string>
+    <string name="screen_report_all_ok">%1$s: %2$d app(s) - all confirmed</string>
+    <string name="screen_report_no_shizuku">%1$s: not possible - Shizuku is not connected, no app was stopped</string>
+    <string name="screen_report_some_failed">%1$s: %2$d of %3$d NOT applied - %4$s</string>
     <string name="search_hint">Search apps…</string>
     <string name="settings_about">App Ops Shizuku %1$s · GPL-3.0 · no network access</string>
     <string name="settings_backup_hint">Export or import privacy profiles and behaviour settings as JSON.</string>
     <string name="settings_backup_title">Backup</string>
     <string name="settings_dynamic_hint">Use the system colours (Material You) for buttons and cards inside the screens.</string>
     <string name="settings_quarantine_hint">Newly installed apps get no background data, no clipboard and no background running until you release them.</string>
+    <string name="shizuku_dialog_hint">Permission dialog not visible? Authorize this app in the Shizuku app under "Authorized apps".</string>
     <string name="shizuku_hint_pill">Shizuku is not connected – nothing can be changed. Tap to open the settings.</string>
     <string name="sort_by">Sort by:</string>
     <string name="sort_hint">Sort order</string>
@@ -592,6 +598,7 @@
     <string name="stealth_error_restore">Error restoring</string>
     <string name="stealth_error_sign">Error signing APK</string>
     <string name="stealth_exclude_from_recents">Hide in history (recent apps)</string>
+    <string name="stealth_fgs_timeout">Android stopped the background service after its allowed running time. Please start the patch again.</string>
     <string name="stealth_label">%1$s (Stealth)</string>
     <string name="stealth_need_launcher">No manifest change selected — please enable at least one option.</string>
     <string name="stealth_notif_channel">Stealth patch</string>

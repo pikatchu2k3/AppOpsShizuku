@@ -169,6 +169,14 @@ class StealthPatchService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    /**
+     * Android 15+: ein `dataSync`-Dienst darf nur ~6 h pro Tag laufen. Danach ruft das System dies auf, und der
+     * Dienst MUSS sofort enden - sonst beendet es die ganze App mit einer Ausnahme.
+     */
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        finish(false, getString(R.string.stealth_fgs_timeout))
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) {
             stopSelf()

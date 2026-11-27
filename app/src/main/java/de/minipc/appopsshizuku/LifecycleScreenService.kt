@@ -312,7 +312,7 @@ class LifecycleScreenService : Service() {
         updateWiuPoll()
         if (!screenOn) stopLastPoll = 0L
         updatePoll() // "Nur beenden"-Apps nur bei eingeschaltetem Bildschirm beobachten
-        val label = if (screenOn) "Bildschirm an" else "Bildschirm aus"
+        val label = getString(if (screenOn) R.string.screen_event_on else R.string.screen_event_off)
         val entries = installedEntries(this, store)
         // Von uns eingefrorene Apps, die inzwischen deinstalliert sind: vergessen statt freigeben
         store.suspendedByUs.filterNot { isInstalled(this, it) }.forEach { store.remove(it) }
@@ -320,7 +320,7 @@ class LifecycleScreenService : Service() {
         val usable = runCatching { backend.isAvailable() && backend.hasPermission() }.getOrDefault(false)
         if (!usable) {
             // Ehrlich: ohne Shizuku passiert nichts - das auch so melden.
-            report("$label: nicht möglich – Shizuku ist nicht verbunden, keine App angehalten")
+            report(getString(R.string.screen_report_no_shizuku, label))
             return
         }
         val exec = ScreenOffExecutor(backend)
@@ -340,16 +340,18 @@ class LifecycleScreenService : Service() {
         results.forEach { Log.i(TAG, "$label: ${it.describe()}") }
         val failed = results.count { !it.ok }
         val summary = if (failed == 0) {
-            "$label: ${results.size} App(s) – alle bestätigt"
+            getString(R.string.screen_report_all_ok, label, results.size)
         } else {
-            "$label: $failed von ${results.size} NICHT übernommen – " +
+            getString(
+                R.string.screen_report_some_failed, label, failed, results.size,
                 results.filter { !it.ok }.joinToString("; ") { it.describe() }
+            )
         }
         report(summary)
     }
 
     private fun report(text: String) {
-        val time = SimpleDateFormat("HH:mm", Locale.GERMANY).format(Date())
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         store.lastReport = "$time $text"
         Log.i(TAG, text)
         // Weggewischt: Meldung nur speichern (steht im Reiter Verhalten), nicht neu einblenden

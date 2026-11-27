@@ -211,6 +211,8 @@
     <string name="restore_all_confirm_title">Все по умолчанию?</string>
     <string name="restore_done">Все значения установлены по умолчанию</string>
     <string name="restore_partial">Установлено по умолчанию, не применено записей: %1$d.</string>
+    <string name="screen_event_off">Экран выключен</string>
+    <string name="screen_event_on">Экран включён</string>
     <string name="screen_off_effect_force_stop">Закрыть (force-stop) – приложение завершается и не получает будильники и push-уведомления, пока его снова не откроют; открыть его можно</string>
     <string name="screen_off_effect_suspend">Заморозить – приложение не может запуститься до включения экрана; данные сохраняются</string>
     <string name="screen_off_excluded_own">Не применяется к собственному приложению.</string>
@@ -224,7 +226,11 @@
     <string name="screen_off_switch">Приостанавливать при выключении экрана</string>
     <string name="screen_off_text">Противоположность профилю выше: приложение останавливается, как только гаснет экран, и не может работать в фоне. Android сообщает о включении/выключении экрана только работающему приложению, поэтому, пока хотя бы у одного приложения включена эта опция, работает служба с уведомлением. Уведомление можно скрыть; служба продолжит работать. По умолчанию: выкл.</string>
     <string name="screen_off_title">Приостанавливать при выключении экрана</string>
+    <string name="screen_report_all_ok">%1$s: приложений: %2$d - все подтверждены</string>
+    <string name="screen_report_no_shizuku">%1$s: невозможно - Shizuku не подключён, приложения не остановлены</string>
+    <string name="screen_report_some_failed">%1$s: не применено %2$d из %3$d - %4$s</string>
     <string name="search_hint">Поиск приложений…</string>
+    <string name="shizuku_dialog_hint">Диалог разрешения не виден? Разрешите это приложение в приложении Shizuku, в разделе «Авторизованные приложения».</string>
     <string name="sort_by">Сортировать по:</string>
     <string name="sort_hint">Порядок сортировки</string>
     <string name="sort_install">Дата установки</string>
@@ -276,6 +282,7 @@
     <string name="stealth_error_restore">Ошибка восстановления</string>
     <string name="stealth_error_sign">Ошибка подписи APK</string>
     <string name="stealth_exclude_from_recents">Скрыть в истории (недавние приложения)</string>
+    <string name="stealth_fgs_timeout">Android остановил фоновую службу по истечении разрешённого времени работы. Запустите патч снова.</string>
     <string name="stealth_label">%1$s (Скрытый)</string>
     <string name="stealth_need_launcher">Изменение манифеста не выбрано. Включите хотя бы одну опцию.</string>
     <string name="stealth_notif_channel">Скрытый патч</string>

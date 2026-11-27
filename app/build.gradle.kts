@@ -21,6 +21,25 @@ android {
         includeInBundle = false
     }
 
+    // Zwei Ausgaben mit derselben Anwendungs-ID:
+    //  - full: mit WLAN-Regeln (braucht Standort-Rechte, um den WLAN-Namen zu lesen) - wie bisher
+    //  - lite: ohne WLAN-Regeln und OHNE jedes Standort-Recht im Manifest
+    flavorDimensions += "edition"
+    productFlavors {
+        create("full") {
+            dimension = "edition"
+            buildConfigField("boolean", "WIFI_RULES", "true")
+        }
+        create("lite") {
+            dimension = "edition"
+            buildConfigField("boolean", "WIFI_RULES", "false")
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false

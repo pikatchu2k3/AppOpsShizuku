@@ -211,6 +211,8 @@
     <string name="restore_all_confirm_title">सभी डिफ़ॉल्ट पर?</string>
     <string name="restore_done">सभी प्रविष्टियाँ डिफ़ॉल्ट पर सेट</string>
     <string name="restore_partial">डिफ़ॉल्ट पर सेट, %1$d प्रविष्टियाँ लागू नहीं हुईं।</string>
+    <string name="screen_event_off">स्क्रीन बंद</string>
+    <string name="screen_event_on">स्क्रीन चालू</string>
     <string name="screen_off_effect_force_stop">बंद करें (force-stop) – ऐप बंद कर दी जाती है और दोबारा खोलने तक उसे अलार्म या पुश संदेश नहीं मिलते; खोलना संभव रहता है</string>
     <string name="screen_off_effect_suspend">फ़्रीज़ – स्क्रीन फिर चालू होने तक ऐप बिल्कुल शुरू नहीं हो सकती; डेटा बना रहता है</string>
     <string name="screen_off_excluded_own">अपने ऐप के लिए नहीं।</string>
@@ -224,7 +226,11 @@
     <string name="screen_off_switch">स्क्रीन बंद होने पर रोकें</string>
     <string name="screen_off_text">ऊपर की प्रोफ़ाइल का उल्टा: स्क्रीन बंद होते ही ऐप रोक दी जाती है, ताकि वह बैकग्राउंड में न चले। Android स्क्रीन चालू/बंद की सूचना केवल चल रही ऐप को देता है, इसलिए जब तक कम से कम एक ऐप में यह विकल्प है, एक सूचना वाली सेवा चलती है। आप सूचना छिपा सकते हैं; सेवा काम करती रहती है। डिफ़ॉल्ट: बंद।</string>
     <string name="screen_off_title">स्क्रीन बंद होने पर रोकें</string>
+    <string name="screen_report_all_ok">%1$s: %2$d ऐप - सभी पुष्टि हुए</string>
+    <string name="screen_report_no_shizuku">%1$s: संभव नहीं - Shizuku जुड़ा नहीं है, कोई ऐप नहीं रोका गया</string>
+    <string name="screen_report_some_failed">%1$s: %3$d में से %2$d लागू नहीं हुए - %4$s</string>
     <string name="search_hint">ऐप खोजें…</string>
+    <string name="shizuku_dialog_hint">अनुमति संवाद नहीं दिख रहा? Shizuku ऐप में "अधिकृत ऐप्स" के तहत इस ऐप को अनुमति दें।</string>
     <string name="sort_by">क्रम से लगाएँ:</string>
     <string name="sort_hint">क्रम</string>
     <string name="sort_install">इंस्टॉल तिथि</string>
@@ -276,6 +282,7 @@
     <string name="stealth_error_restore">पुनर्स्थापित करने में त्रुटि</string>
     <string name="stealth_error_sign">APK साइन करने में त्रुटि</string>
     <string name="stealth_exclude_from_recents">इतिहास (हाल के ऐप्स) में छिपाएँ</string>
+    <string name="stealth_fgs_timeout">Android ने अनुमत चलने के समय के बाद बैकग्राउंड सेवा बंद कर दी। कृपया पैच फिर से शुरू करें।</string>
     <string name="stealth_label">%1$s (स्टेल्थ)</string>
     <string name="stealth_need_launcher">कोई मैनिफ़ेस्ट बदलाव नहीं चुना गया – कृपया कम से कम एक विकल्प चालू करें।</string>
     <string name="stealth_notif_channel">स्टेल्थ पैच</string>

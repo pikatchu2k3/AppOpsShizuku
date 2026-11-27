@@ -17,16 +17,8 @@
          dataSync ist ab Android 15 auf 6 h/Tag begrenzt und passt inhaltlich nicht;
          "specialUse" ist der einzige passende Typ ohne Zeitlimit und braucht genau dieses Recht. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <!-- WLAN-Name (SSID) fuer Automatik-Regeln lesen. Android verlangt dafuer den Standort FUER
-         DIESE App; die App hat selbst keinen Netzzugriff. Wird erst bei der ersten WLAN-Regel
-         zur Laufzeit abgefragt, nicht beim Start. -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- Pflicht-Begleiter: ab Android 12 wird eine Anfrage NUR nach FINE vom System ignoriert. -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- WLAN-Regeln werden im Hintergrund ausgewertet (Weckruf); ohne dieses Recht verbirgt Android
-         dort den Netznamen. Wird nie per Dialog erfragt, sondern beim Speichern einer WLAN-Regel
-         per Shizuku fuer die eigene App erteilt (Best-Effort). -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- Standort-Rechte fuer WLAN-Regeln (SSID lesen) stehen NUR im Flavor "full" (src/full/AndroidManifest.xml).
+         Der Flavor "lite" fragt nie nach Standort und hat keine WLAN-Regeln. -->
     <!-- Nur die ART der Verbindung lesen (WLAN ja/nein) - KEIN Internetzugriff. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Automatik-Regeln: ungefaehre Weckrufe planen (keine Exact-Alarm-Berechtigung noetig). -->
@@ -53,7 +45,7 @@
         android:theme="@style/Theme.AppOpsShizuku"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:largeHeap="true">
+        android:largeHeap="true"><!-- largeHeap: der Dex-Patch (Tarnung) haelt grosse Fremd-APKs im Speicher -->
 
         <!-- Shizuku 13+: Provider fuer den Permission-Request-Flow -->
         <provider
@@ -75,9 +67,6 @@
 
         <activity
             android:name=".AppDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AppOpsActivity"
             android:exported="false" />
         <activity
             android:name=".ComponentsActivity"
@@ -181,7 +170,6 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

@@ -211,6 +211,8 @@
     <string name="restore_all_confirm_title">Tudo para o padrão?</string>
     <string name="restore_done">Todas as entradas definidas como padrão</string>
     <string name="restore_partial">Definidas como padrão, %1$d entradas não aplicadas.</string>
+    <string name="screen_event_off">Tela desligada</string>
+    <string name="screen_event_on">Tela ligada</string>
     <string name="screen_off_effect_force_stop">Fechar (force-stop) – o app é encerrado e não recebe alarmes nem notificações push até ser aberto de novo; abrir continua possível</string>
     <string name="screen_off_effect_suspend">Congelar – o app não consegue iniciar até a tela acender de novo; os dados são mantidos</string>
     <string name="screen_off_excluded_own">Não se aplica ao próprio app.</string>
@@ -224,7 +226,11 @@
     <string name="screen_off_switch">Pausar quando a tela desligar</string>
     <string name="screen_off_text">O oposto do perfil acima: o app é parado assim que a tela apaga, então não continua em segundo plano. O Android só informa liga/desliga da tela a um app em execução; por isso, enquanto pelo menos um app tiver esta opção, roda um serviço com notificação. Você pode ocultar a notificação; o serviço continua funcionando. Padrão: desligado.</string>
     <string name="screen_off_title">Pausar quando a tela desligar</string>
+    <string name="screen_report_all_ok">%1$s: %2$d app(s) - todos confirmados</string>
+    <string name="screen_report_no_shizuku">%1$s: não é possível - o Shizuku não está conectado, nenhum app foi parado</string>
+    <string name="screen_report_some_failed">%1$s: %2$d de %3$d NÃO aplicados - %4$s</string>
     <string name="search_hint">Pesquisar apps…</string>
+    <string name="shizuku_dialog_hint">Caixa de permissão não aparece? Autorize este app no app Shizuku, em "Apps autorizados".</string>
     <string name="sort_by">Ordenar por:</string>
     <string name="sort_hint">Ordem de classificação</string>
     <string name="sort_install">Data de instalação</string>
@@ -276,6 +282,7 @@
     <string name="stealth_error_restore">Erro ao restaurar</string>
     <string name="stealth_error_sign">Erro ao assinar o APK</string>
     <string name="stealth_exclude_from_recents">Ocultar no histórico (apps recentes)</string>
+    <string name="stealth_fgs_timeout">O Android encerrou o serviço em segundo plano após o tempo de execução permitido. Inicie o patch novamente.</string>
     <string name="stealth_label">%1$s (Furtivo)</string>
     <string name="stealth_need_launcher">Nenhuma alteração de manifesto selecionada. Ative pelo menos uma opção.</string>
     <string name="stealth_notif_channel">Patch furtivo</string>

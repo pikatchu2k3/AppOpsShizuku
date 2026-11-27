@@ -887,7 +887,7 @@ class MainActivity : AppCompatActivity() {
                 openShizukuApp()
                 Toast.makeText(
                     this,
-                    "Berechtigungs-Dialog nicht sichtbar? In der Shizuku-App unter 'Berechtigungen' autorisieren.",
+                    R.string.shizuku_dialog_hint,
                     Toast.LENGTH_LONG
                 ).show()
             }

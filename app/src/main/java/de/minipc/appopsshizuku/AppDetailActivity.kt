@@ -18,13 +18,13 @@ import de.minipc.appopsshizuku.appops.DesignSettings
 
 /**
  * App-Detailseite mit drei Reitern: Berechtigungen / Verhalten / Tarnung.
- * Ersetzt als Einstieg aus der App-Liste die AppOpsActivity.
+ * Einstieg aus der App-Liste (frueher AppOpsActivity, entfernt).
  */
 class AppDetailActivity : AppCompatActivity() {
 
     companion object {
-        /** Gleicher Schluessel wie AppOpsActivity/ComponentsActivity ("pkg"). */
-        const val EXTRA_PACKAGE = AppOpsActivity.EXTRA_PACKAGE
+        /** Gleicher Schluessel wie ComponentsActivity ("pkg"). */
+        const val EXTRA_PACKAGE = "pkg"
 
         /** Optionaler Start-Reiter (0=Berechtigungen, 1=Verhalten, 2=Tarnung, 3=Netz & Tracker). */
         const val EXTRA_TAB = "tab"

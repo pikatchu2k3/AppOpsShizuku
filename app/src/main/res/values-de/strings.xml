@@ -23,7 +23,13 @@
     <string name="op_label_use_full_screen_intent">Vollbild-Benachrichtigungen</string>
     <string name="op_label_write_external_storage">Speicher schreiben (alt)</string>
     <string name="op_label_write_settings">Systemeinstellungen ändern</string>
+    <string name="screen_event_off">Bildschirm aus</string>
+    <string name="screen_event_on">Bildschirm an</string>
+    <string name="screen_report_all_ok">%1$s: %2$d App(s) – alle bestätigt</string>
+    <string name="screen_report_no_shizuku">%1$s: nicht möglich – Shizuku ist nicht verbunden, keine App angehalten</string>
+    <string name="screen_report_some_failed">%1$s: %2$d von %3$d NICHT übernommen – %4$s</string>
     <string name="search_hint">App suchen…</string>
+    <string name="shizuku_dialog_hint">Berechtigungs-Dialog nicht sichtbar? In der Shizuku-App unter „Berechtigungen“ autorisieren.</string>
     <string name="sort_hint">Sortierung</string>
     <string name="sort_by">Sortieren:</string>
     <string name="status_no_shizuku">Shizuku nicht verbunden</string>
@@ -136,6 +142,7 @@
     <string name="profiles_import_fail">Import fehlgeschlagen: %1$s</string>
 
     <!-- Stealth-Modus (Feature 2b) -->
+    <string name="stealth_fgs_timeout">Android hat den Hintergrunddienst nach der erlaubten Laufzeit beendet. Bitte den Patch erneut starten.</string>
     <string name="stealth_title">Stealth-Modus</string>
     <string name="stealth_description">Patcht die App so, dass sie dauerhaft nicht im Verlauf (letzte Apps) erscheint. Optional wird zusätzlich das Launcher-Icon entfernt. Die App wird dabei neu signiert.</string>
     <string name="stealth_exclude_from_recents">Im Verlauf (letzte Apps) verstecken</string>

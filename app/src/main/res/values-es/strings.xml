@@ -211,6 +211,8 @@
     <string name="restore_all_confirm_title">¿Todo a predeterminado?</string>
     <string name="restore_done">Todas las entradas restablecidas al valor predeterminado</string>
     <string name="restore_partial">Restablecido a predeterminado; %1$d entradas no aplicadas.</string>
+    <string name="screen_event_off">Pantalla apagada</string>
+    <string name="screen_event_on">Pantalla encendida</string>
     <string name="screen_off_effect_force_stop">Cerrar (force-stop): la app se cierra y no recibe alarmas ni notificaciones push hasta que se vuelva a abrir; se puede seguir abriendo</string>
     <string name="screen_off_effect_suspend">Congelar: la app no puede iniciarse hasta que la pantalla se encienda; los datos se conservan</string>
     <string name="screen_off_excluded_own">No aplica a la propia app.</string>
@@ -224,7 +226,11 @@
     <string name="screen_off_switch">Pausar al apagar la pantalla</string>
     <string name="screen_off_text">Lo contrario del perfil de arriba: la app se detiene en cuanto se apaga la pantalla, así no puede seguir en segundo plano. Android solo informa del encendido/apagado de pantalla a una app en ejecución, por eso, mientras al menos una app tenga esta opción, se ejecuta un servicio con notificación. Puedes ocultar la notificación; el servicio sigue funcionando. Predeterminado: desactivado.</string>
     <string name="screen_off_title">Pausar al apagar la pantalla</string>
+    <string name="screen_report_all_ok">%1$s: %2$d app(s) - todas confirmadas</string>
+    <string name="screen_report_no_shizuku">%1$s: no es posible - Shizuku no está conectado, no se detuvo ninguna app</string>
+    <string name="screen_report_some_failed">%1$s: %2$d de %3$d NO aplicadas - %4$s</string>
     <string name="search_hint">Buscar apps…</string>
+    <string name="shizuku_dialog_hint">¿No ves el cuadro de permiso? Autoriza esta app en la app Shizuku, en «Apps autorizadas».</string>
     <string name="sort_by">Ordenar por:</string>
     <string name="sort_hint">Orden</string>
     <string name="sort_install">Fecha de instalación</string>
@@ -278,6 +284,7 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="stealth_error_restore">Error al restaurar</string>
     <string name="stealth_error_sign">Error al firmar el APK</string>
     <string name="stealth_exclude_from_recents">Ocultar en el historial (apps recientes)</string>
+    <string name="stealth_fgs_timeout">Android detuvo el servicio en segundo plano tras su tiempo de ejecución permitido. Inicia el parche de nuevo.</string>
     <string name="stealth_label">%1$s (Sigilo)</string>
     <string name="stealth_need_launcher">No se ha seleccionado ningún cambio en el manifiesto; activa al menos una opción.</string>
     <string name="stealth_notif_channel">Parche sigilo</string>
