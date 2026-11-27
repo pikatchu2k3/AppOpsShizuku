@@ -1,0 +1,42 @@
+== A8 'Nach Berechtigung' (Op laut Prefs), 275 Pakete auf dem Geraet, Messung inkl. Screenshot+OCR-Takt (~2-3 s), Prozess jeweils frisch
+-- 1.21.0 (aktueller Branch, Debug)
+1.21.0 Lauf 1 (frischer Prozess): (3.6, '4 von 16 Apps')
+1.21.0 Lauf 2 (frischer Prozess): (3.7, '4 von 16 Apps')
+1.21.0 Lauf 3 (frischer Prozess): (3.7, '4 von 16 Apps')
+-- 1.20.9 (9f7bf93, Debug)
+Success
+    versionName=1.20.9
+1.20.9 Lauf 1 (frischer Prozess): (3.7, '4 von 16 Apps')
+1.20.9 Lauf 2 (frischer Prozess): (3.7, '4 von 16 Apps')
+1.20.9 Lauf 3 (frischer Prozess): (3.7, '4 von 16 Apps')
+-- zurueck auf 1.21.0
+Success
+    versionName=1.21.0
+
+== A8 mit Op POST_NOTIFICATIONS (mehr Apps)
+-- 1.21.0
+1.21.0 Lauf 1 (frischer Prozess): (3.8, '4 von 16 Apps')
+1.21.0 Lauf 2 (frischer Prozess): (3.7, '4 von 16 Apps')
+1.21.0 Lauf 3 (frischer Prozess): (3.8, '4 von 16 Apps')
+-- 1.20.9
+Success
+1.20.9 Lauf 1 (frischer Prozess): (3.8, '4 von 16 Apps')
+1.20.9 Lauf 2 (frischer Prozess): (3.7, '4 von 16 Apps')
+1.20.9 Lauf 3 (frischer Prozess): (3.8, '4 von 16 Apps')
+-- zurueck auf 1.21.0
+Success
+
+== A8 mit reinem AppOp RUN_IN_BACKGROUND (kein Permission-Pfad: je Launcher-App eine Abfrage, 48 Apps)
+-- 1.21.0
+1.21.0 Lauf 1 (frischer Prozess): (4.8, '47 von 47 Apps')
+1.21.0 Lauf 2 (frischer Prozess): (4.8, '47 von 47 Apps')
+1.21.0 Lauf 3 (frischer Prozess): (4.7, '47 von 47 Apps')
+-- 1.20.9
+Success
+1.20.9 Lauf 1 (frischer Prozess): (4.8, '47 von 47 Apps')
+1.20.9 Lauf 2 (frischer Prozess): (4.7, '47 von 47 Apps')
+1.20.9 Lauf 3 (frischer Prozess): (4.7, '47 von 47 Apps')
+-- zurueck auf 1.21.0
+Success
+
+AUSWERTUNG: 47 Apps (reines AppOp), 1.21.0 und 1.20.9 beide 4,7-4,8 s bis zur fertigen Liste (Messung: Prozessstart + Screenshot/OCR-Takt, Aufloesung ~1 s, Untergrenze 3,6-3,8 s). Kein Hänger. Ein Geschwindigkeitsgewinn gegenueber 1.20.9 ist hier NICHT messbar: der 4-Thread-Pool in PermissionOverviewActivity.readRows steht schon in 1.20.9 (git show 9f7bf93), der Diff zu HEAD aendert nur Handler/Executor (Lifecycle). Weniger Apps (CAMERA: 16) sind bei beiden unter der Messgrenze.
