@@ -1,0 +1,10 @@
+## Debug-Build: import_file (Datei im App-Cache)
+Starting: Intent { cmp=de.minipc.appopsshizuku/.MainActivity (has extras) }
+auto_rules.xml
+r-prot
+## Release (nicht debuggable), gleiche Datei
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]
+Starting: Intent { cmp=de.minipc.appopsshizuku/.MainActivity (has extras) }
+auto_rules.xml vorhanden (Anzahl):
+0
+0

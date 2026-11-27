@@ -1,0 +1,19 @@
+## vorher
+CAMERA: default
+0
+files:
+apk_signer_cert.der
+apk_signer_key.der
+error_log.txt
+privacy_profiles.json
+profileInstalled
+profileinstaller_profileWrittenFor_lastUpdateTime.dat
+stealth_com.aurora.store
+stealth_com.ebay.kleinanzeigen
+
+shared_prefs:
+change_log.xml
+design.xml
+net_changes.xml
+privacy_profiles.xml
+while_in_use.xml

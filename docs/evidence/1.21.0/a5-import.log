@@ -1,0 +1,385 @@
+## vor Importieren (Dialog offen)
+{
+  "version": 2,
+  "profiles": [],
+  "behavior": {
+    "com.android.contacts": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.deskclock": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.dialer": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.messaging": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.settings": {
+      "standbyBucket": 5,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.aperture": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.eleven": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.etar": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.recorder": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.brave.browser": {
+      "standbyBucket": 20,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.brave.browser.originmod": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "name.pilgr.appdialer.pro": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.calculator2": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.documentsui": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.fmradio": {
+      "standbyBucket": 5,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.stk": {
+      "standbyBucket": 5,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.motorola.dolby.dolbyui": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.glimpse": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.jelly": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.example.stromrechner": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.example.stromverbrauch": {
+      "standbyBucket": 45,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.minipc.spooftest": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.minipc.volumeskip": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.minipc.xreader": {
+      "standbyBucket": 20,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "moe.shizuku.privileged.api": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.torproject.android": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    }
+  }
+}
+change_log.xml
+design.xml
+net_changes.xml
+privacy_profiles.xml
+while_in_use.xml
+apk_signer_cert.der
+apk_signer_key.der
+error_log.txt
+privacy_profiles.json
+profileInstalled
+profileinstaller_profileWrittenFor_lastUpdateTime.dat
+stealth_com.aurora.store
+stealth_com.ebay.kleinanzeigen
+0
+CAMERA: default
+0
+## nach Importieren
+{
+  "version": 2,
+  "profiles": [],
+  "behavior": {
+    "com.android.contacts": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.deskclock": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.dialer": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.messaging": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.settings": {
+      "standbyBucket": 5,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.aperture": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.eleven": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.etar": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.recorder": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.brave.browser": {
+      "standbyBucket": 20,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.brave.browser.originmod": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "name.pilgr.appdialer.pro": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.calculator2": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.documentsui": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.fmradio": {
+      "standbyBucket": 5,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.android.stk": {
+      "standbyBucket": 5,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "com.motorola.dolby.dolbyui": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.glimpse": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.lineageos.jelly": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.example.stromrechner": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.example.stromverbrauch": {
+      "standbyBucket": 45,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.minipc.spooftest": {
+      "standbyBucket": 50,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.minipc.volumeskip": {
+      "standbyBucket": 10,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "de.minipc.xreader": {
+      "standbyBucket": 20,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    },
+    "moe.shizuku.privileged.api": {
+      "standbyBucket": 5,
+      "batteryExempt": true,
+      "frozen": false,
+      "disabled": false
+    },
+    "org.torproject.android": {
+      "standbyBucket": 40,
+      "batteryExempt": false,
+      "frozen": false,
+      "disabled": false
+    }
+  }
+}
+auto_rules.xml
+backup_status.xml
+change_log.xml
+design.xml
+lifecycle_profiles.xml
+net_changes.xml
+privacy_profiles.xml
+while_in_use.xml
+apk_signer_cert.der
+apk_signer_key.der
+error_log.txt
+privacy_profiles.json
+profileInstalled
+profileinstaller_profileWrittenFor_lastUpdateTime.dat
+stealth_com.aurora.store
+stealth_com.ebay.kleinanzeigen
+0
+CAMERA: default
+0
+-- profile (privacy_profiles.json) / auto rules prefs:
+    <string name="rules">[{&quot;id&quot;:&quot;r-prot&quot;,&quot;name&quot;:&quot;prot&quot;,&quot;enabled&quot;:true,&quot;trigger&quot;:&quot;TIME&quot;,&quot;days&quot;:127,&quot;startMin&quot;:0,&quot;endMin&quot;:0,&quot;ssid&quot;:&quot;&quot;,&quot;whenConnected&quot;:true,&quot;action&quot;:&quot;LOCKDOWN&quot;,&quot;packages&quot;:[&quot;de.minipc.spooftest&quot;]}]</string>
+    <boolean name="active_r-prot" value="false" />
+    "com.android.settings": {
+auto_rules.xml
+backup_status.xml
+change_log.xml
+design.xml
+lifecycle_profiles.xml
+net_changes.xml
+privacy_profiles.xml
+while_in_use.xml
+## privacy_profiles.xml nach Import
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <string name="de.minipc.spooftest">{&quot;READ_PHONE_STATE&quot;:&quot;deny&quot;,&quot;CAMERA&quot;:&quot;deny&quot;}</string>
+    <string name="name.pilgr.appdialer.pro">{&quot;READ_CONTACTS&quot;:&quot;default&quot;}</string>
+</map>
+
+## systemui deaktiviert?
+0
+## --user/a;b gespeichert?
+files/stealth_com.ebay.kleinanzeigen/original.apk
+exit=0
