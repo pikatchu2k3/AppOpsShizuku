@@ -1,0 +1,6 @@
+Fehlerbehebungen nach Gerätetest (Android 14).
+- Nicht angeforderte Berechtigungen zeigen „nicht angefordert“ statt „Exit 255“
+- App-Liste lädt nach Shizuku-Reconnect neu
+- WLAN-Regeln im full-Flavor funktionieren wieder (fehlendes ACCESS_WIFI_STATE)
+- Offizieller Gradle-8.14-Wrapper (Prüfsumme stimmt)
+- Neu: Anzeige des Auto-Revoke-Status; Option „bei laufendem Vordergrunddienst nicht entziehen“
