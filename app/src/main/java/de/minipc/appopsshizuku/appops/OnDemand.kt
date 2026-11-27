@@ -89,6 +89,24 @@ object OnDemand {
             ?.let { it == EVENT_RESUMED }
 
     /**
+     * Ist die App im Vordergrund? JE ACTIVITY ausgewertet (aeltestes Ereignis zuerst, Paar = Klasse to Typ):
+     * vorne, wenn bei irgendeiner Activity das letzte RESUMED/PAUSED/STOPPED ein RESUMED ist.
+     *
+     * Wichtig: Beim Wechsel zwischen zwei Bildschirmen DERSELBEN App meldet Android
+     * A PAUSED -> B RESUMED -> A STOPPED. Das letzte Ereignis der App ist dann STOPPED, obwohl B vorne ist.
+     * [foregroundFromEvents] hielt die App deshalb fuer verlassen, und "Nur bei Bedarf" sperrte sie nach
+     * Ablauf der Frist mitten in der Benutzung. null = keine Aussage (keine Ereignisse).
+     */
+    fun foregroundFromActivityEvents(events: List<Pair<String?, Int>>): Boolean? {
+        val last = HashMap<String, Int>()
+        for ((cls, type) in events) {
+            if (type == EVENT_RESUMED || type == EVENT_PAUSED || type == EVENT_STOPPED) last[cls.orEmpty()] = type
+        }
+        if (last.isEmpty()) return null
+        return last.values.any { it == EVENT_RESUMED }
+    }
+
+    /**
      * Fallback ohne Nutzungszugriff: `dumpsys activity activities`. Ausgewertet werden die Zeilen
      * mit der obersten aktiven Activity (Bezeichnung je nach Android-Version verschieden).
      * null = keine solche Zeile gefunden (keine Aussage).
