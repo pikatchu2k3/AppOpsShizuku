@@ -303,6 +303,7 @@
     <string name="stealth_tracker_scanning">Blocos detectados neste app: pesquisando…</string>
     <string name="stealth_tracker_title">Desativar rastreadores (beta)</string>
     <string name="stealth_vault_calc">Ocultar como calculadora (cofre)</string>
+    <string name="stealth_vault_companion_missing">O aplicativo complementar do cofre (%1$s) não está instalado. Instale-o separadamente - sem ele o disfarce de calculadora não funciona.</string>
     <string name="stealth_vault_no_launcher">Cofre: atividade de entrada do app de destino não encontrada</string>
     <string name="stealth_vault_pin_hint">PIN do cofre (dígitos, 4–10; vazio = 12345)</string>
     <string name="stealth_vault_pin_invalid">O PIN deve conter de 4 a 10 dígitos</string>

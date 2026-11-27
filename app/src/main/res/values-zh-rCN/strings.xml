@@ -303,6 +303,7 @@
     <string name="stealth_tracker_scanning">在此应用中检测到的构建模块：正在搜索…</string>
     <string name="stealth_tracker_title">禁用追踪器（测试版）</string>
     <string name="stealth_vault_calc">伪装为计算器（保险库）</string>
+    <string name="stealth_vault_companion_missing">未安装保险库配套应用（%1$s）。请单独安装——没有它，计算器伪装无法工作。</string>
     <string name="stealth_vault_no_launcher">保险库：未找到目标应用的启动器 Activity</string>
     <string name="stealth_vault_pin_hint">保险库 PIN（数字，4–10 位；留空 = 12345）</string>
     <string name="stealth_vault_pin_invalid">PIN 必须为 4–10 位数字</string>

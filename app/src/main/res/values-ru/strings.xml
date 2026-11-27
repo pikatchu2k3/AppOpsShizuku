@@ -303,6 +303,7 @@
     <string name="stealth_tracker_scanning">Обнаруженные блоки в этом приложении: поиск …</string>
     <string name="stealth_tracker_title">Отключить трекеры (бета)</string>
     <string name="stealth_vault_calc">Скрыть под калькулятор (хранилище)</string>
+    <string name="stealth_vault_companion_missing">Приложение-компаньон хранилища (%1$s) не установлено. Установите его отдельно - без него маскировка под калькулятор не работает.</string>
     <string name="stealth_vault_no_launcher">Хранилище: стартовая активность целевого приложения не найдена</string>
     <string name="stealth_vault_pin_hint">PIN хранилища (цифры, 4–10; пусто = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN должен содержать 4–10 цифр</string>

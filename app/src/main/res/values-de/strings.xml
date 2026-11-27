@@ -127,6 +127,7 @@
     <string name="stealth_secure_snapshot">Inhalt im Verlauf schwärzen (Inkognito, wie Banking-Apps)</string>
     <string name="stealth_require_vpn">Nur mit aktivem VPN ausführbar (VPN-Pflicht)</string>
     <string name="stealth_vault_calc">Als Taschenrechner verstecken (Vault)</string>
+    <string name="stealth_vault_companion_missing">Die Vault-Begleit-App (%1$s) ist nicht installiert. Bitte separat installieren - ohne sie funktioniert die Taschenrechner-Tarnung nicht.</string>
     <string name="stealth_vault_pin_hint">Vault-PIN (Ziffern, 4–10; leer = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN muss 4–10 Ziffern enthalten</string>
     <string name="stealth_vault_no_launcher">Vault: Launcher-Activity der Ziel-App nicht gefunden</string>

@@ -305,6 +305,7 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="stealth_tracker_scanning">Bloques detectados en esta app: buscando …</string>
     <string name="stealth_tracker_title">Desactivar rastreadores (beta)</string>
     <string name="stealth_vault_calc">Ocultar como calculadora (caja fuerte)</string>
+    <string name="stealth_vault_companion_missing">La aplicación complementaria de la caja fuerte (%1$s) no está instalada. Instálala por separado: sin ella el disfraz de calculadora no funciona.</string>
     <string name="stealth_vault_no_launcher">Caja fuerte: no se encontró la actividad de lanzamiento de la app de destino</string>
     <string name="stealth_vault_pin_hint">PIN de la caja fuerte (dígitos, 4–10; vacío = 12345)</string>
     <string name="stealth_vault_pin_invalid">El PIN debe tener entre 4 y 10 dígitos</string>

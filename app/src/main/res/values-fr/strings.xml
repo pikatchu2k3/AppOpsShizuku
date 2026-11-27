@@ -303,6 +303,7 @@
     <string name="stealth_tracker_scanning">Blocs détectés dans cette application : recherche…</string>
     <string name="stealth_tracker_title">Désactiver les traqueurs (bêta)</string>
     <string name="stealth_vault_calc">Masquer en calculatrice (coffre)</string>
+    <string name="stealth_vault_companion_missing">L\'application compagnon du coffre (%1$s) n\'est pas installée. Installez-la séparément - sans elle, le camouflage en calculatrice ne fonctionne pas.</string>
     <string name="stealth_vault_no_launcher">Coffre : activité de lancement de l’application cible introuvable</string>
     <string name="stealth_vault_pin_hint">Code PIN du coffre (chiffres, 4–10 ; vide = 12345)</string>
     <string name="stealth_vault_pin_invalid">Le PIN doit contenir 4 à 10 chiffres</string>

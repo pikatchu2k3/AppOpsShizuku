@@ -303,6 +303,7 @@
     <string name="stealth_tracker_scanning">इस ऐप में पहचाने गए बिल्डिंग ब्लॉक: खोज जारी है …</string>
     <string name="stealth_tracker_title">ट्रैकर बंद करें (बीटा)</string>
     <string name="stealth_vault_calc">कैलकुलेटर (वॉल्ट) के रूप में छिपाएँ</string>
+    <string name="stealth_vault_companion_missing">वॉल्ट सहायक ऐप (%1$s) इंस्टॉल नहीं है। इसे अलग से इंस्टॉल करें - इसके बिना कैलकुलेटर आवरण काम नहीं करता।</string>
     <string name="stealth_vault_no_launcher">वॉल्ट: लक्ष्य ऐप का लॉन्चर activity नहीं मिली</string>
     <string name="stealth_vault_pin_hint">वॉल्ट PIN (अंक, 4–10; खाली = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN में 4–10 अंक होने चाहिए</string>

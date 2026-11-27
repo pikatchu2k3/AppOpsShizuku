@@ -621,6 +621,7 @@
     <string name="stealth_tracker_scanning">Detected building blocks in this app: searching …</string>
     <string name="stealth_tracker_title">Disable trackers (beta)</string>
     <string name="stealth_vault_calc">Hide as calculator (vault)</string>
+    <string name="stealth_vault_companion_missing">The vault companion app (%1$s) is not installed. Install it separately - without it the calculator cover does not work.</string>
     <string name="stealth_vault_no_launcher">Vault: launcher activity of target app not found</string>
     <string name="stealth_vault_pin_hint">Vault PIN (digits, 4–10; empty = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN must contain 4–10 digits</string>

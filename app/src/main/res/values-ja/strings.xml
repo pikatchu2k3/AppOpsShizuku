@@ -303,6 +303,7 @@
     <string name="stealth_tracker_scanning">このアプリで検出されたビルディングブロック: 検索中 …</string>
     <string name="stealth_tracker_title">トラッカーを無効化(ベータ)</string>
     <string name="stealth_vault_calc">電卓として隠す(ボールト)</string>
+    <string name="stealth_vault_companion_missing">金庫の補助アプリ（%1$s）がインストールされていません。別途インストールしてください。なければ電卓カモフラージュは動作しません。</string>
     <string name="stealth_vault_no_launcher">ボールト: 対象アプリのランチャーアクティビティが見つかりません</string>
     <string name="stealth_vault_pin_hint">ボールトの PIN(数字、4〜10桁、空欄 = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN は 4〜10 桁の数字で入力してください</string>
