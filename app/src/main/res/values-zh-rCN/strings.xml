@@ -811,4 +811,9 @@
     <string name="errlog_notif_text">错误日志新增 %1$d 条 · %2$s</string>
     <string name="errlog_action_share">分享</string>
     <string name="errlog_action_save">保存</string>
+    <string name="wiu_keep_fgs_check">前台服务运行时不撤销</string>
+    <string name="wiu_keep_fgs_hint">适用于“仅使用期间”：正在运行的前台服务（如音乐、导航）保留其权限，因为撤销会结束应用。服务停止后撤销。默认：关闭。</string>
+    <string name="auto_revoke_active">自动撤销未使用的权限：已启用（默认）</string>
+    <string name="auto_revoke_exempt">自动撤销未使用的权限：应用已被排除（ignore），并非被阻止</string>
+    <string name="auto_revoke_unsupported">自动撤销未使用的权限：此设备不可用</string>
 </resources>

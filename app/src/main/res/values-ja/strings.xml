@@ -811,4 +811,9 @@
     <string name="errlog_notif_text">エラーログの新しい記録: %1$d 件 · %2$s</string>
     <string name="errlog_action_share">共有</string>
     <string name="errlog_action_save">保存</string>
+    <string name="wiu_keep_fgs_check">フォアグラウンドサービス実行中は取り消さない</string>
+    <string name="wiu_keep_fgs_hint">「使用中のみ」に適用：実行中のフォアグラウンドサービス（音楽、ナビなど）は権限を保持します。取り消すとアプリが終了するためです。サービス終了後に取り消されます。既定：オフ。</string>
+    <string name="auto_revoke_active">未使用の権限の自動取り消し：有効（既定）</string>
+    <string name="auto_revoke_exempt">未使用の権限の自動取り消し：アプリは除外（ignore）、ブロックではありません</string>
+    <string name="auto_revoke_unsupported">未使用の権限の自動取り消し：このデバイスでは利用できません</string>
 </resources>

@@ -816,4 +816,9 @@ La app parcheada se firma con nuestra propia clave, no con la del fabricante ni 
     <string name="errlog_notif_text">Nuevas entradas en el registro de errores: %1$d · %2$s</string>
     <string name="errlog_action_share">Compartir</string>
     <string name="errlog_action_save">Guardar</string>
+    <string name="wiu_keep_fgs_check">No revocar mientras haya un servicio en primer plano</string>
+    <string name="wiu_keep_fgs_hint">Se aplica a «solo durante el uso»: un servicio en primer plano activo (música, navegación) conserva sus permisos, porque revocar cerraría la app. Se revoca al terminar el servicio. Predeterminado: desactivado.</string>
+    <string name="auto_revoke_active">Revocación automática de permisos sin uso: activa (predeterminado)</string>
+    <string name="auto_revoke_exempt">Revocación automática de permisos sin uso: la app está exenta (ignore), no bloqueada</string>
+    <string name="auto_revoke_unsupported">Revocación automática de permisos sin uso: no disponible en este dispositivo</string>
 </resources>

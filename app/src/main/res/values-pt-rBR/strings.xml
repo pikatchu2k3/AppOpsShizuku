@@ -814,4 +814,9 @@
     <string name="errlog_notif_text">Novas entradas no registro de erros: %1$d · %2$s</string>
     <string name="errlog_action_share">Compartilhar</string>
     <string name="errlog_action_save">Salvar</string>
+    <string name="wiu_keep_fgs_check">Não revogar enquanto houver serviço em primeiro plano</string>
+    <string name="wiu_keep_fgs_hint">Vale para «somente durante o uso»: um serviço em primeiro plano ativo (música, navegação) mantém as permissões, pois revogar encerraria o app. Revogado quando o serviço termina. Padrão: desligado.</string>
+    <string name="auto_revoke_active">Revogação automática de permissões não usadas: ativa (padrão)</string>
+    <string name="auto_revoke_exempt">Revogação automática de permissões não usadas: app isento (ignore), não bloqueado</string>
+    <string name="auto_revoke_unsupported">Revogação automática de permissões não usadas: indisponível neste dispositivo</string>
 </resources>

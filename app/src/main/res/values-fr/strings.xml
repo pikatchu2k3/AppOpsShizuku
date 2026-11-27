@@ -814,4 +814,9 @@
     <string name="errlog_notif_text">Nouvelles entrées du journal des erreurs : %1$d · %2$s</string>
     <string name="errlog_action_share">Partager</string>
     <string name="errlog_action_save">Enregistrer</string>
+    <string name="wiu_keep_fgs_check">Ne pas révoquer tant qu’un service de premier plan est actif</string>
+    <string name="wiu_keep_fgs_hint">S’applique à « seulement pendant l’utilisation » : un service de premier plan actif (musique, navigation) garde ses autorisations, car la révocation fermerait l’app. Révoqué à l’arrêt du service. Par défaut : désactivé.</string>
+    <string name="auto_revoke_active">Révocation auto des autorisations inutilisées : active (par défaut)</string>
+    <string name="auto_revoke_exempt">Révocation auto des autorisations inutilisées : l’app est exclue (ignore) – pas bloquée</string>
+    <string name="auto_revoke_unsupported">Révocation auto des autorisations inutilisées : indisponible sur cet appareil</string>
 </resources>

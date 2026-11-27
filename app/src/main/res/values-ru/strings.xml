@@ -820,4 +820,9 @@
     <string name="errlog_notif_text">Новых записей в журнале ошибок: %1$d · %2$s</string>
     <string name="errlog_action_share">Поделиться</string>
     <string name="errlog_action_save">Сохранить</string>
+    <string name="wiu_keep_fgs_check">Не отзывать, пока работает служба переднего плана</string>
+    <string name="wiu_keep_fgs_hint">Относится к «только во время использования»: работающая служба переднего плана (музыка, навигация) сохраняет разрешения, так как отзыв завершил бы приложение. Отзыв — после остановки службы. По умолчанию: выкл.</string>
+    <string name="auto_revoke_active">Автоотзыв неиспользуемых разрешений: включён (по умолчанию)</string>
+    <string name="auto_revoke_exempt">Автоотзыв неиспользуемых разрешений: приложение исключено (ignore), не заблокировано</string>
+    <string name="auto_revoke_unsupported">Автоотзыв неиспользуемых разрешений: недоступен на этом устройстве</string>
 </resources>

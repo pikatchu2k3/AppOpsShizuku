@@ -814,4 +814,9 @@
     <string name="errlog_notif_text">त्रुटि लॉग में नई प्रविष्टियाँ: %1$d · %2$s</string>
     <string name="errlog_action_share">शेयर करें</string>
     <string name="errlog_action_save">सहेजें</string>
+    <string name="wiu_keep_fgs_check">फ़ोरग्राउंड सर्विस चलने पर रद्द न करें</string>
+    <string name="wiu_keep_fgs_hint">“केवल उपयोग के दौरान” पर लागू: चल रही फ़ोरग्राउंड सर्विस (संगीत, नेविगेशन) अपनी अनुमतियाँ रखती है, क्योंकि रद्द करने से ऐप बंद हो जाएगा। सर्विस रुकने पर रद्द होगा। डिफ़ॉल्ट: बंद।</string>
+    <string name="auto_revoke_active">अप्रयुक्त अनुमतियों का ऑटो-रद्दीकरण: सक्रिय (डिफ़ॉल्ट)</string>
+    <string name="auto_revoke_exempt">अप्रयुक्त अनुमतियों का ऑटो-रद्दीकरण: ऐप बाहर रखा गया (ignore), ब्लॉक नहीं</string>
+    <string name="auto_revoke_unsupported">अप्रयुक्त अनुमतियों का ऑटो-रद्दीकरण: इस डिवाइस पर उपलब्ध नहीं</string>
 </resources>
