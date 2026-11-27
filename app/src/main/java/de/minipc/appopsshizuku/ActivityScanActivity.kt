@@ -24,6 +24,8 @@ import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Aktivitaet: welche Apps wecken das Geraet (dumpsys alarm), planen Jobs (jobscheduler) oder fragen
@@ -32,8 +34,8 @@ import java.util.concurrent.Executors
  */
 class ActivityScanActivity : AppCompatActivity() {
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private lateinit var backend: ShellBackend
     private val shizukuOn: Boolean get() = backend !is NoopBackend
 

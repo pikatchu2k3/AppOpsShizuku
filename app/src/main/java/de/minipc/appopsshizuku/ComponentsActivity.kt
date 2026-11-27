@@ -52,6 +52,8 @@ import de.minipc.appopsshizuku.ui.GuardedSwitch
 import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Stealth-/Komponenten-Steuerung einer App via pm disable-user (Shizuku/Shell):
@@ -77,8 +79,8 @@ class ComponentsActivity : AppCompatActivity() {
     private lateinit var disableSw: GuardedSwitch
     private lateinit var freezeSw: GuardedSwitch
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
 
     // Fortschrittsdialog + Ergebnis-Handling (Patch laeuft im StealthPatchService)
     private var progressDialog: AlertDialog? = null

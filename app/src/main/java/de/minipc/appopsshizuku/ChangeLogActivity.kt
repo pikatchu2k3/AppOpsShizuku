@@ -31,6 +31,8 @@ import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Zeigt das gemeinsame Aenderungsprotokoll. Op- und Netz-Eintraege lassen sich einzeln rueckgaengig
@@ -38,8 +40,8 @@ import java.util.concurrent.Executors
  */
 class ChangeLogActivity : AppCompatActivity() {
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private lateinit var backend: ShellBackend
     private var entries: List<ChangeLog.Entry> = emptyList()
     private val adapter = Adapter()

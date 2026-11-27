@@ -32,6 +32,8 @@ import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.ui.AppOpsAdapter
 import de.minipc.appopsshizuku.ui.OpsListItem
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Reiter "Berechtigungen" der App-Detailseite (frueher AppOpsActivity):
@@ -85,8 +87,8 @@ class PermissionsFragment : Fragment() {
         }
     }
 
-    private val executor = Executors.newSingleThreadExecutor()
-    private val handler = Handler(Looper.getMainLooper())
+    private val executor = lifecycleExecutor()
+    private val handler = lifecycleHandler()
     private lateinit var appContext: Context
     private lateinit var backend: de.minipc.appopsshizuku.shizuku.ShellBackend
     private lateinit var controller: AppOpsController

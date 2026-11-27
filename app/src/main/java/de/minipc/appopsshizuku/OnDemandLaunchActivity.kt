@@ -17,6 +17,8 @@ import de.minipc.appopsshizuku.appops.OnDemandExecutor
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import rikka.shizuku.Shizuku
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Ziel der Launcher-Verknuepfung von "Nur bei Bedarf": App freigeben, starten, beim Dienst als
@@ -46,8 +48,8 @@ class OnDemandLaunchActivity : AppCompatActivity() {
                 .putExtra(EXTRA_PACKAGE, packageName)
     }
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private var binderListener: Shizuku.OnBinderReceivedListener? = null
     private var started = false
 

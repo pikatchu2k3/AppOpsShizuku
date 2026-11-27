@@ -61,6 +61,8 @@ import de.minipc.appopsshizuku.ui.ComponentListItem
 import de.minipc.appopsshizuku.ui.ComponentsAdapter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Reiter "Verhalten" der App-Detailseite.
@@ -111,7 +113,7 @@ class BehaviorFragment : Fragment() {
     private lateinit var freezeSw: GuardedSwitch
     private lateinit var batterySw: GuardedSwitch
     private lateinit var executor: ExecutorService
-    private val handler = Handler(Looper.getMainLooper())
+    private val handler = lifecycleHandler()
 
     private lateinit var componentsAdapter: ComponentsAdapter
 
@@ -138,7 +140,7 @@ class BehaviorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         root = view
         packageName = requireArguments().getString(ARG_PACKAGE).orEmpty()
-        executor = Executors.newSingleThreadExecutor()
+        executor = viewLifecycleOwner.lifecycleExecutor()
 
         setupDisableSwitch(view)
         setupFreezeSwitch(view)

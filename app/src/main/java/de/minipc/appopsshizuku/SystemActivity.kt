@@ -40,6 +40,8 @@ import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import de.minipc.appopsshizuku.ui.OpLabels
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Seite "Systemweit": Lockdown-Szene (auch als Schnellstart-Kachel), Private DNS und die Uebersicht
@@ -60,8 +62,8 @@ class SystemActivity : AppCompatActivity() {
         const val ID_PRESET_BASE = 100
     }
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private lateinit var backend: ShellBackend
     private lateinit var lockdown: LockdownStore
     private var dnsState: PrivateDns.State? = null

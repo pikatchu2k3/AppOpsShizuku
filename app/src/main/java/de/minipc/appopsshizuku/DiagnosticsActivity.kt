@@ -32,6 +32,8 @@ import de.minipc.appopsshizuku.appops.parseChainEnabled
 import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Diagnose: prueft, welche Hebel auf DIESEM Geraet funktionieren. Jede Probe ist harmlos (nur lesen,
@@ -40,8 +42,8 @@ import java.util.concurrent.Executors
  */
 class DiagnosticsActivity : AppCompatActivity() {
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private var lastReport: String? = null
 
     /** Speichern-Dialog fuer den Fehlerbericht (Textdatei, Ort waehlt der Nutzer). */

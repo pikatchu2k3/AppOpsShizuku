@@ -46,6 +46,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Hauptansicht: alle Apps mit Launcher-Icon.
@@ -81,8 +83,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var manager: ShizukuManager
     private lateinit var profileBackup: ProfileBackup
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newFixedThreadPool(4)
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor(4)
 
     /** Speichern-Dialog fuer die Sicherung: der Nutzer waehlt den Ort (z. B. Downloads). */
     private val exportPicker =
@@ -251,7 +253,7 @@ class MainActivity : AppCompatActivity() {
                                 else getString(R.string.remove_user_failed, r.reason ?: "?"),
                                 Toast.LENGTH_LONG
                             ).show()
-                            loadApps()
+                            loadApps(force = true)
                         }
                     }
                     return@setPositiveButton
@@ -274,7 +276,7 @@ class MainActivity : AppCompatActivity() {
                             else getString(R.string.remove_user_failed, r.reason ?: "?"),
                             Toast.LENGTH_LONG
                         ).show()
-                        loadApps()
+                        loadApps(force = true)
                     }
                 }
             }
@@ -359,7 +361,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 in 100..199 -> { sortMode = item.itemId - 100; applyFilterAndSort() }
                 in 200..299 -> setFilter(item.itemId - 200)
-                300 -> loadApps()
+                300 -> loadApps(force = true)
             }
             true
         }
@@ -503,7 +505,7 @@ class MainActivity : AppCompatActivity() {
                     executor.execute {
                         val ok = DeviceOwnerManager.release(this)
                         handler.post {
-                            renderOwner(); loadApps()
+                            renderOwner(); loadApps(force = true)
                             Toast.makeText(this, if (ok) R.string.owner_released else R.string.standing_failed, Toast.LENGTH_LONG).show()
                         }
                     }
@@ -577,8 +579,94 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadApps() {
+    /**
+     * Liste neu laden. Die teure Basisliste (App-Namen, Icons, Installationszeiten, `pm list packages -d`) wird nur
+     * neu gebaut, wenn sich etwas geaendert hat - Paket-Ereignis, Shizuku-Zustand oder eine eigene Ablage
+     * (entfernt/versteckt/getarnt) -, die Status-Symbole kommen dagegen bei JEDEM Aufruf frisch aus den Speichern
+     * (sie aendern sich in den Detailseiten). Eine Generationsnummer verwirft veraltete Ergebnisse.
+     * [force] erzwingt den Neuaufbau (z. B. nach Wiederherstellen oder Geraeteinhaber-Setup).
+     */
+    private fun loadApps(force: Boolean = false) {
+        val gen = loadGeneration.incrementAndGet()
+        if (force) appsDirty.set(true)
         executor.execute {
+            val signature = baseSignature()
+            if (signature != baseSignatureBuilt) appsDirty.set(true)
+            val needBase = appsDirty.getAndSet(false) || baseApps == null
+            val base = if (needBase) buildBaseApps().also {
+                baseApps = it
+                baseSignatureBuilt = signature
+            } else baseApps!!
+
+            // Status-Symbole aus den eigenen Speichern (kein Shell-Aufruf)
+            val withBadges = base.map {
+                it.copy(
+                    badges = badgeText(it.packageName),
+                    cardColor = cardColorCache.getOrPut(it.packageName) {
+                        de.minipc.appopsshizuku.ui.CardColors.cardStart(de.minipc.appopsshizuku.ui.IconColor.of(it.icon))
+                    }
+                )
+            }
+
+            handler.post {
+                // Nur das neueste Ergebnis zaehlt; Atomare Zuweisung: keine Mutation, kein Datenrennen
+                // mit scanBlockedState()/applyFilterAndSort()
+                if (gen != loadGeneration.get()) return@post
+                allApps = withBadges
+                applyFilterAndSort()
+            }
+        }
+    }
+
+    /** Zuletzt gebaute Basisliste (ohne Status-Symbole) und der Stand der Ablagen, zu dem sie gehoert. */
+    @Volatile private var baseApps: List<AppItem>? = null
+    @Volatile private var baseSignatureBuilt: Int? = null
+    private val appsDirty = java.util.concurrent.atomic.AtomicBoolean(true)
+    private val loadGeneration = java.util.concurrent.atomic.AtomicInteger()
+
+    /** Aendert sich, wenn eine eigene Ablage die Liste beeinflusst oder Shizuku (Liste der deaktivierten Apps) wechselt. */
+    private fun baseSignature(): Int = listOf(
+        UserRemovalManager.removedApps(this).map { it.packageName }.sorted(),
+        de.minipc.appopsshizuku.appops.HiddenStore(this).all().sorted(),
+        getSharedPreferences("stealth", MODE_PRIVATE).all.filterValues { it == true }.keys.sorted(),
+        manager.isConnected && manager.hasPermission
+    ).hashCode()
+
+    /** Systemereignis "Paket installiert/entfernt/geaendert" (auch deaktiviert/aktiviert): Basisliste veraltet. */
+    private val packageReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: android.content.Context, intent: Intent) {
+            appsDirty.set(true)
+        }
+    }
+    private var packageReceiverRegistered = false
+
+    override fun onStart() {
+        super.onStart()
+        if (!packageReceiverRegistered) {
+            val filter = android.content.IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addAction(Intent.ACTION_PACKAGE_CHANGED)
+                addAction(Intent.ACTION_PACKAGE_REPLACED)
+                addDataScheme("package")
+            }
+            androidx.core.content.ContextCompat.registerReceiver(
+                this, packageReceiver, filter, androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            packageReceiverRegistered = true
+        }
+    }
+
+    override fun onStop() {
+        if (packageReceiverRegistered) {
+            runCatching { unregisterReceiver(packageReceiver) }
+            packageReceiverRegistered = false
+        }
+        super.onStop()
+    }
+
+    private fun buildBaseApps(): List<AppItem> {
+        run {
             val pm = packageManager
             val resolved = pm.queryIntentActivities(
                 Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0
@@ -679,22 +767,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            // Status-Symbole aus den eigenen Speichern (kein Shell-Aufruf)
-            val withBadges = loaded.map {
-                it.copy(
-                    badges = badgeText(it.packageName),
-                    cardColor = cardColorCache.getOrPut(it.packageName) {
-                        de.minipc.appopsshizuku.ui.CardColors.cardStart(de.minipc.appopsshizuku.ui.IconColor.of(it.icon))
-                    }
-                )
-            }
-
-            handler.post {
-                // Atomare Zuweisung: keine Mutation, kein Datenrennen mit
-                // scanBlockedState()/applyFilterAndSort()
-                allApps = withBadges
-                applyFilterAndSort()
-            }
+            return loaded
         }
     }
 
