@@ -197,7 +197,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 .show()
         }
-        manager = ShizukuManager(onStateChanged = { runOnUiThread { updateStatus() } })
+        // Die Liste haengt vom Shizuku-Zustand ab (deaktivierte Apps): loadApps() baut nur neu, wenn sich die Signatur aendert
+        manager = ShizukuManager(onStateChanged = { runOnUiThread { updateStatus(); loadApps() } })
         manager.refresh()
 
         findViewById<Button>(R.id.connectButton).setOnClickListener {

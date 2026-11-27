@@ -1,0 +1,14 @@
+(c) Shizuku stoppen/starten; Server per 'kill shizuku_server', Neustart per libshizuku.so (root) - start.sh existiert auf dem Geraet nicht
+Shizuku AUS (pid: ''), App wird jetzt deaktiviert
+Package de.minipc.calcyou new state: disabled-user
+3) Shizuku AUS, App ist deaktiviert: KEIN EINTRAG || atenschutz-Steuerung App suchen... | Q calcyoul | Shiz | Banner: NICHT VERBUNDEN
+Shizuku wird gestartet
+info: shizuku_server pid is 9942
+info: shizuku_starter exit with 0
+4) Shizuku AN (App im Vordergrund geblieben): KEIN EINTRAG || atenschutz-Steuerung App suchen... | Q calcyoul | F ü  | Banner: verbunden
+5) nach erneutem Oeffnen: l | Rechner (deaktiviert) & Unverändert de.minipc.calcyou || atenschut | Banner: verbunden
+== nach Fix (onStateChanged laedt Liste neu) ==
+Server: ''
+A) Shizuku AUS: KEIN EINTRAG || atenschutz-Steuerung App suchen... | Q calcy | Banner: NICHT VERBUNDEN
+info: shizuku_starter exit with 0
+B) Shizuku AN, App NICHT neu geoeffnet: l | Rechner (deaktiviert) & Unverändert de.minipc.calcyou || : Datensc | Banner: verbunden
