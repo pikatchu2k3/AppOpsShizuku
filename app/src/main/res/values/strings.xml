@@ -266,6 +266,7 @@
     <string name="menu_import_profiles">Import profiles</string>
     <string name="menu_net_usage">Network usage</string>
     <string name="menu_quarantine">Quarantine for new apps</string>
+    <string name="menu_star_animation">Animated background</string>
     <string name="menu_system">System-wide</string>
     <string name="menu_work_profile">Work profile</string>
     <string name="net_bg_data">Block background data</string>
@@ -536,6 +537,7 @@
     <string name="settings_backup_title">Backup</string>
     <string name="settings_dynamic_hint">Use the system colours (Material You) for buttons and cards inside the screens.</string>
     <string name="settings_quarantine_hint">Newly installed apps get no background data, no clipboard and no background running until you release them.</string>
+    <string name="settings_star_animation_hint">Stars twinkle slowly and a shooting star passes now and then. It only runs while the screen is visible and stops by itself in battery saver or when system animations are off.</string>
     <string name="shizuku_dialog_hint">Permission dialog not visible? Authorize this app in the Shizuku app under "Authorized apps".</string>
     <string name="shizuku_hint_pill">Shizuku is not connected – nothing can be changed. Tap to open the settings.</string>
     <string name="sort_by">Sort by:</string>

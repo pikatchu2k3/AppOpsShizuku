@@ -137,6 +137,7 @@
     <string name="menu_dynamic_color_unavailable">系统颜色（仅 Android 12 及以上可用）</string>
     <string name="menu_export_profiles">导出配置</string>
     <string name="menu_import_profiles">导入配置</string>
+    <string name="menu_star_animation">动态背景</string>
     <string name="net_bg_data">禁止后台数据</string>
     <string name="net_bg_data_hint">应用仅可在您使用时加载数据。推荐。</string>
     <string name="net_bg_restrict">在后台限制</string>
@@ -230,6 +231,7 @@
     <string name="screen_report_no_shizuku">%1$s：无法执行 - Shizuku 未连接，未停止任何应用</string>
     <string name="screen_report_some_failed">%1$s：%3$d 个中有 %2$d 个未生效 - %4$s</string>
     <string name="search_hint">搜索应用…</string>
+    <string name="settings_star_animation_hint">星星缓慢闪烁，偶尔会有流星划过。仅在屏幕可见时运行，并会在省电模式或系统动画关闭时自动停止。</string>
     <string name="shizuku_dialog_hint">没有看到权限对话框？请在 Shizuku 应用的“已授权的应用”中授权本应用。</string>
     <string name="sort_by">排序方式：</string>
     <string name="sort_hint">排序顺序</string>

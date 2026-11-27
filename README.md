@@ -191,7 +191,7 @@ The repository contains **no prebuilt binaries** (only the standard Gradle wrapp
 
 ## Design and colours
 
-The app uses a **complete Material 3 palette** derived systematically from a calm petrol/teal seed (light and dark), with red reserved for real errors. *Settings* → **System colors (Material You)**: on (default) = colours from the system wallpaper (Android 12+), off = the app's own petrol palette; the choice is remembered. On Android 11 and older the entry is greyed out. Measured contrast: worst text pair 6.49:1 (light) / 5.46:1 (dark) — target was 4.5:1. The app list and tools use gradient cards on a star-field background; the card colour comes from each app icon and is darkened until white text has at least 4.5:1 contrast (covered by a unit test).
+The app uses a **complete Material 3 palette** derived systematically from a calm petrol/teal seed (light and dark), with red reserved for real errors. *Settings* → **System colors (Material You)**: on (default) = colours from the system wallpaper (Android 12+), off = the app's own petrol palette; the choice is remembered. On Android 11 and older the entry is greyed out. Measured contrast: worst text pair 6.49:1 (light) / 5.46:1 (dark) — target was 4.5:1. The app list and tools use gradient cards on an **animated** star-field background (twinkling stars, a very slow drift, an occasional shooting star; it runs only while the screen is visible, at about 30 frames per second, stops by itself in battery saver or when system animations are off, and can be switched off in *Settings* → *Animated background*); the card colour comes from each app icon and is darkened until white text has at least 4.5:1 contrast (covered by a unit test).
 
 ## Signature
 

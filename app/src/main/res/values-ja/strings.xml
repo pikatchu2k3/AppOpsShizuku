@@ -137,6 +137,7 @@
     <string name="menu_dynamic_color_unavailable">システムの色（Android 12 以降のみ）</string>
     <string name="menu_export_profiles">プロファイルをエクスポート</string>
     <string name="menu_import_profiles">プロファイルをインポート</string>
+    <string name="menu_star_animation">動く背景</string>
     <string name="net_bg_data">バックグラウンドのデータ通信をブロック</string>
     <string name="net_bg_data_hint">アプリは使用中のみデータを読み込める場合があります。推奨。</string>
     <string name="net_bg_restrict">バックグラウンドを制限</string>
@@ -230,6 +231,7 @@
     <string name="screen_report_no_shizuku">%1$s: 実行できません - Shizukuが接続されていないため、どのアプリも停止していません</string>
     <string name="screen_report_some_failed">%1$s: %3$d 件中 %2$d 件が反映されませんでした - %4$s</string>
     <string name="search_hint">アプリを検索…</string>
+    <string name="settings_star_animation_hint">星がゆっくりまたたき、ときどき流れ星が通ります。画面が表示されている間だけ動作し、バッテリーセーバー中やシステムのアニメーションがオフのときは自動で止まります。</string>
     <string name="shizuku_dialog_hint">許可ダイアログが表示されませんか？ Shizukuアプリの「許可されたアプリ」でこのアプリを許可してください。</string>
     <string name="sort_by">並び替え:</string>
     <string name="sort_hint">並び順</string>

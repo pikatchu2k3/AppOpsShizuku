@@ -137,6 +137,7 @@
     <string name="menu_dynamic_color_unavailable">Системные цвета (только с Android 12)</string>
     <string name="menu_export_profiles">Экспорт профилей</string>
     <string name="menu_import_profiles">Импорт профилей</string>
+    <string name="menu_star_animation">Анимированный фон</string>
     <string name="net_bg_data">Блокировать фоновые данные</string>
     <string name="net_bg_data_hint">Приложение может загружать данные только тогда, когда вы им пользуетесь. Рекомендуется.</string>
     <string name="net_bg_restrict">Ограничить в фоне</string>
@@ -230,6 +231,7 @@
     <string name="screen_report_no_shizuku">%1$s: невозможно - Shizuku не подключён, приложения не остановлены</string>
     <string name="screen_report_some_failed">%1$s: не применено %2$d из %3$d - %4$s</string>
     <string name="search_hint">Поиск приложений…</string>
+    <string name="settings_star_animation_hint">Звёзды медленно мерцают, время от времени пролетает падающая звезда. Работает только при видимом экране и сама останавливается в режиме энергосбережения или при отключённых системных анимациях.</string>
     <string name="shizuku_dialog_hint">Диалог разрешения не виден? Разрешите это приложение в приложении Shizuku, в разделе «Авторизованные приложения».</string>
     <string name="sort_by">Сортировать по:</string>
     <string name="sort_hint">Порядок сортировки</string>

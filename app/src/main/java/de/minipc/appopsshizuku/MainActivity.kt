@@ -473,6 +473,10 @@ class MainActivity : AppCompatActivity() {
             dynamic.isChecked = false
             dynamic.setText(R.string.menu_dynamic_color_unavailable)
         }
+        // Bewegter Sternenhimmel: wirkt sofort (die View hoert auf die Einstellung), kein Neustart noetig
+        val stars = findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.settingStarAnimation)
+        stars.isChecked = DesignSettings.isStarAnimationEnabled(this)
+        stars.setOnClickListener { DesignSettings.setStarAnimationEnabled(this, stars.isChecked) }
         findViewById<View>(R.id.settingExport).setOnClickListener {
             val day = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
             exportPicker.launch("appopsshizuku-backup-$day.json")
