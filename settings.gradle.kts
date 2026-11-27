@@ -14,4 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "AppOpsShizuku"
 include(":app")
-include(":spooftest")
+// spooftest ist nur ein Test-Fixture (nutzt Google Play Services fuer die Werbe-ID) und fehlt
+// im F-Droid-Build (dort per `rm:` entfernt) - das Modul daher nur einbinden, wenn es vorhanden ist.
+if (file("spooftest").isDirectory) include(":spooftest")

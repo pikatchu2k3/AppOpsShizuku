@@ -5,6 +5,31 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import de.minipc.appopsshizuku.ErrorLog
+import de.minipc.appopsshizuku.PackageSigner
+
+/**
+ * Wem darf die PIN des Vaults anvertraut werden? Ein Paketname oder eine Content-Provider-Authority allein
+ * beweisen nichts: ist die Begleit-App nicht installiert, kann eine fremde App die Authority belegen oder
+ * den Paketnamen annehmen und bekaeme dann PIN und Zielpaket. Deshalb wird beim ersten Mal der Signierer
+ * der Begleit-App gemerkt (Trust on first use) und danach verlangt.
+ */
+object VaultTrust {
+    enum class Verdict { TRUST, TRUST_AND_PIN, REJECT }
+
+    /**
+     * @param providerPackage Paket, dem die Authority gehoert (null = niemand)
+     * @param signer Fingerabdruck der installierten Begleit-App (null = nicht lesbar/nicht installiert)
+     * @param pinned beim ersten Vertrauen gemerkter Fingerabdruck (null = noch keiner)
+     */
+    fun decide(expectedPackage: String, providerPackage: String?, signer: String?, pinned: String?): Verdict = when {
+        providerPackage != expectedPackage -> Verdict.REJECT
+        signer == null -> Verdict.REJECT
+        pinned == null -> Verdict.TRUST_AND_PIN
+        pinned == signer -> Verdict.TRUST
+        else -> Verdict.REJECT
+    }
+}
 
 /**
  * Konfiguriert die CalcYou-Vault-App nach erfolgreichem Stealth-Patch.
@@ -36,6 +61,7 @@ object VaultIntegration {
         targetActivity: String,
         secretCode: String? = null
     ) {
+        if (!trusted(context)) return
         val extras = Bundle().apply {
             putString(KEY_PACKAGE, targetPackage)
             putString(KEY_CLASS, targetActivity)
@@ -67,6 +93,28 @@ object VaultIntegration {
             context.startActivity(intent)
         } catch (_: Throwable) {
             // VaultCalculator nicht installiert oder Activity nicht startbar.
+        }
+    }
+
+    /** Gehoert die Authority wirklich der (gemerkten) Begleit-App? Sonst geht weder PIN noch Ziel raus. */
+    private fun trusted(context: Context): Boolean {
+        val pm = context.packageManager
+        val provider = runCatching {
+            pm.resolveContentProvider(CONFIG_AUTHORITY.removePrefix("content://"), 0)?.packageName
+        }.getOrNull()
+        val signer = PackageSigner.fingerprint(pm, VAULT_PACKAGE)
+        val prefs = context.getSharedPreferences("vault_trust", Context.MODE_PRIVATE)
+        val pinned = prefs.getString("signer", null)
+        return when (VaultTrust.decide(VAULT_PACKAGE, provider, signer, pinned)) {
+            VaultTrust.Verdict.TRUST -> true
+            VaultTrust.Verdict.TRUST_AND_PIN -> {
+                prefs.edit().putString("signer", signer).apply()
+                true
+            }
+            VaultTrust.Verdict.REJECT -> {
+                ErrorLog.w("VaultIntegration", "Vault-Begleit-App nicht vertrauenswürdig (Paket/Signatur) - PIN nicht übergeben")
+                false
+            }
         }
     }
 }

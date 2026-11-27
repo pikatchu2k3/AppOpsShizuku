@@ -1,0 +1,21 @@
+App Ops Shizuku ist ein Datenschutz-Steuerpult für die <b>anderen</b> Apps auf deinem Handy. Es zeigt und beschränkt, was jede App darf - Kamera, Mikrofon, Standort, Kontakte, Zwischenablage, Dateien, Hintergrund, Netz - <b>ohne Root</b>, über <a href="https://shizuku.rikka.app/">Shizuku</a>.
+
+<b>Braucht Shizuku</b> (z. B. per Wireless-Debugging gestartet) und dessen Berechtigung für diese App. Ohne Shizuku zeigt die App nur an und ändert nichts.
+
+<b>Was es kann</b>
+• Berechtigungen je App: 49 Berechtigungen und App Ops in Gruppen - erlauben / zurücksetzen / blockieren, mit Zugriffsprotokoll (letzte Nutzung, abgewehrte Versuche) und Empfehlungen für Rechte, die eine App offenbar nicht braucht.
+• Nur während der Nutzung, nur bei Bedarf und ein Schnell-Lockdown, der allen Apps auf einmal Kamera und Mikrofon entzieht (auch als Schnelleinstellungs-Kachel).
+• Netz: Hintergrunddaten sperren oder eine App komplett offline nehmen, Verkehr je App sehen, privates DNS für das ganze Handy.
+• Automatik: Regeln nach Zeit (und WLAN in der Ausgabe „full“), Quarantäne für neu installierte Apps, Profil-Vorlagen.
+• Herausfinden, was Apps tun: wer das Gerät weckt, Jobs plant, Bedienungshilfen- oder Benachrichtigungszugriff hat.
+• Arbeitsprofil, Standby-Stufen, Akku-Ausnahmen, Apps einfrieren oder deaktivieren.
+• Optional, experimentell: Apps auf dem Gerät patchen (Tracker oder Berechtigungen entfernen, aus dem Verlauf ausblenden, parallele Klone).
+
+<b>Kontrolle, die du prüfen kannst</b>
+• Jede Änderung wird vom Gerät zurückgelesen; wirkt etwas nicht, sagt die App das.
+• Änderungsprotokoll mit „Rückgängig“; Sicherung als JSON-Datei, die du wählst. Beim Import siehst du, was in der Datei steht, bevor etwas angewendet wird.
+• Die App hat <b>keine Internet-Berechtigung</b> - nichts verlässt das Handy. Quelloffen (GPL-3.0).
+
+<b>Zwei Ausgaben:</b> „full“ (WLAN-Regeln, braucht Standort-Rechte, um den WLAN-Namen zu lesen) und „lite“ (gar keine Standort-Rechte).
+
+<b>Ehrliche Grenzen:</b> manche Berechtigungen lassen sich auf manchen Geräten nicht ändern; Hersteller können das Deaktivieren von Apps sperren; einzelne Komponenten fremder Apps lassen sich ab Android 15 zur Laufzeit nicht abschalten. Die App sagt es dir, statt Erfolg vorzutäuschen.

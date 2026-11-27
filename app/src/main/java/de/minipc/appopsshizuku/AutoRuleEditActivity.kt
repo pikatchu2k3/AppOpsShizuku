@@ -129,6 +129,11 @@ class AutoRuleEditActivity : AppCompatActivity() {
     }
 
     private fun updateSections() {
+        // Flavor "lite": keine WLAN-Regeln (kein Standort-Recht im Manifest) - die Option gar nicht anbieten
+        if (!BuildConfig.WIFI_RULES) {
+            findViewById<View>(R.id.triggerWifi).visibility = View.GONE
+            findViewById<RadioGroup>(R.id.triggerGroup).check(R.id.triggerTime)
+        }
         val time = findViewById<RadioGroup>(R.id.triggerGroup).checkedRadioButtonId == R.id.triggerTime
         findViewById<View>(R.id.timeSection).visibility = if (time) View.VISIBLE else View.GONE
         findViewById<View>(R.id.wifiSection).visibility = if (time) View.GONE else View.VISIBLE

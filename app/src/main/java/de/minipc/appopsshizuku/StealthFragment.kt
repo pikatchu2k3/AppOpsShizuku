@@ -42,6 +42,7 @@ import de.minipc.appopsshizuku.stealth.StealthPhase
 import de.minipc.appopsshizuku.stealth.StealthStealer
 import de.minipc.appopsshizuku.stealth.VaultIntegration
 import java.io.File
+import de.minipc.appopsshizuku.ui.lifecycleHandler
 
 /**
  * Reiter "Tarnung" der App-Detailseite (umgezogen aus ComponentsActivity):
@@ -65,7 +66,7 @@ class StealthFragment : Fragment() {
 
     private lateinit var packageName: String
     private lateinit var root: View
-    private val handler = Handler(Looper.getMainLooper())
+    private val handler = lifecycleHandler()
 
     private var backend: ShellBackend = NoopBackend()
 

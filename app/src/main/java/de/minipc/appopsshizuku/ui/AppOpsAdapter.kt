@@ -82,8 +82,10 @@ class AppOpsAdapter(
                 // und wird deshalb nicht als eigene Option angeboten. Ist der aktuelle
                 // Zustand trotzdem ignore (z.B. Permission nicht granted), bleibt er sichtbar.
                 // "in-use" = nur waehrend Nutzung (erteilt, solange die App vorne ist)
+                // "reset" = entziehen und "nicht mehr fragen" loesen (die App darf neu fragen). Frueher stand hier
+                // "default", das bei Berechtigungen aber ERTEILTE - ein irrefuehrendes "Standard".
                 val baseModes = if (item.op.permissionName != null) {
-                    listOf("default", "allow", "deny", de.minipc.appopsshizuku.appops.WhileInUse.MODE)
+                    listOf("reset", "allow", "deny", de.minipc.appopsshizuku.appops.WhileInUse.MODE)
                 } else {
                     listOf("default", "allow", "ignore", "deny")
                 }

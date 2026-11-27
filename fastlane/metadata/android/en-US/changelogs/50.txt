@@ -1,0 +1,8 @@
+Security and F-Droid release.
+- Imported backups are checked and previewed before anything is applied
+- "Reset" no longer grants; unknown modes do nothing
+- Signing key encrypted with the Android Keystore; no cloud backup
+- Faster: one query instead of ~30 when opening an app; app list cached
+- 11 more permissions / special accesses, 9 languages
+- New "lite" edition without location permissions
+- Builds from source: no bundled binaries

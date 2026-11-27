@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # Nur der offizielle Gradle-Wrapper darf im Repository liegen (F-Droid prueft das auch)
+      - uses: gradle/actions/wrapper-validation@v4
+
+      # JDK 17 wie beim F-Droid-Build; das Projekt zielt auf Java 17
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Unit-Tests (beide Flavors)
+        run: ./gradlew --no-daemon :app:testFullDebugUnitTest :app:testLiteDebugUnitTest
+
+      - name: Lint (beide Flavors)
+        run: ./gradlew --no-daemon :app:lintFullDebug :app:lintLiteDebug
+
+      - name: Release-APKs bauen (unsigniert, wie bei F-Droid)
+        run: ./gradlew --no-daemon :app:assembleRelease
+
+      - name: Keine vorkompilierten Binaerdateien im Quellbaum
+        run: |
+          set -eu
+          bad=$(git ls-files | grep -Ei '\.(apk|aab|jar|aar|so|dex)$' | grep -v '^gradle/wrapper/gradle-wrapper.jar$' || true)
+          if [ -n "$bad" ]; then echo "Binaerdateien gefunden:"; echo "$bad"; exit 1; fi
+
+      - name: Standort-Rechte nur im Flavor "full"
+        run: |
+          set -eu
+          AAPT=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          if "$AAPT" dump permissions app/build/outputs/apk/lite/release/app-lite-release-unsigned.apk | grep -q LOCATION; then
+            echo "Flavor lite enthaelt Standort-Rechte"; exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reports
+          path: |
+            app/build/reports/tests
+            app/build/reports/lint-results-*.html
+          if-no-files-found: ignore

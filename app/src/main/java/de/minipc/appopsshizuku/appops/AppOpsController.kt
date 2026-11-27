@@ -16,38 +16,59 @@ import de.minipc.appopsshizuku.shizuku.ShellResult
 class AppOpsController(private val backend: ShellBackend) {
 
     /**
-     * "default" = nicht blockiert (grant + appops default). Zugriff wieder normal.
+     * Setzt den Modus einer Op ([OpMode]-Token als String; ein unbekanntes Token fuehrt NICHTS aus).
      *
      * [userFixed]: Ein reines `pm revoke` laesst die App sofort wieder nach der Berechtigung fragen
      * (kein USER_FIXED-Flag). Beim Blockieren wird deshalb zusaetzlich `user-fixed` gesetzt - wie
      * "Nicht mehr fragen" im System-Dialog. Beim Erteilen und beim Zuruecksetzen ([userFixed] = false)
      * wird das Flag entfernt, damit "Standard" wieder "die App darf fragen" heisst.
      * Die Flag-Befehle sind Best-Effort (nicht jedes Android kennt `set-permission-flags`); massgeblich
-     * bleibt das Ergebnis von grant/revoke, das zurueckgegeben wird.
+     * bleibt das Ergebnis von grant/revoke, das zurueckgegeben wird. Ob das Flag wirklich steht, prueft
+     * [OpEffect.permissionFlags] gegen `dumpsys package`.
+     *
+     * [userId]: Android-Nutzer (Zweitnutzer, Arbeitsprofil); null = Standard der Shell (Nutzer 0).
      */
-    fun setMode(packageName: String, op: AppOp, mode: String, userFixed: Boolean = true): ShellResult {
+    fun setMode(
+        packageName: String, op: AppOp, mode: String, userFixed: Boolean = true, userId: Int? = null
+    ): ShellResult {
+        val m = OpMode.parse(mode)
+            ?: return ShellResult(2, "", "Unbekannter Modus: $mode")
+        return setMode(packageName, op, m, userFixed, userId)
+    }
+
+    fun setMode(
+        packageName: String, op: AppOp, mode: OpMode, userFixed: Boolean = true, userId: Int? = null
+    ): ShellResult {
+        val user = userArgs(userId)
         val perm = op.permissionName
-        return if (perm != null) {
-            when (mode) {
-                "deny", "ignore" -> backend.exec("pm", "revoke", packageName, perm).also {
-                    if (it.exitCode == 0) {
-                        val verb = if (userFixed) "set-permission-flags" else "clear-permission-flags"
-                        backend.exec("pm", verb, packageName, perm, *USER_CHOICE_FLAGS)
-                    }
-                }
-                else -> {
-                    // allow + default: danach das Flag loesen, sonst bleibt "nicht mehr fragen" stehen
-                    val res = backend.exec("pm", "grant", packageName, perm)
-                    if (res.exitCode == 0) {
-                        backend.exec("pm", "clear-permission-flags", packageName, perm, *USER_CHOICE_FLAGS)
-                    }
-                    res
+            ?: return backend.exec("cmd", "appops", "set", *user, packageName, op.opName, mode.appOpToken)
+        return when (mode) {
+            OpMode.DENY, OpMode.IGNORE -> backend.exec("pm", "revoke", *user, packageName, perm).also {
+                if (it.exitCode == 0) {
+                    val verb = if (userFixed) "set-permission-flags" else "clear-permission-flags"
+                    backend.exec("pm", verb, *user, packageName, perm, *USER_CHOICE_FLAGS)
                 }
             }
-        } else {
-            backend.exec("cmd", "appops", "set", packageName, op.opName, mode)
+            OpMode.RESET -> backend.exec("pm", "revoke", *user, packageName, perm).also {
+                if (it.exitCode == 0) {
+                    backend.exec("pm", "clear-permission-flags", *user, packageName, perm, *USER_CHOICE_FLAGS)
+                    // eine frueher gesetzte AppOp-Uebersteuerung gehoert zu "Standard" dazu (siehe OpReset)
+                    backend.exec("cmd", "appops", "set", *user, packageName, op.opName, "default")
+                }
+            }
+            OpMode.ALLOW, OpMode.DEFAULT -> {
+                // erteilen; danach das Flag loesen, sonst bleibt "nicht mehr fragen" stehen
+                val res = backend.exec("pm", "grant", *user, packageName, perm)
+                if (res.exitCode == 0) {
+                    backend.exec("pm", "clear-permission-flags", *user, packageName, perm, *USER_CHOICE_FLAGS)
+                }
+                res
+            }
         }
     }
+
+    private fun userArgs(userId: Int?): Array<String> =
+        if (userId == null) emptyArray() else arrayOf("--user", userId.toString())
 
     companion object {
         /** Flags fuer "Nutzer hat entschieden, nicht erneut fragen". */
@@ -97,8 +118,9 @@ class AppOpsController(private val backend: ShellBackend) {
         return "default"
     }
 
+    /** Alle Ops auf "zuruecksetzen": Berechtigungen entzogen (nie erteilt), reine AppOps auf Systemstandard. */
     fun restoreAll(packageName: String, ops: List<AppOp>): Map<String, ShellResult> =
-        ops.associate { it.opName to setMode(packageName, it, "default") }
+        ops.associate { it.opName to setMode(packageName, it, OpMode.RESET) }
 
     /** Capability-Probe: existiert die Op auf dem Gerät? */
     fun probe(packageName: String, op: AppOp): Boolean = getMode(packageName, op) != null

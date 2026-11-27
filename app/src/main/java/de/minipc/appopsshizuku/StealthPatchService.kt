@@ -82,7 +82,7 @@ class StealthPatchService : Service() {
         const val EXTRA_SPOOF_ANDROID_ID_ON = "spoofAndroidIdOn"
         const val EXTRA_SPOOF_TELEPHONY = "spoofTelephony"
 
-        /** Begleit-App (CalcYou-Vault-Fork), die bei Vault-Patches auto-installiert wird. */
+        /** Begleit-App (CalcYou-Vault-Fork); wird nicht mehr mitgeliefert, nur noch auf Vorhandensein geprueft. */
         const val VAULT_CALC_PACKAGE = "de.minipc.calcyou"
 
         const val CHANNEL_ID = "stealth_patch"
@@ -168,6 +168,14 @@ class StealthPatchService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    /**
+     * Android 15+: ein `dataSync`-Dienst darf nur ~6 h pro Tag laufen. Danach ruft das System dies auf, und der
+     * Dienst MUSS sofort enden - sonst beendet es die ganze App mit einer Ausnahme.
+     */
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        finish(false, getString(R.string.stealth_fgs_timeout))
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) {
@@ -382,12 +390,12 @@ class StealthPatchService : Service() {
                         signed, targetPkg,
                         allowAutoUninstall = cloneNewPkg == null
                     )
-                    // Vault: Begleit-App (VaultCalculator) automatisch mitinstallieren,
-                    // wenn sie fehlt. NICHT blockierend: Ein Fehler hier aendert das
-                    // Patch-Ergebnis nicht (nur Log; Nutzer kann Rechner manuell holen).
-                    if (res.success && intent.getBooleanExtra(EXTRA_VAULT, false)) {
-                        ensureVaultAppInstalled(backend, stealer)
-                    }
+                    // Vault: Die Begleit-App (CalcYou-Fork) ist KEIN Teil dieser APK mehr (F-Droid
+                    // erlaubt keine vorkompilierten Binaerdateien). Fehlt sie, bekommt der Nutzer
+                    // einen Hinweis im Ergebnis; das Patch-Ergebnis selbst aendert das nicht.
+                    val vaultCompanionMissing = res.success &&
+                        intent.getBooleanExtra(EXTRA_VAULT, false) &&
+                        !isVaultCompanionInstalled(backend)
                     if (res.success) {
                         // Originale dauerhaft sichern (filesDir) + Arbeitsordner
                         // aufräumen: repacked/signed-Kopien sind nach dem Install
@@ -402,6 +410,9 @@ class StealthPatchService : Service() {
                             getString(R.string.stealth_success)
                         }
                         msg += trackerNote + stripNote
+                        if (vaultCompanionMissing) {
+                            msg += "\n\n" + getString(R.string.stealth_vault_companion_missing, VAULT_CALC_PACKAGE)
+                        }
                         var ok = true
                         if (trackerGroups.isNotEmpty() || stripGroups.isNotEmpty()) {
                             val probe = startProbe(backend, stealer, targetPkg, launcherForProbe)
@@ -540,38 +551,14 @@ class StealthPatchService : Service() {
     }
 
     /**
-     * Installiert die Vault-Begleit-App (CalcYou-Fork, de.minipc.calcyou) automatisch,
-     * wenn sie noch nicht installiert ist. Die APK ist als Raw-Ressource gebuendelt
-     * (app/src/main/res/raw/calcyou.apk). Fehler sind NICHT blockierend: Der
-     * Haupt-Patch bleibt erfolgreich; ein fehlgeschlagener Begleit-Install wird nur
-     * geloggt (der Nutzer kann den Rechner dann manuell installieren).
+     * Ist die Vault-Begleit-App (CalcYou-Fork, [VAULT_CALC_PACKAGE]) installiert? Die App liefert sie nicht
+     * mehr selbst mit; der Nutzer installiert sie bei Bedarf separat.
      */
-    private fun ensureVaultAppInstalled(
-        backend: de.minipc.appopsshizuku.shizuku.ShellBackend,
-        stealer: StealthStealer
-    ) {
-        try {
+    private fun isVaultCompanionInstalled(backend: de.minipc.appopsshizuku.shizuku.ShellBackend): Boolean =
+        runCatching {
             val check = backend.exec("pm", "path", VAULT_CALC_PACKAGE)
-            if (check.exitCode == 0 && check.stdout.contains("package:")) return // bereits installiert
-            val apk = File(cacheDir, "calcyou.apk")
-            try {
-                resources.openRawResource(R.raw.calcyou).use { input ->
-                    apk.outputStream().use { out -> input.copyTo(out) }
-                }
-                val result = stealer.installApk(apk, VAULT_CALC_PACKAGE, allowAutoUninstall = false)
-                if (!result.success) {
-                    ErrorLog.w(TAG, "CalcYou-Auto-Install fehlgeschlagen: ${result.message}")
-                } else {
-                    Log.d(TAG, "CalcYou (Vault) automatisch installiert")
-                }
-            } finally {
-                // Temp-Datei entfernen — wird bei Bedarf aus der Raw-Ressource neu geschrieben
-                apk.delete()
-            }
-        } catch (e: Exception) {
-            ErrorLog.w(TAG, "CalcYou-Auto-Install Fehler", e)
-        }
-    }
+            check.exitCode == 0 && check.stdout.contains("package:")
+        }.getOrDefault(false)
 
     private fun finish(success: Boolean, message: String) {
         lastResult = PatchResult(success, message)

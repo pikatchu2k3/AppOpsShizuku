@@ -6,10 +6,12 @@ set -euo pipefail
 
 REPO="pikatchu2k3/AppOpsShizuku"
 EXPECTED_SHA256="652394f75d9ed1ea168561e4056556fd82d3645a6c88020cd30b18c0a3d7226e"
-ARTIFACT_DIR="/mnt/wd_nvme/appopsshizuku-artifacts"
-SDK="/opt/android-sdk"
+# Pfade aus der Umgebung (kein fester Rechner): ANDROID_HOME, optional JAVA_HOME und ARTIFACT_DIR
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ARTIFACT_DIR="${ARTIFACT_DIR:-$ROOT/build/release-artifacts}"
+SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/opt/android-sdk}}"
 
-export JAVA_HOME=/opt/jdk-21.0.6+7 ANDROID_HOME="$SDK" ANDROID_SDK_ROOT="$SDK"
+export ANDROID_HOME="$SDK" ANDROID_SDK_ROOT="$SDK"
 
 log()  { echo "[release] $*" >&2; }
 fail() { echo "[release] FEHLER: $*" >&2; exit 1; }
@@ -66,14 +68,14 @@ api GET "https://api.github.com/repos/$REPO"
 [ "$HTTP_CODE" = 200 ] || fail "GitHub-Token/Repo-Zugriff fehlgeschlagen (HTTP $HTTP_CODE): $HTTP_BODY"
 
 # --- 3. Build + Tests (Ergebnis aus den XML-Dateien, nicht aus dem Log) ---
-rm -rf app/build/test-results/testDebugUnitTest
-log "Gradle: Tests + assembleDebug ..."
-./gradlew --no-daemon :app:testDebugUnitTest :app:assembleDebug --console=plain >&2 \
+rm -rf app/build/test-results/testFullDebugUnitTest
+log "Gradle: Tests + assembleFullRelease (mit Debug-Zertifikat signiert, siehe README \"Signatur\") ..."
+./gradlew --no-daemon -PdebugSignedRelease=true :app:testFullDebugUnitTest :app:assembleFullRelease --console=plain >&2 \
     || fail "Gradle-Build oder Tests fehlgeschlagen (siehe Log oben)."
 
 shopt -s nullglob
-XMLS=(app/build/test-results/testDebugUnitTest/*.xml)
-[ "${#XMLS[@]}" -gt 0 ] || fail "Keine Test-Ergebnisse unter app/build/test-results/testDebugUnitTest/ - Tests nicht gelaufen?"
+XMLS=(app/build/test-results/testFullDebugUnitTest/*.xml)
+[ "${#XMLS[@]}" -gt 0 ] || fail "Keine Test-Ergebnisse unter app/build/test-results/testFullDebugUnitTest/ - Tests nicht gelaufen?"
 sum_attr() { grep -h '<testsuite ' "${XMLS[@]}" | grep -oE " $1=\"[0-9]+\"" | grep -oE '[0-9]+' | awk '{s+=$1} END{print s+0}'; }
 TESTS=$(sum_attr tests); FAILURES=$(sum_attr failures); ERRORS=$(sum_attr errors)
 log "Tests: $TESTS, Failures: $FAILURES, Errors: $ERRORS"
@@ -81,8 +83,8 @@ log "Tests: $TESTS, Failures: $FAILURES, Errors: $ERRORS"
 [ $((FAILURES + ERRORS)) -eq 0 ] || fail "$FAILURES Failures + $ERRORS Errors in den Unit-Tests."
 
 # --- 4. APK finden ---
-APKS=(app/build/outputs/apk/debug/*.apk)
-[ "${#APKS[@]}" -eq 1 ] || fail "Erwartet genau 1 APK unter app/build/outputs/apk/debug/, gefunden: ${#APKS[@]}."
+APKS=(app/build/outputs/apk/full/release/*.apk)
+[ "${#APKS[@]}" -eq 1 ] || fail "Erwartet genau 1 APK unter app/build/outputs/apk/full/release/, gefunden: ${#APKS[@]}."
 APK=${APKS[0]}
 log "APK: $APK"
 

@@ -17,6 +17,8 @@ import de.minipc.appopsshizuku.appops.OnDemandExecutor
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import rikka.shizuku.Shizuku
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Ziel der Launcher-Verknuepfung von "Nur bei Bedarf": App freigeben, starten, beim Dienst als
@@ -46,8 +48,8 @@ class OnDemandLaunchActivity : AppCompatActivity() {
                 .putExtra(EXTRA_PACKAGE, packageName)
     }
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private var binderListener: Shizuku.OnBinderReceivedListener? = null
     private var started = false
 
@@ -71,18 +73,27 @@ class OnDemandLaunchActivity : AppCompatActivity() {
         val caller = callingPackage
             ?: if (Build.VERSION.SDK_INT >= 34) launchedFromPackage else null
         val store = LifecycleStore(this)
-        when (OnDemandCallers.decide(caller, packageName, pkg, store.onDemandCallers)) {
-            OnDemandCallers.Decision.ALLOW -> proceed(pkg)
+        val fingerprint = caller?.let { PackageSigner.fingerprint(packageManager, it) }
+        when (OnDemandCallers.decide(caller, packageName, pkg, store.onDemandCallers, fingerprint)) {
+            OnDemandCallers.Decision.ALLOW -> {
+                // Altbestand ohne Signatur: beim ersten erkannten Start festpinnen
+                if (caller != null && caller != packageName && fingerprint != null &&
+                    OnDemandCallers.entryFor(caller, fingerprint) !in store.onDemandCallers
+                ) {
+                    store.onDemandCallers = OnDemandCallers.pin(store.onDemandCallers, caller, fingerprint)
+                }
+                proceed(pkg)
+            }
             OnDemandCallers.Decision.DENY -> {
                 ErrorLog.w(TAG, "Fremder Start von $pkg abgelehnt (Aufrufer: $caller)")
                 Toast.makeText(this, R.string.ondemand_caller_unknown, Toast.LENGTH_LONG).show()
                 finish()
             }
-            OnDemandCallers.Decision.ASK -> askCaller(caller!!, pkg, store)
+            OnDemandCallers.Decision.ASK -> askCaller(caller!!, pkg, store, fingerprint)
         }
     }
 
-    private fun askCaller(caller: String, pkg: String, store: LifecycleStore) {
+    private fun askCaller(caller: String, pkg: String, store: LifecycleStore, fingerprint: String?) {
         // Gesperrt hat nur, was wirklich auf "Nur bei Bedarf" steht - sonst gar nicht erst fragen
         if (store.get(pkg).onDemand != true) {
             proceed(pkg)
@@ -94,7 +105,7 @@ class OnDemandLaunchActivity : AppCompatActivity() {
             .setMessage(getString(R.string.ondemand_caller_text, labelOf(caller), labelOf(pkg)))
             .setPositiveButton(R.string.ondemand_caller_allow) { _, _ ->
                 answered = true
-                store.onDemandCallers = store.onDemandCallers + caller
+                store.onDemandCallers = OnDemandCallers.pin(store.onDemandCallers, caller, fingerprint)
                 proceed(pkg)
             }
             .setNeutralButton(R.string.ondemand_caller_once) { _, _ ->

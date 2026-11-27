@@ -7,7 +7,29 @@
     <string name="btn_check">Prüfen</string>
     <string name="btn_restore_all">Alle auf Standard</string>
     <string name="btn_refresh">Aktualisieren</string>
+    <string name="category_special">Spezialzugriff</string>
+    <string name="import_preview_apply">Importieren</string>
+    <string name="import_preview_dropped">%1$d ungültige oder geschützte Einträge wurden verworfen.</string>
+    <string name="import_preview_message">Diese Datei enthält:\n• %1$d Apps mit Berechtigungsprofilen\n• %2$d Apps mit Verhaltens-Einstellungen (davon %3$d zum Deaktivieren oder Einfrieren)\n• %4$d Automatik-Regeln\n\nVor deiner Bestätigung wird nichts geändert. Importiere nur Dateien, denen du vertraust.</string>
+    <string name="import_preview_title">Diese Sicherung importieren?</string>
+    <string name="op_blocked_can_ask_again">Blockiert, aber dieses Gerät hat „Nicht mehr fragen“ nicht gespeichert - die App darf die Berechtigung erneut anfordern.</string>
+    <string name="op_label_bluetooth_connect">Mit Bluetooth-Geräten verbinden</string>
+    <string name="op_label_call_phone">Anrufe tätigen</string>
+    <string name="op_label_read_external_storage">Speicher lesen (alt)</string>
+    <string name="op_label_read_phone_numbers">Telefonnummern lesen</string>
+    <string name="op_label_request_install_packages">Unbekannte Apps installieren</string>
+    <string name="op_label_schedule_exact_alarm">Exakte Alarme</string>
+    <string name="op_label_send_sms">SMS senden</string>
+    <string name="op_label_use_full_screen_intent">Vollbild-Benachrichtigungen</string>
+    <string name="op_label_write_external_storage">Speicher schreiben (alt)</string>
+    <string name="op_label_write_settings">Systemeinstellungen ändern</string>
+    <string name="screen_event_off">Bildschirm aus</string>
+    <string name="screen_event_on">Bildschirm an</string>
+    <string name="screen_report_all_ok">%1$s: %2$d App(s) – alle bestätigt</string>
+    <string name="screen_report_no_shizuku">%1$s: nicht möglich – Shizuku ist nicht verbunden, keine App angehalten</string>
+    <string name="screen_report_some_failed">%1$s: %2$d von %3$d NICHT übernommen – %4$s</string>
     <string name="search_hint">App suchen…</string>
+    <string name="shizuku_dialog_hint">Berechtigungs-Dialog nicht sichtbar? In der Shizuku-App unter „Berechtigungen“ autorisieren.</string>
     <string name="sort_hint">Sortierung</string>
     <string name="sort_by">Sortieren:</string>
     <string name="status_no_shizuku">Shizuku nicht verbunden</string>
@@ -120,6 +142,7 @@
     <string name="profiles_import_fail">Import fehlgeschlagen: %1$s</string>
 
     <!-- Stealth-Modus (Feature 2b) -->
+    <string name="stealth_fgs_timeout">Android hat den Hintergrunddienst nach der erlaubten Laufzeit beendet. Bitte den Patch erneut starten.</string>
     <string name="stealth_title">Stealth-Modus</string>
     <string name="stealth_description">Patcht die App so, dass sie dauerhaft nicht im Verlauf (letzte Apps) erscheint. Optional wird zusätzlich das Launcher-Icon entfernt. Die App wird dabei neu signiert.</string>
     <string name="stealth_exclude_from_recents">Im Verlauf (letzte Apps) verstecken</string>
@@ -127,6 +150,7 @@
     <string name="stealth_secure_snapshot">Inhalt im Verlauf schwärzen (Inkognito, wie Banking-Apps)</string>
     <string name="stealth_require_vpn">Nur mit aktivem VPN ausführbar (VPN-Pflicht)</string>
     <string name="stealth_vault_calc">Als Taschenrechner verstecken (Vault)</string>
+    <string name="stealth_vault_companion_missing">Die Vault-Begleit-App (%1$s) ist nicht installiert. Bitte separat installieren - ohne sie funktioniert die Taschenrechner-Tarnung nicht.</string>
     <string name="stealth_vault_pin_hint">Vault-PIN (Ziffern, 4–10; leer = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN muss 4–10 Ziffern enthalten</string>
     <string name="stealth_vault_no_launcher">Vault: Launcher-Activity der Ziel-App nicht gefunden</string>

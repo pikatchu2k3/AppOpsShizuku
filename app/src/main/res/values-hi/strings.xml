@@ -64,6 +64,7 @@
     <string name="category_media">मीडिया</string>
     <string name="category_other">अन्य</string>
     <string name="category_sensors">सेंसर</string>
+    <string name="category_special">विशेष पहुँच</string>
     <string name="category_system_ui">सिस्टम UI</string>
     <string name="components_activities">गतिविधियाँ</string>
     <string name="components_autostart">ऑटोस्टार्ट</string>
@@ -108,6 +109,10 @@
     <string name="error_start_activity">गतिविधि शुरू नहीं की जा सकी</string>
     <string name="filter_all">सभी</string>
     <string name="filter_blocked">ब्लॉक किए गए</string>
+    <string name="import_preview_apply">आयात करें</string>
+    <string name="import_preview_dropped">%1$d अमान्य या सुरक्षित प्रविष्टियाँ हटा दी गईं।</string>
+    <string name="import_preview_message">इस फ़ाइल में है:\n• अनुमति प्रोफ़ाइल वाले %1$d ऐप\n• व्यवहार सेटिंग वाले %2$d ऐप (इनमें से %3$d अक्षम या फ़्रीज़ होंगे)\n• %4$d स्वचालित नियम\n\nआपकी पुष्टि से पहले कुछ नहीं बदलता। केवल भरोसेमंद फ़ाइलें आयात करें।</string>
+    <string name="import_preview_title">यह बैकअप आयात करें?</string>
     <string name="lifecycle_apply">प्रोफ़ाइल लागू करें</string>
     <string name="lifecycle_battery_check">बैटरी अपवाद दें</string>
     <string name="lifecycle_battery_hint">ध्यान दें: बैटरी छूट होने पर Android स्तर को ख़ुद \"सिस्टम द्वारा छूट प्राप्त\" पर सेट करता है। ऊपर चुना गया स्तर तब अनदेखा होता है और \"लागू नहीं\" दिखता है – यह अपेक्षित है, कोई त्रुटि नहीं।</string>
@@ -166,9 +171,20 @@
     <string name="net_switches_title">नेटवर्क ट्रैफ़िक प्रतिबंधित करें</string>
     <string name="net_tracker_not_blockable">मिले कंपोनेंट यहाँ अलग से अक्षम नहीं किए जा सकते – रूट के बिना Android यह मना करता है (shell दूसरे ऐप के कंपोनेंट की स्थिति नहीं बदल सकता)। ब्लॉकिंग ऊपर के तीन स्विच से होती है; केवल \"कैमोफ़्लाज़\" टैब का APK पैच कोड हटाता है।</string>
     <string name="no_apps">कोई ऐप नहीं मिला</string>
+    <string name="op_blocked_can_ask_again">ब्लॉक किया गया, लेकिन इस डिवाइस ने "फिर न पूछें" सहेजा नहीं - ऐप अनुमति फिर से माँग सकता है।</string>
     <string name="op_deny_warning">सावधान: अस्वीकार करने से ऐप शुरू होते समय क्रैश हो सकता है (SecurityException)। क्लिपबोर्ड के लिए अनदेखा करना बेहतर विकल्प है (चुपचाप ब्लॉक)।</string>
+    <string name="op_label_bluetooth_connect">ब्लूटूथ डिवाइस से कनेक्ट करें</string>
+    <string name="op_label_call_phone">फ़ोन कॉल करें</string>
     <string name="op_label_not_requested">%1$s · अनुरोध नहीं किया गया</string>
+    <string name="op_label_read_external_storage">स्टोरेज पढ़ें (पुराना)</string>
+    <string name="op_label_read_phone_numbers">फ़ोन नंबर पढ़ें</string>
+    <string name="op_label_request_install_packages">अज्ञात ऐप्स इंस्टॉल करें</string>
+    <string name="op_label_schedule_exact_alarm">सटीक अलार्म</string>
+    <string name="op_label_send_sms">SMS भेजें</string>
     <string name="op_label_unsupported">%1$s · सेट नहीं किया जा सकता</string>
+    <string name="op_label_use_full_screen_intent">फ़ुल-स्क्रीन सूचनाएँ</string>
+    <string name="op_label_write_external_storage">स्टोरेज में लिखें (पुराना)</string>
+    <string name="op_label_write_settings">सिस्टम सेटिंग बदलें</string>
     <string name="op_mode_hint">मोड</string>
     <string name="op_not_requested">%1$s: यह ऐप यह अनुमति नहीं माँगता — कुछ नहीं बदला।</string>
     <string name="op_not_settable">%1$s इस डिवाइस पर नहीं बदला जा सकता – लागू नहीं हुआ।</string>
@@ -195,6 +211,8 @@
     <string name="restore_all_confirm_title">सभी डिफ़ॉल्ट पर?</string>
     <string name="restore_done">सभी प्रविष्टियाँ डिफ़ॉल्ट पर सेट</string>
     <string name="restore_partial">डिफ़ॉल्ट पर सेट, %1$d प्रविष्टियाँ लागू नहीं हुईं।</string>
+    <string name="screen_event_off">स्क्रीन बंद</string>
+    <string name="screen_event_on">स्क्रीन चालू</string>
     <string name="screen_off_effect_force_stop">बंद करें (force-stop) – ऐप बंद कर दी जाती है और दोबारा खोलने तक उसे अलार्म या पुश संदेश नहीं मिलते; खोलना संभव रहता है</string>
     <string name="screen_off_effect_suspend">फ़्रीज़ – स्क्रीन फिर चालू होने तक ऐप बिल्कुल शुरू नहीं हो सकती; डेटा बना रहता है</string>
     <string name="screen_off_excluded_own">अपने ऐप के लिए नहीं।</string>
@@ -208,7 +226,11 @@
     <string name="screen_off_switch">स्क्रीन बंद होने पर रोकें</string>
     <string name="screen_off_text">ऊपर की प्रोफ़ाइल का उल्टा: स्क्रीन बंद होते ही ऐप रोक दी जाती है, ताकि वह बैकग्राउंड में न चले। Android स्क्रीन चालू/बंद की सूचना केवल चल रही ऐप को देता है, इसलिए जब तक कम से कम एक ऐप में यह विकल्प है, एक सूचना वाली सेवा चलती है। आप सूचना छिपा सकते हैं; सेवा काम करती रहती है। डिफ़ॉल्ट: बंद।</string>
     <string name="screen_off_title">स्क्रीन बंद होने पर रोकें</string>
+    <string name="screen_report_all_ok">%1$s: %2$d ऐप - सभी पुष्टि हुए</string>
+    <string name="screen_report_no_shizuku">%1$s: संभव नहीं - Shizuku जुड़ा नहीं है, कोई ऐप नहीं रोका गया</string>
+    <string name="screen_report_some_failed">%1$s: %3$d में से %2$d लागू नहीं हुए - %4$s</string>
     <string name="search_hint">ऐप खोजें…</string>
+    <string name="shizuku_dialog_hint">अनुमति संवाद नहीं दिख रहा? Shizuku ऐप में "अधिकृत ऐप्स" के तहत इस ऐप को अनुमति दें।</string>
     <string name="sort_by">क्रम से लगाएँ:</string>
     <string name="sort_hint">क्रम</string>
     <string name="sort_install">इंस्टॉल तिथि</string>
@@ -260,6 +282,7 @@
     <string name="stealth_error_restore">पुनर्स्थापित करने में त्रुटि</string>
     <string name="stealth_error_sign">APK साइन करने में त्रुटि</string>
     <string name="stealth_exclude_from_recents">इतिहास (हाल के ऐप्स) में छिपाएँ</string>
+    <string name="stealth_fgs_timeout">Android ने अनुमत चलने के समय के बाद बैकग्राउंड सेवा बंद कर दी। कृपया पैच फिर से शुरू करें।</string>
     <string name="stealth_label">%1$s (स्टेल्थ)</string>
     <string name="stealth_need_launcher">कोई मैनिफ़ेस्ट बदलाव नहीं चुना गया – कृपया कम से कम एक विकल्प चालू करें।</string>
     <string name="stealth_notif_channel">स्टेल्थ पैच</string>
@@ -303,6 +326,7 @@
     <string name="stealth_tracker_scanning">इस ऐप में पहचाने गए बिल्डिंग ब्लॉक: खोज जारी है …</string>
     <string name="stealth_tracker_title">ट्रैकर बंद करें (बीटा)</string>
     <string name="stealth_vault_calc">कैलकुलेटर (वॉल्ट) के रूप में छिपाएँ</string>
+    <string name="stealth_vault_companion_missing">वॉल्ट सहायक ऐप (%1$s) इंस्टॉल नहीं है। इसे अलग से इंस्टॉल करें - इसके बिना कैलकुलेटर आवरण काम नहीं करता।</string>
     <string name="stealth_vault_no_launcher">वॉल्ट: लक्ष्य ऐप का लॉन्चर activity नहीं मिली</string>
     <string name="stealth_vault_pin_hint">वॉल्ट PIN (अंक, 4–10; खाली = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN में 4–10 अंक होने चाहिए</string>

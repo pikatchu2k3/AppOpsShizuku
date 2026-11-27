@@ -34,6 +34,8 @@ import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Netzverkehr pro App (letzte 7 Tage), Vordergrund und Hintergrund getrennt. Verdaechtige Apps
@@ -42,8 +44,8 @@ import java.util.concurrent.TimeUnit
  */
 class NetUsageActivity : AppCompatActivity() {
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private lateinit var backend: ShellBackend
     private lateinit var netStore: NetStore
     private var rows: List<NetUsage.Row> = emptyList()

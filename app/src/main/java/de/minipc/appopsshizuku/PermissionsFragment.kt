@@ -18,6 +18,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import de.minipc.appopsshizuku.appops.AppOpsController
+import de.minipc.appopsshizuku.appops.AppOpsDump
 import de.minipc.appopsshizuku.appops.AccessLog
 import de.minipc.appopsshizuku.appops.AppOp
 import de.minipc.appopsshizuku.appops.OpAccess
@@ -31,6 +32,8 @@ import de.minipc.appopsshizuku.shizuku.NoopBackend
 import de.minipc.appopsshizuku.ui.AppOpsAdapter
 import de.minipc.appopsshizuku.ui.OpsListItem
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Reiter "Berechtigungen" der App-Detailseite (frueher AppOpsActivity):
@@ -43,11 +46,14 @@ import java.util.concurrent.Executors
 class PermissionsFragment : Fragment() {
 
     companion object {
+        /** Welche Ops dieses Geraet kennt - einmal pro Prozess geprüft, nicht je App. */
+        private val opSupport = AppOpsDump.Support()
+
         private const val ARG_PACKAGE = "pkg"
 
         private val CATEGORY_SENSORS = listOf(
             "CAMERA", "RECORD_AUDIO", "BODY_SENSORS", "ACTIVITY_RECOGNITION",
-            "BLUETOOTH_SCAN", "NEARBY_WIFI_DEVICES", "ACCESS_LOCAL_NETWORK"
+            "BLUETOOTH_SCAN", "BLUETOOTH_CONNECT", "NEARBY_WIFI_DEVICES", "ACCESS_LOCAL_NETWORK"
         )
         private val CATEGORY_LOCATION = listOf(
             "FINE_LOCATION", "COARSE_LOCATION", "ACCESS_BACKGROUND_LOCATION", "ACCESS_MEDIA_LOCATION"
@@ -55,11 +61,12 @@ class PermissionsFragment : Fragment() {
         private val CATEGORY_DATA = listOf(
             "READ_CONTACTS", "WRITE_CONTACTS", "READ_CALENDAR", "WRITE_CALENDAR",
             "READ_CALL_LOG", "WRITE_CALL_LOG", "READ_CLIPBOARD", "WRITE_CLIPBOARD",
-            "READ_PHONE_STATE", "READ_SMS", "RECEIVE_SMS"
+            "READ_PHONE_STATE", "READ_PHONE_NUMBERS", "CALL_PHONE", "READ_SMS", "RECEIVE_SMS", "SEND_SMS"
         )
         private val CATEGORY_MEDIA = listOf(
             "READ_MEDIA_IMAGES", "READ_MEDIA_VIDEO", "READ_MEDIA_AUDIO",
-            "READ_MEDIA_VISUAL_USER_SELECTED", "MANAGE_EXTERNAL_STORAGE"
+            "READ_MEDIA_VISUAL_USER_SELECTED", "MANAGE_EXTERNAL_STORAGE",
+            "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"
         )
         private val CATEGORY_ACCOUNT = listOf("GET_ACCOUNTS")
         private val CATEGORY_BACKGROUND = listOf(
@@ -71,14 +78,17 @@ class PermissionsFragment : Fragment() {
             "SYSTEM_ALERT_WINDOW", "ACCESS_NOTIFICATIONS", "POST_NOTIFICATION", "TURN_SCREEN_ON",
             "PICTURE_IN_PICTURE"
         )
+        private val CATEGORY_SPECIAL = listOf(
+            "REQUEST_INSTALL_PACKAGES", "WRITE_SETTINGS", "SCHEDULE_EXACT_ALARM", "USE_FULL_SCREEN_INTENT"
+        )
 
         fun newInstance(packageName: String) = PermissionsFragment().apply {
             arguments = Bundle().apply { putString(ARG_PACKAGE, packageName) }
         }
     }
 
-    private val executor = Executors.newSingleThreadExecutor()
-    private val handler = Handler(Looper.getMainLooper())
+    private val executor = lifecycleExecutor()
+    private val handler = lifecycleHandler()
     private lateinit var appContext: Context
     private lateinit var backend: de.minipc.appopsshizuku.shizuku.ShellBackend
     private lateinit var controller: AppOpsController
@@ -101,6 +111,9 @@ class PermissionsFragment : Fragment() {
 
     /** Zwischenspeicher fuer `pm list permissions` (Geraetewissen), ebenfalls einmal pro Ladevorgang. */
     private var permissionsCache: String? = null
+
+    /** Gesamtausgabe von `cmd appops get <pkg>` waehrend eines Ladevorgangs; sonst null (dann Einzelabfrage). */
+    private var appOpsDump: String? = null
 
     /** Zugriffsprotokoll (opName -> letzte Nutzung/Ablehnung), aus EINEM `cmd appops get <pkg>`. */
     private var access: Map<String, OpAccess> = emptyMap()
@@ -220,6 +233,10 @@ class PermissionsFragment : Fragment() {
         executor.execute {
             dumpsysCache = null
             permissionsCache = null
+            // EIN `cmd appops get <pkg>` fuer alle Ops (statt je Op ein Prozess) - dient zugleich dem Zugriffsprotokoll
+            val appops = runCatching { backend.exec("cmd", "appops", "get", packageName) }.getOrNull()
+            appOpsDump = appops?.takeIf { it.exitCode == 0 }?.stdout
+            access = appOpsDump?.let { AccessLog.parse(it) } ?: emptyMap()
             for (op in ops) {
                 opStates[op.opName] = try {
                     readMode(op)
@@ -227,7 +244,7 @@ class PermissionsFragment : Fragment() {
                     null
                 }
             }
-            readAccessLog()
+            appOpsDump = null
             readAppMeta()
             handler.post {
                 loading = false
@@ -246,7 +263,15 @@ class PermissionsFragment : Fragment() {
     private fun readMode(op: AppOp, useCache: Boolean = true): String? {
         // "Nur waehrend Nutzung" ist ein Modus dieser App, kein Systemzustand: so anzeigen
         if (op.permissionName != null && wiuStore.has(packageName, op.opName)) return WhileInUse.MODE
-        if (!op.readViaPermission) return controller.getMode(packageName, op)
+        if (!op.readViaPermission) {
+            val dump = appOpsDump
+            if (dump != null) {
+                // Beim Laden: aus der Gesamtausgabe; unbekannte Ops (nur dieses Geraet weiss das) einmal pro Prozess pruefen
+                val known = opSupport.isKnown(op.opName) { backend.exec("cmd", "appops", "get", packageName, op.opName) }
+                return if (known == true) AppOpsDump.mode(controller, dump, op) else null
+            }
+            return controller.getMode(packageName, op)   // Rueckleseprobe nach dem Setzen: frisch, einzeln
+        }
         val perm = op.permissionName ?: return null
         val dump = if (useCache) (dumpsysCache ?: readPackageDump()) else readPackageDump()
         if (dump == null) return null
@@ -277,12 +302,6 @@ class PermissionsFragment : Fragment() {
         if (res.exitCode != 0) return null
         dumpsysCache = res.stdout
         return res.stdout
-    }
-
-    /** Zugriffszeiten aller Ops dieser App mit EINER Shell-Abfrage (nur lesen, bleibt auf dem Geraet). */
-    private fun readAccessLog() {
-        val res = runCatching { backend.exec("cmd", "appops", "get", packageName) }.getOrNull()
-        access = if (res != null && res.exitCode == 0) AccessLog.parse(res.stdout) else emptyMap()
     }
 
     private fun readAppMeta() {
@@ -498,7 +517,8 @@ class PermissionsFragment : Fragment() {
             Pair(appContext.getString(R.string.category_account_activity), CATEGORY_ACCOUNT),
             Pair(appContext.getString(R.string.category_background), CATEGORY_BACKGROUND),
             Pair(appContext.getString(R.string.category_identity), CATEGORY_IDENTITY),
-            Pair(appContext.getString(R.string.category_system_ui), CATEGORY_SYSTEM_UI)
+            Pair(appContext.getString(R.string.category_system_ui), CATEGORY_SYSTEM_UI),
+            Pair(appContext.getString(R.string.category_special), CATEGORY_SPECIAL)
         )
         for ((title, names) in categories) {
             val catOps = names.mapNotNull { byName[it] }
@@ -577,12 +597,20 @@ class PermissionsFragment : Fragment() {
             val unsupported = res.exitCode != 0 && opStates[op.opName] == null
             val effective = res.exitCode == 0 &&
                 de.minipc.appopsshizuku.appops.OpEffect.isSetEffective(op.permissionName, mode, actual)
+            // Blockiert, aber ohne "nicht mehr fragen"? Dann darf die App die Berechtigung neu anfordern -
+            // `pm set-permission-flags` kennt nicht jedes Gerät, und der Befehl wird nicht allein geglaubt.
+            val canAskAgain = effective && op.permissionName != null && (mode == "deny" || mode == "ignore") &&
+                de.minipc.appopsshizuku.appops.OpEffect.isUserFixed(
+                    backend.exec("dumpsys", "package", packageName).stdout, op.permissionName
+                ) == false
             handler.post {
                 if (effective) {
-                    opStates[op.opName] = mode
+                    // "reset" ist eine Handlung, kein Zustand: angezeigt wird, was das System jetzt meldet
+                    opStates[op.opName] = if (mode == "reset") actual else mode
                     // Profil-Speicherung darf den UI-Thread NIE crashen
                     // (z.B. korruptes/leeres JSON in den Prefs -> JSONException).
-                    runCatching { profileStore.setOpMode(packageName, op.opName, mode) }
+                    // Ein Reset erzwingt nichts: im Profil als "default" ablegen (aeltere Dateien bleiben lesbar).
+                    runCatching { profileStore.setOpMode(packageName, op.opName, if (mode == "reset") "default" else mode) }
                     runCatching {
                         de.minipc.appopsshizuku.appops.ChangeLog.recordOp(appContext, packageName, op, prevMode, mode)
                     }
@@ -591,6 +619,9 @@ class PermissionsFragment : Fragment() {
                         appContext.getString(R.string.op_set_ok, op.label, mode),
                         Toast.LENGTH_SHORT
                     ).show()
+                    if (canAskAgain) {
+                        Toast.makeText(appContext, R.string.op_blocked_can_ask_again, Toast.LENGTH_LONG).show()
+                    }
                     // deny auf reinen AppOps (Zwischenablage) laesst die Ziel-App beim
                     // Start crashen (SecurityException, live verifiziert) -> Hinweis.
                     if (mode == "deny" && op.permissionName == null) {

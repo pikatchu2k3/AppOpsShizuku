@@ -3,6 +3,7 @@ package de.minipc.appopsshizuku.appops
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import de.minipc.appopsshizuku.LifecycleScreenService
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -37,8 +38,14 @@ class ProfileBackup(context: Context) {
         val profiles: Map<String, Map<String, String>>,
         val behavior: Map<String, BehaviorState>,
         val lifecycle: Map<String, LifecycleEntry> = emptyMap(),
-        val extras: BackupExtras = BackupExtras()
-    )
+        val extras: BackupExtras = BackupExtras(),
+        /** Eintraege, die [ImportGuard] verworfen hat (ungueltiges/geschuetztes Paket, unbekannter Modus ...). */
+        val dropped: Int = 0
+    ) {
+        /** Apps, die beim Uebernehmen deaktiviert oder eingefroren wuerden. */
+        val disableOrFreezeCount: Int
+            get() = behavior.values.count { it.disabled == true || it.frozen == true }
+    }
 
     /**
      * Schreibt Profile UND Verhaltens-Einstellungen als JSON in die vom Nutzer gewaehlte Datei
@@ -75,25 +82,66 @@ class ProfileBackup(context: Context) {
     }.getOrNull() ?: uri.lastPathSegment ?: uri.toString()
 
     /**
-     * Liest die JSON-Datei aus der SAF-URI und merged die Profile in die Prefs.
-     * Die Verhaltens-Einstellungen werden zurueckgegeben - sie werden vom Aufrufer
-     * auf das Geraet angewendet (dafuer braucht er ein Backend).
+     * Liest die JSON-Datei aus der SAF-URI und prueft sie mit [ImportGuard] - OHNE etwas zu speichern oder
+     * anzuwenden. Die Oberflaeche zeigt das Ergebnis an; erst [commit] uebernimmt es.
+     * Wirft bei ungueltigem JSON.
      */
-    fun import(uri: Uri): ImportResult {
+    fun parse(uri: Uri): ImportResult {
         val json = appContext.contentResolver.openInputStream(uri)
             ?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
             ?: throw IllegalArgumentException("Datei nicht lesbar")
-        val (profiles, behavior) = parseDocument(json)
-        val lifecycle = parseLifecycle(json)
-        store.importProfiles(profiles)
-        // Nur Einstellungen mergen - angewendet wird ein Lifecycle-Profil erst per Knopf
-        lifecycleStore.importEntries(lifecycle)
+        val document = parseDocument(json)
+        val life = parseLifecycle(json)
         val extras = BackupExtras.parse(json)
-        BackupExtras.apply(appContext, extras)
-        return ImportResult(profiles, behavior, lifecycle, extras)
+        return sanitize(document, life, extras, defaultProtection(document, life, extras))
     }
 
+    /** Geschuetzte Pakete (System-UI, Einstellungen, Launcher, Tastatur, Shizuku, diese App ...). */
+    private fun defaultProtection(
+        document: Pair<Map<String, Map<String, String>>, Map<String, BehaviorState>>,
+        lifecycle: Map<String, LifecycleEntry>,
+        extras: BackupExtras
+    ): (String) -> Boolean {
+        val all = (document.second.keys + lifecycle.keys + extras.whileInUse.keys +
+            extras.rules.flatMap { it.packages }).filter { ImportGuard.validPackage(it) }
+        val blocked = runCatching { LifecycleScreenService.protectedPackagesOf(appContext, all) }
+            .getOrDefault(emptySet())
+        return { it in blocked }
+    }
+
+    /** Ein geprueftes Ergebnis in die Speicher uebernehmen (Verhalten wird vom Aufrufer auf das Geraet angewendet). */
+    fun commit(result: ImportResult) {
+        store.importProfiles(result.profiles)
+        // Nur Einstellungen mergen - angewendet wird ein Lifecycle-Profil erst per Knopf
+        lifecycleStore.importEntries(result.lifecycle)
+        BackupExtras.apply(appContext, result.extras)
+    }
+
+    /** [parse] und sofort [commit] (fuer Skripte/Tests ohne Rueckfrage). */
+    fun import(uri: Uri): ImportResult = parse(uri).also { commit(it) }
+
     companion object {
+        /** Prueft ein bereits gelesenes Dokument (auch fuer Tests mit eigener Schutzliste). */
+        fun sanitize(
+            document: Pair<Map<String, Map<String, String>>, Map<String, BehaviorState>>,
+            lifecycle: Map<String, LifecycleEntry>,
+            extras: BackupExtras,
+            isProtected: (String) -> Boolean
+        ): ImportResult {
+            val profiles = ImportGuard.profiles(document.first)
+            val behavior = ImportGuard.behavior(document.second, isProtected)
+            val life = ImportGuard.lifecycle(lifecycle, isProtected)
+            val rules = ImportGuard.rules(extras.rules, isProtected)
+            val wiu = ImportGuard.whileInUse(extras.whileInUse, isProtected)
+            return ImportResult(
+                profiles = profiles.value,
+                behavior = behavior.value,
+                lifecycle = life.value,
+                extras = extras.copy(rules = rules.value, whileInUse = wiu.value),
+                dropped = profiles.dropped + behavior.dropped + life.dropped + rules.dropped + wiu.dropped
+            )
+        }
+
         /**
          * Akzeptiert das v2-Objekt und alte Array-Dateien (nur Profile).
          * Wirft bei ungueltigem JSON.

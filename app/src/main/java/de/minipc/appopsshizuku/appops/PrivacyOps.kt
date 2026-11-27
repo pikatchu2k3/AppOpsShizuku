@@ -43,6 +43,12 @@ object PrivacyOps {
         AppOp("RECEIVE_SMS", "SMS empfangen", "android.permission.RECEIVE_SMS"),
         AppOp("BLUETOOTH_SCAN", "Bluetooth-Suche", "android.permission.BLUETOOTH_SCAN"),
         AppOp("NEARBY_WIFI_DEVICES", "WLAN-Geräte in der Nähe", "android.permission.NEARBY_WIFI_DEVICES"),
+        // Auf Geraeten, die eine Op/Permission nicht kennen (z. B. BLUETOOTH_CONNECT vor Android 12), erkennt die
+        // Probe das und zeigt "nicht setzbar" - der Katalog darf also neuere Rechte enthalten.
+        AppOp("BLUETOOTH_CONNECT", "Mit Bluetooth-Geräten verbinden", "android.permission.BLUETOOTH_CONNECT"),
+        AppOp("READ_PHONE_NUMBERS", "Telefonnummern lesen", "android.permission.READ_PHONE_NUMBERS"),
+        AppOp("CALL_PHONE", "Anrufe tätigen", "android.permission.CALL_PHONE"),
+        AppOp("SEND_SMS", "SMS senden", "android.permission.SEND_SMS"),
         // Android 17 (API 37): auf aelteren Geraeten unbekannt (AppOp UND Permission) -> "nicht setzbar".
         // Zustand kommt aus dem Grant-Flag, da der AppOp-Name auf Android 17 nicht gesichert ist.
         AppOp(
@@ -78,6 +84,9 @@ object PrivacyOps {
             "android.permission.READ_MEDIA_VISUAL_USER_SELECTED", "Medien"
         ),
         AppOp("MANAGE_EXTERNAL_STORAGE", "Alle Dateien", null, "Medien"),
+        // Altes Speichermodell: Apps mit targetSdk unter 33 fragen diese statt READ_MEDIA_* an.
+        AppOp("READ_EXTERNAL_STORAGE", "Speicher lesen (alt)", "android.permission.READ_EXTERNAL_STORAGE", "Medien"),
+        AppOp("WRITE_EXTERNAL_STORAGE", "Speicher schreiben (alt)", "android.permission.WRITE_EXTERNAL_STORAGE", "Medien"),
         // --- Hintergrund (reine AppOps, cmd appops set-Hebel) ---
         AppOp("RUN_IN_BACKGROUND", "Hintergrund-Ausfuehrung", null, "Hintergrund"),
         AppOp("RUN_ANY_IN_BACKGROUND", "Hintergrund-Ausfuehrung (beliebig)", null, "Hintergrund"),
@@ -92,7 +101,12 @@ object PrivacyOps {
         // AppOp heisst POST_NOTIFICATION (ohne S); pm-Hebel live auf Android 14 belegt.
         AppOp("POST_NOTIFICATION", "Benachrichtigungen senden", "android.permission.POST_NOTIFICATIONS", "System-UI"),
         AppOp("TURN_SCREEN_ON", "Bildschirm einschalten", null, "System-UI"),
-        AppOp("PICTURE_IN_PICTURE", "Bild-in-Bild", null, "System-UI")
+        AppOp("PICTURE_IN_PICTURE", "Bild-in-Bild", null, "System-UI"),
+        // --- Spezialzugriff (reine AppOps, `cmd appops set`-Hebel; "Spezielle App-Zugriffe" der Systemeinstellungen) ---
+        AppOp("REQUEST_INSTALL_PACKAGES", "Unbekannte Apps installieren", null, "Spezial"),
+        AppOp("WRITE_SETTINGS", "Systemeinstellungen ändern", null, "Spezial"),
+        AppOp("SCHEDULE_EXACT_ALARM", "Exakte Alarme", null, "Spezial"),
+        AppOp("USE_FULL_SCREEN_INTENT", "Vollbild-Benachrichtigungen", null, "Spezial")
     )
 
     val MODES = listOf("default", "allow", "ignore", "deny")

@@ -109,7 +109,8 @@ object Recommendations {
     private val CATEGORY_SUSPICIOUS: Map<Int, Set<String>> = run {
         val personal = setOf(
             "READ_CONTACTS", "WRITE_CONTACTS", "READ_CALL_LOG", "WRITE_CALL_LOG",
-            "READ_SMS", "RECEIVE_SMS", "GET_ACCOUNTS", "READ_PHONE_STATE", "FINE_LOCATION",
+            "READ_SMS", "RECEIVE_SMS", "SEND_SMS", "CALL_PHONE", "READ_PHONE_NUMBERS",
+            "GET_ACCOUNTS", "READ_PHONE_STATE", "FINE_LOCATION",
             "READ_CALENDAR", "WRITE_CALENDAR"
         )
         mapOf(

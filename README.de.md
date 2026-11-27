@@ -16,13 +16,17 @@ Ohne Shizuku *zeigt* die App nur an und schaltet nichts.
 
 APK aus dem [neuesten GitHub-Release](https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest) laden.
 
+**F-Droid:** Die App ist für [F-Droid](https://f-droid.org) vorbereitet (Build aus dem Quellcode, Metadaten unter `fastlane/`, siehe [docs/fdroid](docs/fdroid/README.md)). F-Droid signiert mit eigenem Schlüssel; ein Wechsel zwischen F-Droid- und GitHub-Build braucht eine Neuinstallation (vorher die Sicherung exportieren).
+
+**Zwei Ausgaben** mit derselben App-ID: **full** (wie bisher, mit WLAN-Regeln, die Standort-Rechte brauchen, um den WLAN-Namen zu lesen) und **lite** (gar keine Standort-Rechte, keine WLAN-Regeln). Das GitHub-Release ist *full*.
+
 Automatische Updates: Repository in [Obtainium](https://github.com/ImranR98/Obtainium) eintragen (Quelle: *GitHub Releases*, URL `https://github.com/pikatchu2k3/AppOpsShizuku`). Die Signatur bleibt gleich, deshalb wird ein Update direkt über die installierte App eingespielt, die Daten bleiben erhalten.
 
 ## Auf einen Blick
 
 App Ops Shizuku ist ein **Datenschutz-Steuerpult für die anderen Apps auf deinem Handy**. Es kann:
 
-- **Sehen und einschränken**, was jede App darf: 33 Berechtigungen und App Ops (Kamera, Mikrofon, Standort, Kontakte, Kalender, Anrufliste, SMS, Zwischenablage, Medien, Hintergrund-Lauf, Overlays, …) — mit einem **Zugriffsprotokoll**, das zeigt, wann eine App sie zuletzt benutzt hat und welche Versuche abgewehrt wurden.
+- **Sehen und einschränken**, was jede App darf: 49 Berechtigungen und App Ops (Kamera, Mikrofon, Standort, Kontakte, Kalender, Anrufliste, SMS, Zwischenablage, Medien, Hintergrund-Lauf, Overlays, …) — mit einem **Zugriffsprotokoll**, das zeigt, wann eine App sie zuletzt benutzt hat und welche Versuche abgewehrt wurden.
 - **Nur bei Bedarf erteilen**: *nur während Nutzung* (die Berechtigung gibt es nur, solange die App vorne ist), *nur bei Bedarf* (die App bleibt geschlossen, bis du sie öffnest) und ein *Schnell-Lockdown*, der allen Apps auf einmal Kamera und Mikrofon entzieht.
 - **Netzzugriff kappen**: Hintergrunddaten sperren, eine App komplett offline nehmen, den **Verkehr je App** sehen (Hintergrund getrennt) und **privates DNS** (mit Tracker-Blocker-Vorlagen) für das ganze Handy umschalten.
 - **Automatisieren**: Regeln nach Zeit oder WLAN, Quarantäne für neu installierte Apps, Profil-Vorlagen per Tipp, eine Schnelleinstellungs-Kachel.
@@ -54,7 +58,7 @@ Die App hat unten in einer schwebenden Leiste drei Bereiche: **Apps**, **Werkzeu
 - Verlaufskarten in der Farbe des jeweiligen App-Icons auf einem ruhigen Sternenhimmel (hell und dunkel). Solange Shizuku nicht verbunden ist, erscheint ein Hinweis.
 
 ### Berechtigungen je App (Reiter *Berechtigungen*)
-- **33 Datenschutz-Berechtigungen** in acht Gruppen — *Sensoren* (Kamera, Mikrofon, Körper-Sensoren, Aktivitätserkennung, Bluetooth-Suche, WLAN-Geräte in der Nähe, lokales Netzwerk), *Standort* (genau, ungefähr, im Hintergrund, Foto-Standort), *Daten* (Kontakte, Kalender, Anrufliste, Zwischenablage, Telefonstatus, SMS), *Medien* (Fotos, Videos, Audio, ausgewählte Medien, alle Dateien), *Konten*, *Hintergrund* (Hintergrund-Ausführung, Vordergrunddienste aus dem Hintergrund, Nutzungsstatistik), *Identität* (Geräte-IDs, Standort vortäuschen) und *System-UI* (Overlay, Benachrichtigungen, Bildschirm einschalten, Bild-in-Bild).
+- **49 Datenschutz-Berechtigungen und Spezialzugriffe** in neun Gruppen — *Sensoren* (Kamera, Mikrofon, Körper-Sensoren, Aktivitätserkennung, Bluetooth-Suche, WLAN-Geräte in der Nähe, lokales Netzwerk), *Standort* (genau, ungefähr, im Hintergrund, Foto-Standort), *Daten* (Kontakte, Kalender, Anrufliste, Zwischenablage, Telefonstatus, SMS), *Medien* (Fotos, Videos, Audio, ausgewählte Medien, alle Dateien), *Konten*, *Hintergrund* (Hintergrund-Ausführung, Vordergrunddienste aus dem Hintergrund, Nutzungsstatistik), *Identität* (Geräte-IDs, Standort vortäuschen) *System-UI* (Overlay, Benachrichtigungen, Bildschirm einschalten, Bild-in-Bild) und *Spezialzugriff* (unbekannte Apps installieren, Systemeinstellungen, exakte Alarme, Vollbild-Benachrichtigungen).
 - Jede lässt sich auf Standard / erlauben / ignorieren / verweigern setzen. Berechtigungen mit Laufzeit-Erteilung nutzen `pm grant|revoke` (Blockieren setzt zusätzlich `user-fixed`, die App kann also nicht einfach erneut fragen); reine App Ops nutzen `cmd appops set`. Ops, die das Gerät nicht kennt, erscheinen als „nicht setzbar", Berechtigungen, die die App nie anfordert, als „nicht angefordert".
 - **Alles blockieren** und **Alle auf Standard** (ein Reset erteilt nie etwas). Profile werden gespeichert und als JSON exportiert.
 - **Zugriffsprotokoll**: letzte Nutzung, abgewehrte Versuche und „wird gerade benutzt" je Berechtigung, aus einem einzigen `cmd appops get`.
@@ -101,7 +105,7 @@ Die App hat unten in einer schwebenden Leiste drei Bereiche: **Apps**, **Werkzeu
 
 ### Einstellungen und Sicherung
 - Shizuku-Status, Quarantäne-Schalter, *Systemfarben (Material You)*, **Dauerrecht**, Export / Import und die App-Version.
-- Die **Sicherung** ist eine JSON-Datei, gespeichert wo du willst (der Speichern-Dialog schlägt `appopsshizuku-backup-<Datum>.json` vor, z. B. in *Downloads*): Privacy-Profile, Verhaltens-Einstellungen, Lifecycle-Profile, Automatik-Regeln, „Nur während Nutzung", der Quarantäne-Schalter und die Lockdown-Auswahl. Ältere Dateien bleiben lesbar; beim Import werden nur bekannte Berechtigungen akzeptiert. Der momentane Gerätezustand (welche Apps gerade in Quarantäne stehen) wird bewusst nicht gesichert. Für Skripte und Tasker geht der Import auch ohne Dateidialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <Pfad>`.
+- Die **Sicherung** ist eine JSON-Datei, gespeichert wo du willst (der Speichern-Dialog schlägt `appopsshizuku-backup-<Datum>.json` vor, z. B. in *Downloads*): Privacy-Profile, Verhaltens-Einstellungen, Lifecycle-Profile, Automatik-Regeln, „Nur während Nutzung", der Quarantäne-Schalter und die Lockdown-Auswahl. Vor dem Anwenden zeigt der Import, was in der Datei steht, und verwirft ungültige Einträge sowie Deaktivieren/Einfrieren geschützter System-Apps. Ältere Dateien bleiben lesbar; beim Import werden nur bekannte Berechtigungen akzeptiert. Der momentane Gerätezustand (welche Apps gerade in Quarantäne stehen) wird bewusst nicht gesichert. Für Skripte und Tasker geht der Import auch ohne Dateidialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <Pfad>`.
 
 ## Sicherheitsprinzipien
 
@@ -177,15 +181,13 @@ Der Reiter Tarnung (Patch, Klon, Tracker abschalten) ist **in Entwicklung**. Er 
 ## Selbst bauen
 
 ```bash
-export JAVA_HOME=/pfad/zum/jdk       # JDK 17+ (Projekt zielt auf Java 17)
-export ANDROID_HOME=/pfad/zum/android-sdk
-export ANDROID_SDK_ROOT=$ANDROID_HOME
-./gradlew :app:assembleDebug
+export ANDROID_HOME=/pfad/zum/android-sdk     # oder sdk.dir in local.properties
+./gradlew :app:assembleFullDebug              # oder :app:assembleLiteDebug
 ```
 
-Das APK liegt danach unter `app/build/outputs/apk/debug/`. Unit-Tests: `./gradlew :app:testDebugUnitTest`. `scripts/release.sh` baut, testet, prüft die Signatur und veröffentlicht ein GitHub-Release (für den Maintainer).
+JDK 17 oder neuer genügt (das Projekt zielt auf Java 17); feste Rechnerpfade sind nicht nötig. Das APK liegt unter `app/build/outputs/apk/<ausgabe>/debug/`. Tests: `./gradlew :app:testFullDebugUnitTest :app:testLiteDebugUnitTest`, Lint: `:app:lintFullDebug :app:lintLiteDebug`. `./gradlew :app:assembleRelease` baut unsignierte Release-APKs (das baut F-Droid). Optionales R8-Verkleinern: `-Pminify=true` (auf dem Gerät nicht geprüft, standardmäßig aus). `scripts/release.sh` baut, testet, prüft die Signatur und veröffentlicht ein GitHub-Release (für den Maintainer; liest `ANDROID_HOME`, optional `ARTIFACT_DIR`).
 
-Hinweis: `app/src/main/res/raw/calcyou.apk` (der Taschenrechner-Build für den Vault, siehe *Lizenz*) liegt **nicht** im Repository, weil `*.apk` von Git ignoriert wird. Zum Bauen diese Datei dort ablegen (für die Entwicklung genügt ein Platzhalter; der Vault kann dann seinen Taschenrechner nicht installieren).
+Das Repository enthält **keine vorkompilierten Binärdateien** (nur den Standard-Gradle-Wrapper). Die Begleit-App des Taschenrechner-Vaults (`de.minipc.calcyou`, ein eigenes GPL-3.0-Projekt) wird nicht mehr mitgeliefert; fehlt sie nach einem Vault-Patch, weist das Ergebnis darauf hin, sie separat zu installieren.
 
 ## Design und Farben
 
@@ -193,13 +195,13 @@ Die App nutzt eine **vollständige Material-3-Palette**, systematisch aus einer 
 
 ## Signatur
 
-Releases sind mit dem Debug-Zertifikat signiert, SHA-256 `652394f7…7226e` (vollständig: `652394f75d9ed1ea168561e4056556fd82d3645a6c88020cd30b18c0a3d7226e`). Ein Update lässt sich nur mit **gleicher Signatur** über eine bestehende Installation einspielen; ein selbst gebautes APK mit anderem Debug-Schlüssel aktualisiert die veröffentlichte App nicht (erst deinstallieren, dabei gehen die App-Daten verloren).
+GitHub-Releases sind Release-Builds (nicht debuggable), signiert mit dem Debug-Zertifikat, SHA-256 `652394f7…7226e` (vollständig: `652394f75d9ed1ea168561e4056556fd82d3645a6c88020cd30b18c0a3d7226e`). Ein Update lässt sich nur mit **gleicher Signatur** über eine bestehende Installation einspielen; ein selbst gebautes APK mit anderem Debug-Schlüssel aktualisiert die veröffentlichte App nicht (erst deinstallieren, dabei gehen die App-Daten verloren).
 
 ## Lizenz
 
 Dieses Projekt steht unter der **GNU General Public License, Version 3.0** — vollständiger Text in [LICENSE](LICENSE).
 
-Grund: Die App bündelt einen Build eines CalcYou-Forks (`app/src/main/res/raw/calcyou.apk`) als Raw-Ressource für den Taschenrechner-Vault, und der ist selbst GPL-3.0. Da die App ohnehin öffentlich verteilt wird, steht das ganze Projekt unter derselben Lizenz — konsistent und rechtlich sauber.
+Der Taschenrechner-Vault arbeitet mit einem CalcYou-Fork (GPL-3.0) zusammen. Da die App ohnehin öffentlich verteilt wird, steht das ganze Projekt unter derselben Lizenz.
 
 Weil das Repository öffentlich ist, ist der Quellcode zu jedem veröffentlichten Paket an derselben Stelle verfügbar (Repository + Releases). Es gibt **keine Gewährleistung**: Das Patchen fremder Apps kann sie beschädigen, der Tarnungs-Reiter wird auf eigenes Risiko benutzt.
 

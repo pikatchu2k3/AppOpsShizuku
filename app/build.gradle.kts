@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -11,17 +11,52 @@ android {
         applicationId = "de.minipc.appopsshizuku"
         minSdk = 26
         targetSdk = 35
-        versionCode = 49
-        versionName = "1.20.9"
+        versionCode = 50
+        versionName = "1.21.0"
+    }
+
+    // F-Droid/IzzyOnDroid: keinen verschluesselten Abhaengigkeits-Block (Google-Blob) in die APK schreiben.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
+    // Zwei Ausgaben mit derselben Anwendungs-ID:
+    //  - full: mit WLAN-Regeln (braucht Standort-Rechte, um den WLAN-Namen zu lesen) - wie bisher
+    //  - lite: ohne WLAN-Regeln und OHNE jedes Standort-Recht im Manifest
+    flavorDimensions += "edition"
+    productFlavors {
+        create("full") {
+            dimension = "edition"
+            buildConfigField("boolean", "WIFI_RULES", "true")
+        }
+        create("lite") {
+            dimension = "edition"
+            buildConfigField("boolean", "WIFI_RULES", "false")
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 (Verkleinern, ohne Umbenennen) ist ein Opt-in: -Pminify=true. Standard ist aus, weil smali/dexlib2,
+            // BouncyCastle und Shizuku nicht auf dem Geraet geprueft sind - siehe app/proguard-rules.pro.
+            val minify = providers.gradleProperty("minify").orNull == "true"
+            isMinifyEnabled = minify
+            isShrinkResources = minify
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
+                getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro"
             )
+            // Veroeffentlichte APKs behalten das bisherige Zertifikat (Updates ueber bestehende Installationen,
+            // siehe README "Signatur"), sind aber echte Release-Builds (nicht debuggable).
+            // Ohne die Property bleibt das APK unsigniert - so baut F-Droid und signiert selbst.
+            if (providers.gradleProperty("debugSignedRelease").orNull == "true") {
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 
@@ -47,26 +82,26 @@ android {
 
 dependencies {
     // Shizuku-API: Shell-Privilegien (adb) ohne Root
-    implementation("dev.rikka.shizuku:api:13.1.5")
-    implementation("dev.rikka.shizuku:provider:13.1.5")
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
     // Material Design 3 (Google-Standard) + AppCompat-Basis
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation(libs.material)
+    implementation(libs.appcompat)
+    implementation(libs.core.ktx)
+    implementation(libs.recyclerview)
     // App-Detail mit Reitern (TabLayout aus material, Pager aus viewpager2)
-    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation(libs.viewpager2)
 
     // On-Device-APK-Signierung (v1+v2+v3) + selbstsigniertes Zertifikat (Stealth-Modus)
-    implementation("com.android.tools.build:apksig:8.2.2")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
+    implementation(libs.apksig)
+    implementation(libs.bouncycastle.pkix)
 
-    // On-Device-Dex-Patch (Schwaerz-Modus): baksmali + smali (einheitlich org.smali 2.5.2)
-    implementation("org.smali:smali:2.5.2")
-    implementation("org.smali:baksmali:2.5.2")
-    implementation("org.smali:dexlib2:2.5.2")
+    // On-Device-Dex-Patch (Schwaerz-Modus): baksmali + smali (einheitlich org.smali)
+    implementation(libs.smali)
+    implementation(libs.smali.baksmali)
+    implementation(libs.smali.dexlib2)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
     // Android-Unit-Tests haben kein echtes org.json (nur Stubs) -> echte Impl fuer JVM-Tests
-    testImplementation("org.json:json:20240303")
+    testImplementation(libs.org.json)
 }

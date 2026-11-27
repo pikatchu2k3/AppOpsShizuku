@@ -64,6 +64,7 @@
     <string name="category_media">メディア</string>
     <string name="category_other">その他</string>
     <string name="category_sensors">センサー</string>
+    <string name="category_special">特別なアクセス</string>
     <string name="category_system_ui">システム UI</string>
     <string name="components_activities">アクティビティ</string>
     <string name="components_autostart">自動起動</string>
@@ -108,6 +109,10 @@
     <string name="error_start_activity">アクティビティを起動できませんでした</string>
     <string name="filter_all">すべて</string>
     <string name="filter_blocked">ブロック済み</string>
+    <string name="import_preview_apply">インポート</string>
+    <string name="import_preview_dropped">無効または保護された項目 %1$d 件を破棄しました。</string>
+    <string name="import_preview_message">このファイルの内容:\n• 権限プロファイル付きアプリ %1$d 件\n• 動作設定付きアプリ %2$d 件（うち %3$d 件は無効化または凍結されます）\n• 自動ルール %4$d 件\n\n確認するまで何も変更されません。信頼できるファイルだけをインポートしてください。</string>
+    <string name="import_preview_title">このバックアップをインポートしますか？</string>
     <string name="lifecycle_apply">プロファイルを適用</string>
     <string name="lifecycle_battery_check">バッテリー除外を許可</string>
     <string name="lifecycle_battery_hint">注意：バッテリー最適化から除外すると、Android がバケットを自動的に「システムにより除外」にします。上で選んだバケットは無視され「未適用」と表示されますが、これは想定どおりでエラーではありません。</string>
@@ -166,9 +171,20 @@
     <string name="net_switches_title">ネットワーク通信を制限</string>
     <string name="net_tracker_not_blockable">検出されたコンポーネントは、ここでは個別に無効化できません – root なしでは Android が拒否します（シェルは他アプリのコンポーネント状態を変更できません）。ブロックは上の3つのスイッチで行います。コードを削除するのは「カモフラージュ」タブの APK パッチだけです。</string>
     <string name="no_apps">アプリが見つかりません</string>
+    <string name="op_blocked_can_ask_again">ブロックしましたが、この端末は「今後表示しない」を保存しませんでした。アプリが再び権限を要求する可能性があります。</string>
     <string name="op_deny_warning">注意: 拒否すると起動時にアプリがクラッシュする場合があります（SecurityException）。クリップボードには無視（サイレントブロック）の方が適しています。</string>
+    <string name="op_label_bluetooth_connect">Bluetooth機器への接続</string>
+    <string name="op_label_call_phone">電話の発信</string>
     <string name="op_label_not_requested">%1$s · 要求されていません</string>
+    <string name="op_label_read_external_storage">ストレージの読み取り（旧方式）</string>
+    <string name="op_label_read_phone_numbers">電話番号の読み取り</string>
+    <string name="op_label_request_install_packages">提供元不明のアプリのインストール</string>
+    <string name="op_label_schedule_exact_alarm">正確なアラーム</string>
+    <string name="op_label_send_sms">SMSの送信</string>
     <string name="op_label_unsupported">%1$s · 設定不可</string>
+    <string name="op_label_use_full_screen_intent">全画面通知</string>
+    <string name="op_label_write_external_storage">ストレージへの書き込み（旧方式）</string>
+    <string name="op_label_write_settings">システム設定の変更</string>
     <string name="op_mode_hint">モード</string>
     <string name="op_not_requested">%1$s: このアプリはこの権限を要求していません – 変更はありません。</string>
     <string name="op_not_settable">この端末では %1$s を変更できません – 適用されていません。</string>
@@ -195,6 +211,8 @@
     <string name="restore_all_confirm_title">すべて初期値に戻しますか？</string>
     <string name="restore_done">すべての項目を初期値に戻しました</string>
     <string name="restore_partial">初期値に戻しました、%1$d 件は適用されませんでした。</string>
+    <string name="screen_event_off">画面オフ</string>
+    <string name="screen_event_on">画面オン</string>
     <string name="screen_off_effect_force_stop">終了（force-stop）– アプリを終了し、再び開くまでアラームやプッシュ通知を受け取りません。開くことはできます</string>
     <string name="screen_off_effect_suspend">フリーズ – 画面が再びオンになるまでアプリは一切起動できません。データは残ります</string>
     <string name="screen_off_excluded_own">自分自身のアプリには適用されません。</string>
@@ -208,7 +226,11 @@
     <string name="screen_off_switch">画面オフ時に一時停止</string>
     <string name="screen_off_text">上のプロファイルの逆です：画面がオフになるとすぐにアプリを止め、バックグラウンドで動き続けられないようにします。Android は画面のオン／オフを実行中のアプリにしか通知しないため、この設定のアプリが 1 つでもある間は通知付きのサービスが動きます。通知は非表示にでき、サービスは動き続けます。既定：オフ。</string>
     <string name="screen_off_title">画面オフ時に一時停止</string>
+    <string name="screen_report_all_ok">%1$s: %2$d 件のアプリ - すべて確認済み</string>
+    <string name="screen_report_no_shizuku">%1$s: 実行できません - Shizukuが接続されていないため、どのアプリも停止していません</string>
+    <string name="screen_report_some_failed">%1$s: %3$d 件中 %2$d 件が反映されませんでした - %4$s</string>
     <string name="search_hint">アプリを検索…</string>
+    <string name="shizuku_dialog_hint">許可ダイアログが表示されませんか？ Shizukuアプリの「許可されたアプリ」でこのアプリを許可してください。</string>
     <string name="sort_by">並び替え:</string>
     <string name="sort_hint">並び順</string>
     <string name="sort_install">インストール日</string>
@@ -260,6 +282,7 @@
     <string name="stealth_error_restore">復元エラー</string>
     <string name="stealth_error_sign">APK の署名エラー</string>
     <string name="stealth_exclude_from_recents">履歴(最近使用したアプリ)に表示しない</string>
+    <string name="stealth_fgs_timeout">許可された実行時間を過ぎたため、Androidがバックグラウンドサービスを停止しました。もう一度パッチを開始してください。</string>
     <string name="stealth_label">%1$s(ステルス)</string>
     <string name="stealth_need_launcher">マニフェストの変更が選択されていません。少なくとも1つのオプションを有効にしてください。</string>
     <string name="stealth_notif_channel">ステルスパッチ</string>
@@ -303,6 +326,7 @@
     <string name="stealth_tracker_scanning">このアプリで検出されたビルディングブロック: 検索中 …</string>
     <string name="stealth_tracker_title">トラッカーを無効化(ベータ)</string>
     <string name="stealth_vault_calc">電卓として隠す(ボールト)</string>
+    <string name="stealth_vault_companion_missing">金庫の補助アプリ（%1$s）がインストールされていません。別途インストールしてください。なければ電卓カモフラージュは動作しません。</string>
     <string name="stealth_vault_no_launcher">ボールト: 対象アプリのランチャーアクティビティが見つかりません</string>
     <string name="stealth_vault_pin_hint">ボールトの PIN(数字、4〜10桁、空欄 = 12345)</string>
     <string name="stealth_vault_pin_invalid">PIN は 4〜10 桁の数字で入力してください</string>

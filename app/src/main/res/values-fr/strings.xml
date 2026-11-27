@@ -64,6 +64,7 @@
     <string name="category_media">Médias</string>
     <string name="category_other">Autre</string>
     <string name="category_sensors">Capteurs</string>
+    <string name="category_special">Accès spéciaux</string>
     <string name="category_system_ui">Interface système</string>
     <string name="components_activities">Activités</string>
     <string name="components_autostart">Démarrage automatique</string>
@@ -108,6 +109,10 @@
     <string name="error_start_activity">Impossible de démarrer l\'activité</string>
     <string name="filter_all">Toutes</string>
     <string name="filter_blocked">Bloquées</string>
+    <string name="import_preview_apply">Importer</string>
+    <string name="import_preview_dropped">%1$d entrées invalides ou protégées ont été ignorées.</string>
+    <string name="import_preview_message">Ce fichier contient :\n• %1$d applications avec des profils d\'autorisations\n• %2$d applications avec des réglages de comportement (dont %3$d à désactiver ou à geler)\n• %4$d règles automatiques\n\nRien n\'est modifié avant votre confirmation. N\'importez que des fichiers de confiance.</string>
+    <string name="import_preview_title">Importer cette sauvegarde ?</string>
     <string name="lifecycle_apply">Appliquer le profil</string>
     <string name="lifecycle_battery_check">Accorder l\'exemption de batterie</string>
     <string name="lifecycle_battery_hint">Remarque : avec une exemption de batterie, Android met lui-même le groupe sur « Exemptée par le système ». Le groupe choisi ci-dessus est alors ignoré et affiché comme « non appliqué » – c\'est voulu, pas une erreur.</string>
@@ -166,9 +171,20 @@
     <string name="net_switches_title">Restreindre le trafic réseau</string>
     <string name="net_tracker_not_blockable">Les composants trouvés ne peuvent pas être désactivés individuellement ici – Android le refuse sans root (le shell ne peut pas modifier l\'état de composants étrangers). Le blocage se fait via les trois interrupteurs ci-dessus ; seul le patch APK de l\'onglet « Camouflage » supprime le code.</string>
     <string name="no_apps">Aucune application trouvée</string>
+    <string name="op_blocked_can_ask_again">Bloqué, mais cet appareil n\'a pas enregistré « Ne plus demander » - l\'application peut redemander l\'autorisation.</string>
     <string name="op_deny_warning">Attention : refuser peut faire planter l\'application au démarrage (SecurityException). Pour le presse-papiers, ignorer est préférable (blocage silencieux).</string>
+    <string name="op_label_bluetooth_connect">Se connecter aux appareils Bluetooth</string>
+    <string name="op_label_call_phone">Passer des appels</string>
     <string name="op_label_not_requested">%1$s · non demandé</string>
+    <string name="op_label_read_external_storage">Lire le stockage (ancien)</string>
+    <string name="op_label_read_phone_numbers">Lire les numéros de téléphone</string>
+    <string name="op_label_request_install_packages">Installer des applis inconnues</string>
+    <string name="op_label_schedule_exact_alarm">Alarmes exactes</string>
+    <string name="op_label_send_sms">Envoyer des SMS</string>
     <string name="op_label_unsupported">%1$s · non modifiable</string>
+    <string name="op_label_use_full_screen_intent">Notifications plein écran</string>
+    <string name="op_label_write_external_storage">Écrire dans le stockage (ancien)</string>
+    <string name="op_label_write_settings">Modifier les paramètres système</string>
     <string name="op_mode_hint">Mode</string>
     <string name="op_not_requested">%1$s : cette application ne demande pas l\'autorisation — rien n\'a changé.</string>
     <string name="op_not_settable">%1$s ne peut pas être modifié sur cet appareil – non appliqué.</string>
@@ -195,6 +211,8 @@
     <string name="restore_all_confirm_title">Tout remettre par défaut ?</string>
     <string name="restore_done">Toutes les entrées remises par défaut</string>
     <string name="restore_partial">Remises par défaut, %1$d entrées non appliquées.</string>
+    <string name="screen_event_off">Écran éteint</string>
+    <string name="screen_event_on">Écran allumé</string>
     <string name="screen_off_effect_force_stop">Fermer (force-stop) – l\'app est arrêtée et ne reçoit ni alarmes ni notifications push jusqu\'à sa prochaine ouverture ; l\'ouvrir reste possible</string>
     <string name="screen_off_effect_suspend">Geler – l\'app ne peut pas démarrer du tout jusqu\'au rallumage de l\'écran ; les données sont conservées</string>
     <string name="screen_off_excluded_own">Non applicable à l\'application elle-même.</string>
@@ -208,7 +226,11 @@
     <string name="screen_off_switch">Suspendre à l’extinction de l’écran</string>
     <string name="screen_off_text">L\'inverse du profil ci-dessus : l\'app est arrêtée dès que l\'écran s\'éteint et ne peut donc pas continuer en arrière-plan. Android ne signale l\'allumage/l\'extinction de l\'écran qu\'à une app en cours d\'exécution ; tant qu\'au moins une app a cette option, un service avec notification tourne donc. Tu peux masquer la notification ; le service continue. Par défaut : désactivé.</string>
     <string name="screen_off_title">Suspendre à l’extinction de l’écran</string>
+    <string name="screen_report_all_ok">%1$s : %2$d appli(s) - toutes confirmées</string>
+    <string name="screen_report_no_shizuku">%1$s : impossible - Shizuku n\'est pas connecté, aucune appli arrêtée</string>
+    <string name="screen_report_some_failed">%1$s : %2$d sur %3$d NON appliquées - %4$s</string>
     <string name="search_hint">Rechercher des applications…</string>
+    <string name="shizuku_dialog_hint">Boîte de dialogue invisible ? Autorisez cette appli dans l\'appli Shizuku, sous « Applis autorisées ».</string>
     <string name="sort_by">Trier par :</string>
     <string name="sort_hint">Ordre de tri</string>
     <string name="sort_install">Date d’installation</string>
@@ -260,6 +282,7 @@
     <string name="stealth_error_restore">Erreur lors de la restauration</string>
     <string name="stealth_error_sign">Erreur lors de la signature de l’APK</string>
     <string name="stealth_exclude_from_recents">Masquer dans l’historique (applications récentes)</string>
+    <string name="stealth_fgs_timeout">Android a arrêté le service d\'arrière-plan après sa durée d\'exécution autorisée. Veuillez relancer le patch.</string>
     <string name="stealth_label">%1$s (Furtif)</string>
     <string name="stealth_need_launcher">Aucune modification du manifeste sélectionnée : activez au moins une option.</string>
     <string name="stealth_notif_channel">Patch furtif</string>
@@ -303,6 +326,7 @@
     <string name="stealth_tracker_scanning">Blocs détectés dans cette application : recherche…</string>
     <string name="stealth_tracker_title">Désactiver les traqueurs (bêta)</string>
     <string name="stealth_vault_calc">Masquer en calculatrice (coffre)</string>
+    <string name="stealth_vault_companion_missing">L\'application compagnon du coffre (%1$s) n\'est pas installée. Installez-la séparément - sans elle, le camouflage en calculatrice ne fonctionne pas.</string>
     <string name="stealth_vault_no_launcher">Coffre : activité de lancement de l’application cible introuvable</string>
     <string name="stealth_vault_pin_hint">Code PIN du coffre (chiffres, 4–10 ; vide = 12345)</string>
     <string name="stealth_vault_pin_invalid">Le PIN doit contenir 4 à 10 chiffres</string>

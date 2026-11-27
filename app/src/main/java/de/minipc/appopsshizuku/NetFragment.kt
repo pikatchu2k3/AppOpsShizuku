@@ -28,6 +28,8 @@ import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import java.io.File
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Reiter "Netz & Tracker": Diagnose der Tracker-Bausteine (nur lesen) + drei Netz-Schalter.
@@ -46,8 +48,8 @@ class NetFragment : Fragment() {
         }
     }
 
-    private val executor = Executors.newSingleThreadExecutor()
-    private val handler = Handler(Looper.getMainLooper())
+    private val executor = lifecycleExecutor()
+    private val handler = lifecycleHandler()
     private lateinit var appContext: Context
     private lateinit var backend: ShellBackend
     private lateinit var net: NetControl

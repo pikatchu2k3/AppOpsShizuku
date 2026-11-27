@@ -43,7 +43,7 @@ class PrivacyOpsCatalogTest {
     }
 
     @Test fun kategorien_sindKonsistent() {
-        val erlaubt = setOf("Privacy", "Standort", "Medien", "Hintergrund", "Identitaet", "System-UI")
+        val erlaubt = setOf("Privacy", "Standort", "Medien", "Hintergrund", "Identitaet", "System-UI", "Spezial")
         assertTrue(ops.all { it.category in erlaubt })
         assertEquals("Standort", op("FINE_LOCATION").category)
         assertEquals("Standort", op("COARSE_LOCATION").category)

@@ -45,6 +45,8 @@ import de.minipc.appopsshizuku.ui.OpLabels
 import de.minipc.appopsshizuku.ui.ToggleGuard
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * "Nach Berechtigung": Eine Berechtigung waehlen, sehen, welche Apps sie haben (und wann sie sie
@@ -62,8 +64,8 @@ class PermissionOverviewActivity : AppCompatActivity() {
         private const val THREADS = 4
     }
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private lateinit var backend: ShellBackend
     private lateinit var controller: AppOpsController
     private lateinit var profileStore: PrivacyProfileStore

@@ -30,7 +30,7 @@ object ApkSigner {
 
     private const val TAG = "ApkSigner"
 
-    /** Persistenter RSA-Privatkey (PKCS#8-DER) im filesDir. */
+    /** Persistenter RSA-Privatkey (PKCS#8-DER, Keystore-umhüllt) im filesDir. */
     private const val KEY_FILE = "apk_signer_key.der"
     /** Passendes X.509-Zertifikat (DER) — apksig signiert mit PrivateKey + Cert-Kette. */
     private const val CERT_FILE = "apk_signer_cert.der"
@@ -52,7 +52,7 @@ object ApkSigner {
         val certFile = File(context.filesDir, CERT_FILE)
         if (keyFile.isFile && certFile.isFile) {
             try {
-                val kp = loadKeyPair(keyFile, certFile)
+                val kp = loadKeyPair(keyFile, certFile, KeystoreKeyWrapper())
                 cachedKeyPair = kp.first
                 cachedCert = kp.second
                 return kp
@@ -83,7 +83,16 @@ object ApkSigner {
         cert.checkValidity()
 
         try {
-            FileOutputStream(keyFile).use { it.write(kp.private.encoded) }
+            // Privater Schluessel nur umhuellt (Android-Keystore, AES-GCM) - nie im Klartext in filesDir
+            try {
+                SignerKeyStorage.write(keyFile, kp.private.encoded, KeystoreKeyWrapper())
+            } catch (e: Exception) {
+                // Defekter Keystore: lieber vorübergehend Klartext als bei jedem Prozessstart eine neue
+                // Identität (gepatchte Apps ließen sich sonst nicht mehr aktualisieren). Beim nächsten
+                // Lesen wird die Datei umhüllt, sobald der Keystore wieder geht.
+                ErrorLog.w(TAG, "Keystore nicht nutzbar - Signaturschlüssel vorerst unverschlüsselt", e)
+                FileOutputStream(keyFile).use { it.write(kp.private.encoded) }
+            }
             FileOutputStream(certFile).use { it.write(cert.encoded) }
         } catch (e: Exception) {
             ErrorLog.e(TAG, "Signaturschlüssel konnte nicht persistiert werden", e)
@@ -94,11 +103,10 @@ object ApkSigner {
         return kp to cert
     }
 
-    /** Lädt PrivateKey (PKCS#8-DER) + Zertifikat (X.509-DER) als KeyPair. */
-    private fun loadKeyPair(keyFile: File, certFile: File): Pair<KeyPair, X509Certificate> {
-        val privateKey = keyFile.inputStream().use { input ->
-            KeyFactory.getInstance("RSA").generatePrivate(PKCS8EncodedKeySpec(input.readBytes()))
-        }
+    /** Lädt PrivateKey (PKCS#8-DER, aus der umhüllten Datei) + Zertifikat (X.509-DER) als KeyPair. */
+    private fun loadKeyPair(keyFile: File, certFile: File, wrapper: KeyWrapper): Pair<KeyPair, X509Certificate> {
+        val privateKey = KeyFactory.getInstance("RSA")
+            .generatePrivate(PKCS8EncodedKeySpec(SignerKeyStorage.read(keyFile, wrapper)))
         val cert = FileInputStream(certFile).use { input ->
             CertificateFactory.getInstance("X.509").generateCertificate(input) as X509Certificate
         }

@@ -32,6 +32,8 @@ import de.minipc.appopsshizuku.shizuku.ShellBackend
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
 import de.minipc.appopsshizuku.ui.ToggleGuard
 import java.util.concurrent.Executors
+import de.minipc.appopsshizuku.ui.lifecycleHandler
+import de.minipc.appopsshizuku.ui.lifecycleExecutor
 
 /**
  * Arbeitsprofil: ein zweites Profil, in das Apps verschoben werden koennen (sehen dann weder Kontakte
@@ -40,8 +42,8 @@ import java.util.concurrent.Executors
  */
 class WorkProfileActivity : AppCompatActivity() {
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val executor = Executors.newSingleThreadExecutor()
+    private val handler = lifecycleHandler()
+    private val executor = lifecycleExecutor()
     private lateinit var backend: ShellBackend
     private lateinit var mgr: WorkProfileManager
     private var profile: WorkProfile.User? = null

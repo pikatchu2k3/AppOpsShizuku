@@ -64,6 +64,7 @@
     <string name="category_media">媒体</string>
     <string name="category_other">其他</string>
     <string name="category_sensors">传感器</string>
+    <string name="category_special">特殊访问</string>
     <string name="category_system_ui">系统界面</string>
     <string name="components_activities">活动</string>
     <string name="components_autostart">自启动</string>
@@ -108,6 +109,10 @@
     <string name="error_start_activity">无法启动活动</string>
     <string name="filter_all">全部</string>
     <string name="filter_blocked">已禁止</string>
+    <string name="import_preview_apply">导入</string>
+    <string name="import_preview_dropped">已丢弃 %1$d 个无效或受保护的条目。</string>
+    <string name="import_preview_message">此文件包含：\n• %1$d 个带权限配置的应用\n• %2$d 个带行为设置的应用（其中 %3$d 个将被停用或冻结）\n• %4$d 条自动规则\n\n确认之前不会更改任何内容。请只导入你信任的文件。</string>
+    <string name="import_preview_title">导入此备份？</string>
     <string name="lifecycle_apply">应用配置</string>
     <string name="lifecycle_battery_check">授予电池豁免</string>
     <string name="lifecycle_battery_hint">提示：设置电池优化豁免后，Android 会自动把分组设为“系统豁免”。上方选择的分组将被忽略并显示为“未生效”——这是预期行为，不是错误。</string>
@@ -166,9 +171,20 @@
     <string name="net_switches_title">限制网络流量</string>
     <string name="net_tracker_not_blockable">此处无法单独停用已找到的组件 – 没有 root 权限时 Android 会拒绝此操作（shell 无法更改其他应用组件的状态）。请使用上面三个开关进行阻止；只有“伪装”标签页中的 APK 补丁才能移除代码。</string>
     <string name="no_apps">未找到应用</string>
+    <string name="op_blocked_can_ask_again">已阻止，但此设备未保存“不再询问”——应用可能会再次请求该权限。</string>
     <string name="op_deny_warning">注意：拒绝可能导致应用在启动时崩溃（SecurityException）。对于剪贴板，建议选择忽略（静默阻止）。</string>
+    <string name="op_label_bluetooth_connect">连接蓝牙设备</string>
+    <string name="op_label_call_phone">拨打电话</string>
     <string name="op_label_not_requested">%1$s · 未请求</string>
+    <string name="op_label_read_external_storage">读取存储（旧版）</string>
+    <string name="op_label_read_phone_numbers">读取电话号码</string>
+    <string name="op_label_request_install_packages">安装未知应用</string>
+    <string name="op_label_schedule_exact_alarm">精确闹钟</string>
+    <string name="op_label_send_sms">发送短信</string>
     <string name="op_label_unsupported">%1$s · 无法设置</string>
+    <string name="op_label_use_full_screen_intent">全屏通知</string>
+    <string name="op_label_write_external_storage">写入存储（旧版）</string>
+    <string name="op_label_write_settings">修改系统设置</string>
     <string name="op_mode_hint">模式</string>
     <string name="op_not_requested">%1$s：此应用未请求该权限 — 未作任何更改。</string>
     <string name="op_not_settable">此设备无法更改 %1$s – 未应用。</string>
@@ -195,6 +211,8 @@
     <string name="restore_all_confirm_title">全部恢复默认？</string>
     <string name="restore_done">所有条目已恢复默认</string>
     <string name="restore_partial">已恢复默认，%1$d 项未应用。</string>
+    <string name="screen_event_off">屏幕熄灭</string>
+    <string name="screen_event_on">屏幕亮起</string>
     <string name="screen_off_effect_force_stop">关闭（force-stop）——应用被结束，在再次打开前收不到闹钟和推送消息；仍可正常打开</string>
     <string name="screen_off_effect_suspend">冻结——在屏幕再次点亮前应用完全无法启动；数据保留</string>
     <string name="screen_off_excluded_own">不适用于本应用。</string>
@@ -208,7 +226,11 @@
     <string name="screen_off_switch">屏幕关闭时暂停</string>
     <string name="screen_off_text">与上方配置相反：屏幕一关闭就停止应用，使其无法在后台继续运行。Android 只会把屏幕开/关通知给正在运行的应用，因此只要至少有一个应用开启此选项，就会运行一个带通知的服务。通知可以隐藏，服务会继续工作。默认：关闭。</string>
     <string name="screen_off_title">屏幕关闭时暂停</string>
+    <string name="screen_report_all_ok">%1$s：%2$d 个应用 - 全部已确认</string>
+    <string name="screen_report_no_shizuku">%1$s：无法执行 - Shizuku 未连接，未停止任何应用</string>
+    <string name="screen_report_some_failed">%1$s：%3$d 个中有 %2$d 个未生效 - %4$s</string>
     <string name="search_hint">搜索应用…</string>
+    <string name="shizuku_dialog_hint">没有看到权限对话框？请在 Shizuku 应用的“已授权的应用”中授权本应用。</string>
     <string name="sort_by">排序方式：</string>
     <string name="sort_hint">排序顺序</string>
     <string name="sort_install">安装日期</string>
@@ -260,6 +282,7 @@
     <string name="stealth_error_restore">恢复出错</string>
     <string name="stealth_error_sign">签名 APK 出错</string>
     <string name="stealth_exclude_from_recents">在历史记录（最近使用的应用）中隐藏</string>
+    <string name="stealth_fgs_timeout">Android 在允许的运行时间结束后停止了后台服务。请重新开始修补。</string>
     <string name="stealth_label">%1$s（隐身）</string>
     <string name="stealth_need_launcher">未选择清单更改，请至少启用一个选项。</string>
     <string name="stealth_notif_channel">隐身修补</string>
@@ -303,6 +326,7 @@
     <string name="stealth_tracker_scanning">在此应用中检测到的构建模块：正在搜索…</string>
     <string name="stealth_tracker_title">禁用追踪器（测试版）</string>
     <string name="stealth_vault_calc">伪装为计算器（保险库）</string>
+    <string name="stealth_vault_companion_missing">未安装保险库配套应用（%1$s）。请单独安装——没有它，计算器伪装无法工作。</string>
     <string name="stealth_vault_no_launcher">保险库：未找到目标应用的启动器 Activity</string>
     <string name="stealth_vault_pin_hint">保险库 PIN（数字，4–10 位；留空 = 12345）</string>
     <string name="stealth_vault_pin_invalid">PIN 必须为 4–10 位数字</string>

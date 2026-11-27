@@ -17,15 +17,41 @@ object OnDemandCallers {
     enum class Decision { ALLOW, ASK, DENY }
 
     /**
+     * Vertrauenslisten-Eintrag: `paket` (Altbestand, ohne Signatur) oder `paket@fingerprint`.
+     * Mit Fingerabdruck gilt das Vertrauen nur fuer genau diesen Signierer - eine andere App, die spaeter
+     * denselben Paketnamen belegt, wird neu gefragt.
+     */
+    fun entryFor(pkg: String, fingerprint: String?): String =
+        if (fingerprint.isNullOrBlank()) pkg else "$pkg@$fingerprint"
+
+    private fun pkgOf(entry: String) = entry.substringBefore('@')
+    private fun fpOf(entry: String): String? = entry.substringAfter('@', "").ifEmpty { null }
+
+    /** Eintrag fuer [caller] in [trusted]; Altbestand ohne Fingerabdruck wird beim naechsten Treffer ersetzt. */
+    fun pin(trusted: Set<String>, caller: String, fingerprint: String?): Set<String> =
+        trusted.filterNot { pkgOf(it) == caller }.toSet() + entryFor(caller, fingerprint)
+
+    /** Anzahl vertrauter Starter-Apps (fuer die Anzeige). */
+    fun count(trusted: Set<String>): Int = trusted.map(::pkgOf).toSet().size
+
+    /**
      * @param caller vom System gemeldeter Aufrufer; null = nicht erkennbar (z. B. ohne ForResult gestartet)
      * @param target Ziel-App
+     * @param callerFingerprint Signierer des Aufrufers ([PackageSigner.fingerprint]); null = nicht lesbar
      */
-    fun decide(caller: String?, ownPackage: String, target: String, trusted: Set<String>): Decision = when {
-        caller.isNullOrBlank() -> Decision.DENY
+    fun decide(
+        caller: String?,
+        ownPackage: String,
+        target: String,
+        trusted: Set<String>,
+        callerFingerprint: String? = null
+    ): Decision {
+        if (caller.isNullOrBlank()) return Decision.DENY
         // Eine App darf sich nicht selbst freigeben (z. B. gesperrte App oeffnet sich per Link selbst)
-        caller == target -> Decision.DENY
-        caller == ownPackage -> Decision.ALLOW
-        caller in trusted -> Decision.ALLOW
-        else -> Decision.ASK
+        if (caller == target) return Decision.DENY
+        if (caller == ownPackage) return Decision.ALLOW
+        val entry = trusted.firstOrNull { pkgOf(it) == caller } ?: return Decision.ASK
+        val pinned = fpOf(entry) ?: return Decision.ALLOW          // Altbestand: erlauben, dann festpinnen
+        return if (callerFingerprint != null && callerFingerprint == pinned) Decision.ALLOW else Decision.ASK
     }
 }

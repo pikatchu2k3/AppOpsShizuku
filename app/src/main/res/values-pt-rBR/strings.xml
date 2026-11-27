@@ -64,6 +64,7 @@
     <string name="category_media">Mídia</string>
     <string name="category_other">Outros</string>
     <string name="category_sensors">Sensores</string>
+    <string name="category_special">Acessos especiais</string>
     <string name="category_system_ui">Interface do sistema</string>
     <string name="components_activities">Atividades</string>
     <string name="components_autostart">Início automático</string>
@@ -108,6 +109,10 @@
     <string name="error_start_activity">Não foi possível iniciar a atividade</string>
     <string name="filter_all">Todos</string>
     <string name="filter_blocked">Bloqueados</string>
+    <string name="import_preview_apply">Importar</string>
+    <string name="import_preview_dropped">%1$d entradas inválidas ou protegidas foram descartadas.</string>
+    <string name="import_preview_message">Este arquivo contém:\n• %1$d apps com perfis de permissões\n• %2$d apps com configurações de comportamento (%3$d delas serão desativadas ou congeladas)\n• %4$d regras automáticas\n\nNada é alterado antes da sua confirmação. Importe apenas arquivos em que você confia.</string>
+    <string name="import_preview_title">Importar este backup?</string>
     <string name="lifecycle_apply">Aplicar perfil</string>
     <string name="lifecycle_battery_check">Conceder isenção de bateria</string>
     <string name="lifecycle_battery_hint">Observação: com isenção de bateria, o próprio Android coloca o grupo em \"Isento pelo sistema\". O grupo escolhido acima é ignorado e mostrado como \"não aplicado\" – isso é esperado, não um erro.</string>
@@ -166,9 +171,20 @@
     <string name="net_switches_title">Restringir tráfego de rede</string>
     <string name="net_tracker_not_blockable">Os componentes encontrados não podem ser desativados individualmente aqui – o Android recusa isso sem root (o shell não pode alterar o estado de componentes de outros apps). O bloqueio é feito pelas três chaves acima; só a correção do APK na aba \"Camuflagem\" remove código.</string>
     <string name="no_apps">Nenhum app encontrado</string>
+    <string name="op_blocked_can_ask_again">Bloqueado, mas este aparelho não gravou "Não perguntar novamente" - o app pode pedir a permissão outra vez.</string>
     <string name="op_deny_warning">Atenção: negar pode fazer o app travar ao iniciar (SecurityException). Para a área de transferência, ignorar é a melhor escolha (bloqueio silencioso).</string>
+    <string name="op_label_bluetooth_connect">Conectar a dispositivos Bluetooth</string>
+    <string name="op_label_call_phone">Fazer chamadas</string>
     <string name="op_label_not_requested">%1$s · não solicitada</string>
+    <string name="op_label_read_external_storage">Ler armazenamento (legado)</string>
+    <string name="op_label_read_phone_numbers">Ler números de telefone</string>
+    <string name="op_label_request_install_packages">Instalar apps desconhecidos</string>
+    <string name="op_label_schedule_exact_alarm">Alarmes exatos</string>
+    <string name="op_label_send_sms">Enviar SMS</string>
     <string name="op_label_unsupported">%1$s · não configurável</string>
+    <string name="op_label_use_full_screen_intent">Notificações em tela cheia</string>
+    <string name="op_label_write_external_storage">Gravar no armazenamento (legado)</string>
+    <string name="op_label_write_settings">Alterar configurações do sistema</string>
     <string name="op_mode_hint">Modo</string>
     <string name="op_not_requested">%1$s: este app não solicita a permissão – nada foi alterado.</string>
     <string name="op_not_settable">%1$s não pode ser alterada neste dispositivo – não aplicada.</string>
@@ -195,6 +211,8 @@
     <string name="restore_all_confirm_title">Tudo para o padrão?</string>
     <string name="restore_done">Todas as entradas definidas como padrão</string>
     <string name="restore_partial">Definidas como padrão, %1$d entradas não aplicadas.</string>
+    <string name="screen_event_off">Tela desligada</string>
+    <string name="screen_event_on">Tela ligada</string>
     <string name="screen_off_effect_force_stop">Fechar (force-stop) – o app é encerrado e não recebe alarmes nem notificações push até ser aberto de novo; abrir continua possível</string>
     <string name="screen_off_effect_suspend">Congelar – o app não consegue iniciar até a tela acender de novo; os dados são mantidos</string>
     <string name="screen_off_excluded_own">Não se aplica ao próprio app.</string>
@@ -208,7 +226,11 @@
     <string name="screen_off_switch">Pausar quando a tela desligar</string>
     <string name="screen_off_text">O oposto do perfil acima: o app é parado assim que a tela apaga, então não continua em segundo plano. O Android só informa liga/desliga da tela a um app em execução; por isso, enquanto pelo menos um app tiver esta opção, roda um serviço com notificação. Você pode ocultar a notificação; o serviço continua funcionando. Padrão: desligado.</string>
     <string name="screen_off_title">Pausar quando a tela desligar</string>
+    <string name="screen_report_all_ok">%1$s: %2$d app(s) - todos confirmados</string>
+    <string name="screen_report_no_shizuku">%1$s: não é possível - o Shizuku não está conectado, nenhum app foi parado</string>
+    <string name="screen_report_some_failed">%1$s: %2$d de %3$d NÃO aplicados - %4$s</string>
     <string name="search_hint">Pesquisar apps…</string>
+    <string name="shizuku_dialog_hint">Caixa de permissão não aparece? Autorize este app no app Shizuku, em "Apps autorizados".</string>
     <string name="sort_by">Ordenar por:</string>
     <string name="sort_hint">Ordem de classificação</string>
     <string name="sort_install">Data de instalação</string>
@@ -260,6 +282,7 @@
     <string name="stealth_error_restore">Erro ao restaurar</string>
     <string name="stealth_error_sign">Erro ao assinar o APK</string>
     <string name="stealth_exclude_from_recents">Ocultar no histórico (apps recentes)</string>
+    <string name="stealth_fgs_timeout">O Android encerrou o serviço em segundo plano após o tempo de execução permitido. Inicie o patch novamente.</string>
     <string name="stealth_label">%1$s (Furtivo)</string>
     <string name="stealth_need_launcher">Nenhuma alteração de manifesto selecionada. Ative pelo menos uma opção.</string>
     <string name="stealth_notif_channel">Patch furtivo</string>
@@ -303,6 +326,7 @@
     <string name="stealth_tracker_scanning">Blocos detectados neste app: pesquisando…</string>
     <string name="stealth_tracker_title">Desativar rastreadores (beta)</string>
     <string name="stealth_vault_calc">Ocultar como calculadora (cofre)</string>
+    <string name="stealth_vault_companion_missing">O aplicativo complementar do cofre (%1$s) não está instalado. Instale-o separadamente - sem ele o disfarce de calculadora não funciona.</string>
     <string name="stealth_vault_no_launcher">Cofre: atividade de entrada do app de destino não encontrada</string>
     <string name="stealth_vault_pin_hint">PIN do cofre (dígitos, 4–10; vazio = 12345)</string>
     <string name="stealth_vault_pin_invalid">O PIN deve conter de 4 a 10 dígitos</string>

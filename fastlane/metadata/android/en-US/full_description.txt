@@ -1,0 +1,21 @@
+App Ops Shizuku is a privacy control panel for the <b>other</b> apps on your phone. It shows and restricts what each app may do - camera, microphone, location, contacts, clipboard, files, background activity, network - <b>without root</b>, using <a href="https://shizuku.rikka.app/">Shizuku</a>.
+
+<b>Requires Shizuku</b> (started e.g. via wireless debugging) and its permission for this app. Without Shizuku the app only shows state and changes nothing.
+
+<b>What it can do</b>
+• Permissions per app: 49 permissions and App Ops in groups - set to allow / reset / block, with an access log (last use, blocked attempts) and recommendations for rights an app seems not to need.
+• Only while in use, only on demand, and a quick Lockdown that removes camera and microphone from all apps at once (also as a quick-settings tile).
+• Network: block background data or take an app fully offline, see traffic per app, private DNS for the whole phone.
+• Automation: rules by time (and WiFi in the "full" edition), quarantine for newly installed apps, profile templates.
+• Find out what apps do: who wakes the device, schedules jobs, has accessibility or notification access.
+• Work profile, standby buckets, battery exemptions, freeze or disable apps.
+• Optional, experimental: patch apps on the device (remove trackers or permissions, hide from recents, parallel clones).
+
+<b>Control you can verify</b>
+• Every change is read back from the device; the app says so when something did not take effect.
+• A change log with undo; backups as a JSON file you choose. Imports show what a file contains before anything is applied.
+• The app has <b>no internet permission</b> - nothing leaves the phone. Open source (GPL-3.0).
+
+<b>Two editions:</b> "full" (WiFi rules, needs location permissions to read the WiFi name) and "lite" (no location permissions at all).
+
+<b>Honest limits:</b> some permissions cannot be changed on some devices; manufacturers may block disabling apps; individual components of other apps cannot be switched off at runtime on Android 15+. The app tells you instead of pretending.

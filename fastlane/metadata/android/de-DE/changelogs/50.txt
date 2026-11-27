@@ -1,0 +1,8 @@
+Sicherheits- und F-Droid-Release.
+- Importierte Sicherungen werden geprüft und vorab angezeigt
+- „Zurücksetzen“ erteilt nie mehr; unbekannte Modi tun nichts
+- Signaturschlüssel im Android-Keystore verschlüsselt; kein Cloud-Backup
+- Schneller: eine Abfrage statt ~30 beim Öffnen einer App; App-Liste gecacht
+- 11 weitere Berechtigungen/Spezialzugriffe, 9 Sprachen
+- Neue Ausgabe „lite“ ohne Standort-Rechte
+- Baut aus dem Quellcode: keine mitgelieferten Binärdateien

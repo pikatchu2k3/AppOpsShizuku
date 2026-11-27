@@ -92,6 +92,8 @@ object AutoRuleManager {
         val wifi by lazy { wifiState(app) }
         for (rule in rules) {
             if (!rule.enabled) continue
+            // Flavor "lite" kann keinen WLAN-Namen lesen: importierte WLAN-Regeln bleiben gespeichert, ruhen aber
+            if (rule.trigger == RuleTrigger.WIFI && !BuildConfig.WIFI_RULES) continue
             // WLAN-Regel bei unlesbarem Netznamen: nichts entscheiden (weder an noch aus)
             if (rule.trigger == RuleTrigger.WIFI && wifi is WifiState.Unknown) continue
             val ssid = (wifi.takeIf { rule.trigger == RuleTrigger.WIFI } as? WifiState.Ssid)?.name
@@ -157,7 +159,7 @@ object AutoRuleManager {
         } else {
             runCatching { am.cancel(pending(context, REQ_EDGE)) }
         }
-        val hasWifi = rules.any { it.enabled && it.trigger == RuleTrigger.WIFI }
+        val hasWifi = BuildConfig.WIFI_RULES && rules.any { it.enabled && it.trigger == RuleTrigger.WIFI }
         val periodic = pending(context, REQ_PERIODIC)
         if (hasWifi) {
             runCatching {
