@@ -12,6 +12,7 @@
     <string name="import_preview_dropped">%1$d ungültige oder geschützte Einträge wurden verworfen.</string>
     <string name="import_preview_message">Diese Datei enthält:\n• %1$d Apps mit Berechtigungsprofilen\n• %2$d Apps mit Verhaltens-Einstellungen (davon %3$d zum Deaktivieren oder Einfrieren)\n• %4$d Automatik-Regeln\n\nVor deiner Bestätigung wird nichts geändert. Importiere nur Dateien, denen du vertraust.</string>
     <string name="import_preview_title">Diese Sicherung importieren?</string>
+    <string name="menu_star_animation">Bewegter Hintergrund</string>
     <string name="op_blocked_can_ask_again">Blockiert, aber dieses Gerät hat „Nicht mehr fragen“ nicht gespeichert - die App darf die Berechtigung erneut anfordern.</string>
     <string name="op_label_bluetooth_connect">Mit Bluetooth-Geräten verbinden</string>
     <string name="op_label_call_phone">Anrufe tätigen</string>
@@ -29,6 +30,7 @@
     <string name="screen_report_no_shizuku">%1$s: nicht möglich – Shizuku ist nicht verbunden, keine App angehalten</string>
     <string name="screen_report_some_failed">%1$s: %2$d von %3$d NICHT übernommen – %4$s</string>
     <string name="search_hint">App suchen…</string>
+    <string name="settings_star_animation_hint">Die Sterne funkeln langsam, ab und zu zieht eine Sternschnuppe vorbei. Läuft nur bei sichtbarem Bildschirm und stoppt von selbst im Energiesparmodus oder bei abgeschalteten Systemanimationen.</string>
     <string name="shizuku_dialog_hint">Berechtigungs-Dialog nicht sichtbar? In der Shizuku-App unter „Berechtigungen“ autorisieren.</string>
     <string name="sort_hint">Sortierung</string>
     <string name="sort_by">Sortieren:</string>
@@ -837,4 +839,9 @@
     <string name="errlog_notif_text">Neue Einträge im Fehlerprotokoll: %1$d · %2$s</string>
     <string name="errlog_action_share">Teilen</string>
     <string name="errlog_action_save">Speichern</string>
+    <string name="wiu_keep_fgs_check">Auch bei laufendem Vordergrunddienst nicht entziehen</string>
+    <string name="wiu_keep_fgs_hint">Gilt für „nur während Nutzung“: Ein laufender Vordergrunddienst (z. B. Musik, Navigation) behält seine Berechtigungen, weil das Entziehen die App beenden würde. Nach Ende des Dienstes wird entzogen. Standard: aus.</string>
+    <string name="auto_revoke_active">Automatik „Berechtigungen bei Nichtnutzung entziehen“: aktiv (Standard)</string>
+    <string name="auto_revoke_exempt">Automatik „Berechtigungen bei Nichtnutzung entziehen“: App ist ausgenommen (ignore) – nicht blockiert</string>
+    <string name="auto_revoke_unsupported">Automatik „Berechtigungen bei Nichtnutzung entziehen“: auf diesem Gerät nicht verfügbar</string>
 </resources>

@@ -1,0 +1,7 @@
+Ausgang: calcyou nicht installiert
+install: Success
+(a1) nach Installation im Hintergrund: (True, 4.0)
+deaktivieren: Package de.minipc.calcyou new state: disabled-user
+(a2) deaktiviert angezeigt: True True 4.0
+deinstallieren: Success
+(a3) nach Deinstallation im Hintergrund (Eintrag weg): (True, 3.9)

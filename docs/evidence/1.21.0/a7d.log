@@ -1,0 +1,10 @@
+== A7d: 20x Drehen + Dunkelmodus wechseln (App im Vordergrund), pid=11046
+vorher: ui-worker=4 Threads=32
+nach 5: pid=11046 ui-worker=4 night=Night mode: yes top=
+nach 10: pid=11046 ui-worker=4 night=Night mode: no top=
+nach 15: pid=11046 ui-worker=4 night=Night mode: yes top=
+nach 20: pid=11046 ui-worker=4 night=Night mode: no top=
+Abstuerze im Logcat: 1
+pid danach=11046 (vorher 11046)
+
+Rotation verifiziert: Bildschirm im Querformat (siehe Groesse oben). SystemUI-Absturz um 14:33:34 (com.android.systemui, status_bar-Inflate, ROM-intern, startete selbst neu) trat waehrend des Dunkelmodus-Wechsels auf; App-PID unveraendert.

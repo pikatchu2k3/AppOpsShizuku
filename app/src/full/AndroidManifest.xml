@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- WifiManager.getConnectionInfo() verlangt ACCESS_WIFI_STATE (Normal-Recht, kein Dialog); ohne wirft es,
+         und der Netzname waere nie lesbar. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- WLAN-Name (SSID) fuer Automatik-Regeln lesen. Android verlangt dafuer den Standort FUER
          DIESE App; die App hat selbst keinen Netzzugriff. Wird erst bei der ersten WLAN-Regel
          zur Laufzeit abgefragt, nicht beim Start. -->

@@ -1,5 +1,6 @@
 package de.minipc.appopsshizuku.appops
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -63,4 +64,16 @@ class OpEffectTest {
 
     @Test fun appop_actualNull_nichtEffektiv() =
         assertFalse(OpEffect.isSetEffective(null, "deny", null))
+
+    // BUG 1: spooftest fordert CAMERA nicht an -> keine Zeile im Dump -> NOT_REQUESTED statt "default"
+    private val dumpOhneCamera = "    runtime permissions:\n      android.permission.READ_PHONE_STATE: granted=false, flags=[ USER_SET|USER_FIXED]\n"
+
+    @Test fun nichtAngeforderteBerechtigung_istNotRequested() =
+        assertEquals(OpEffect.NOT_REQUESTED, OpEffect.permissionState(dumpOhneCamera, "android.permission.CAMERA"))
+
+    @Test fun angeforderteBerechtigung_liefertGrantZustand() =
+        assertEquals("deny", OpEffect.permissionState(dumpOhneCamera, "android.permission.READ_PHONE_STATE"))
+
+    @Test fun nichtAngefordert_aberGeraetKenntRecht_bleibtNotRequested() =
+        assertEquals(OpEffect.NOT_REQUESTED, OpEffect.notRequestedOrUnknown("permission:android.permission.CAMERA", "android.permission.CAMERA"))
 }

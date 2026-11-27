@@ -1,0 +1,7 @@
+== A9 lite
+Success
+0
+(Anzahl LOCATION-Zeilen, erwartet 0)
+    versionName=1.21.0
+    flags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]
+        android.permission.POST_NOTIFICATIONS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]

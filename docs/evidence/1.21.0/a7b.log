@@ -1,0 +1,9 @@
+(b) Profil in Detailseite aendern -> zurueck -> Karte
+Profil-Datei: 0 (0 = kein Profil)
+Karte (Liste noch alt, vor Rueckkehr): Ah 1 blockiert
+Telefonstatus: ['deny@idx2/n5 -> Uid mode: READ_PHONE_STATE: ignore\nREAD_PHONE_STATE: default', 'deny@idx3/n4 -> Uid mode: READ_PHONE_STATE: ignore\nREAD_PHONE_STATE: default']
+Profil-Datei nach Aenderung: spooftest">{&quot;READ_PHONE_STATE&quot;:&quot;deny&quot;}
+Karte nach Rueckkehr (Profil gesetzt): : Datenschutz-Steuerung App suchen... | Q\ spooftest| | Spoof Test Ai 1 blockiert - Nur während Nutzung de.minipc.spooftest o > störtest | spürtest | Sportes & 
+--- sauberer Durchlauf: Alle auf Standard, WARTEN bis fertig, dann zurueck
+Profil entfernt nach 13s; appops: Uid mode: READ_PHONE_STATE: ignore | READ_PHONE_STATE: default | 
+Karte nach Rueckkehr (Profil entfernt): ih Unverändert

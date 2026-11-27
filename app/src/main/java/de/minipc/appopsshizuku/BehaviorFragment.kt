@@ -33,6 +33,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
+import de.minipc.appopsshizuku.appops.AutoRevoke
 import de.minipc.appopsshizuku.appops.LifecycleEntry
 import de.minipc.appopsshizuku.appops.LifecycleManager
 import de.minipc.appopsshizuku.appops.LifecycleProfile
@@ -571,9 +572,18 @@ class BehaviorFragment : Fragment() {
             val res = backend.exec("cmd", "activity", "get-standby-bucket", packageName)
             val bucket = res.stdout.trim().lineSequence().firstOrNull()?.trim()?.toIntOrNull()
             standbyRaw = if (bucket == null) rawOf(res) else ""
+            val revoke = backend.exec("cmd", "appops", "get", packageName, AutoRevoke.OP)
+            val state = AutoRevoke.parse(revoke.exitCode, revoke.stdout, revoke.stderr)
             handler.post {
                 if (!isAdded) return@post
                 label.text = standbyText(bucket)
+                root.findViewById<TextView>(R.id.autoRevokeState).setText(
+                    when (state) {
+                        AutoRevoke.State.ACTIVE -> R.string.auto_revoke_active
+                        AutoRevoke.State.EXEMPT -> R.string.auto_revoke_exempt
+                        AutoRevoke.State.UNSUPPORTED -> R.string.auto_revoke_unsupported
+                    }
+                )
             }
         }
     }
@@ -726,6 +736,14 @@ class BehaviorFragment : Fragment() {
             .check(bucketButtonId(profile.standbyBucket))
         view.findViewById<MaterialCheckBox>(R.id.lifecycleBatteryCheck).isChecked = profile.batteryExempt
         view.findViewById<MaterialCheckBox>(R.id.lifecycleCompileCheck).isChecked = profile.compile
+        val wiu = de.minipc.appopsshizuku.appops.WhileInUseStore(requireContext())
+        view.findViewById<MaterialCheckBox>(R.id.keepWithFgsCheck).apply {
+            isChecked = packageName in wiu.keepWithForegroundService
+            setOnCheckedChangeListener { _, on ->
+                wiu.keepWithForegroundService =
+                    if (on) wiu.keepWithForegroundService + packageName else wiu.keepWithForegroundService - packageName
+            }
+        }
         view.findViewById<MaterialButton>(R.id.lifecycleApplyButton).setOnClickListener { applyLifecycle() }
         view.findViewById<MaterialButton>(R.id.lifecycleRevertButton).setOnClickListener { revertLifecycle() }
     }

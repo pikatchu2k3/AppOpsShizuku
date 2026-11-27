@@ -1,0 +1,4 @@
+No operations.
+Default mode: default
+AUTO_REVOKE_PERMISSIONS_IF_UNUSED: ignore
+AUTO_REVOKE_PERMISSIONS_IF_UNUSED: default

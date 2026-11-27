@@ -1,0 +1,58 @@
+## 1.20.9 installiert:
+    versionName=1.20.9
+00000000: 3082 04bc 0201 0030 0d06 092a 8648 86f7  0......0...*.H..
+## 1. Patch mit 1.20.9
+Starting service: Intent { act=de.minipc.appopsshizuku.action.PATCH cmp=de.minipc.appopsshizuku/.StealthPatchService (has extras) }
+00000000: 3082 04bc 0201 0030 0d06 092a 8648 86f7  0......0...*.H..
+## nach 1. Patch (1.20.9)
+    versionName=1.0
+    lastUpdateTime=2026-11-27 13:55:27
+      firstInstallTime=2026-11-27 13:55:27
+00000000: 3082 04bc 0201 0030 0d06 092a 8648 86f7  0......0...*.H..
+-rw------- 1 u0_a205 u0_a205  743 2026-10-05 00:25 apk_signer_cert.der
+-rw------- 1 u0_a205 u0_a205 1216 2026-10-05 00:25 apk_signer_key.der
+## Update auf 1.21.0 (Debug-Keystore gleich)
+Success
+    versionName=1.21.0
+00000000: 3082 04bc 0201 0030 0d06 092a 8648 86f7  0......0...*.H..
+Starting service: Intent { act=de.minipc.appopsshizuku.action.PATCH cmp=de.minipc.appopsshizuku/.StealthPatchService (has extras) }
+## nach 2. Patch (1.21.0)
+    versionName=1.0
+    lastUpdateTime=2026-11-27 14:00:12
+    signatures=PackageSignatures{b4e821 version:3, signatures:[930b9112], past signatures:[]}
+      firstInstallTime=2026-11-27 13:55:27
+00000000: 414f 534b 01c6 fa47 159e 83cc cfeb e3b8  AOSK...G........
+-rw------- 1 u0_a205 u0_a205  743 2026-10-05 00:25 apk_signer_cert.der
+-rw------- 1 u0_a205 u0_a205 1249 2026-11-27 14:00 apk_signer_key.der
+1
+exit=255
+stderr: Error: Unknown operation string: START_FOREGROUND_SERVICES_FROM_BACKGROUND
+--- 2026-11-27 13:55:51 · SHELL
+$ cmd appops set de.minipc.appopsshizuku START_FOREGROUND_SERVICES_FROM_BACKGROUND allow
+exit=255
+stderr: Error: Unknown operation string: START_FOREGROUND_SERVICES_FROM_BACKGROUND
+--- 2026-11-27 14:00:13 · WARNUNG StealthPatchService
+relocateOriginals fehlgeschlagen für de.minipc.spooftest (Originale bleiben im Cache)
+## Schritt 4: Neuinstallation ohne Altdaten (Sicherung /tmp/a6bak, md5 67268a04...)
+Success
+Success
+ls: /data/data/de.minipc.appopsshizuku/files: No such file or directory
+ls: /data/data/de.minipc.appopsshizuku/files: No such file or directory
+0
+## nach Patch auf frischer Installation
+package:de.minipc.spooftest
+package:de.minipc.spooftest.a6clone
+xxd: /data/data/de.minipc.appopsshizuku/files/apk_signer_key.der: No such file or directory
+tail: /data/data/de.minipc.appopsshizuku/files/error_log.txt: No such file or directory
+## nach Patch auf frischer Installation (Shizuku-Recht per Dialog erteilt)
+package:de.minipc.spooftest.a6clone2
+package:de.minipc.spooftest
+package:de.minipc.spooftest.a6clone
+00000000: 414f 534b 01f1 3d98 5172 c5f0 613a 4847  AOSK..=.Qr..a:HG
+-rw------- 1 u0_a274 u0_a274  742 2026-11-27 14:20 apk_signer_cert.der
+-rw------- 1 u0_a274 u0_a274 1250 2026-11-27 14:20 apk_signer_key.der
+    signatures=PackageSignatures{13d5af4 version:3, signatures:[9577faf8], past signatures:[]}
+$ cmd appops set de.minipc.appopsshizuku START_FOREGROUND_SERVICES_FROM_BACKGROUND allow
+exit=255
+stderr: Error: Unknown operation string: START_FOREGROUND_SERVICES_FROM_BACKGROUND
+## Aufraeumen: Klone deinstalliert, alte Daten (inkl. urspruenglichem Klartext-Schluessel) zurueckgespielt; Debug-Build 1.21.0 installiert

@@ -1,0 +1,6 @@
+Fixes after on-device testing (Android 14).
+- Permissions an app does not request now show "not requested" instead of "Exit 255"
+- App list refreshes after Shizuku reconnects
+- Wi-Fi rules work in the full flavor again (missing ACCESS_WIFI_STATE)
+- Official Gradle 8.14 wrapper (checksum verified)
+- New: auto-revoke status display; option "do not revoke while a foreground service runs"

@@ -363,6 +363,22 @@
                             android:text="@string/settings_dynamic_hint"
                             android:textColor="@color/on_glass_dim"
                             android:textSize="13sp" />
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/settingStarAnimation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/menu_star_animation"
+                            android:textColor="@color/on_glass"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_star_animation_hint"
+                            android:textColor="@color/on_glass_dim"
+                            android:textSize="13sp" />
                     </LinearLayout>
 
                     <LinearLayout

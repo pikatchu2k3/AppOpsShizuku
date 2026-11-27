@@ -1,0 +1,49 @@
+== CAMERA: CAMERA: default|
+== RECORD_AUDIO: No operations.|Default mode: allow|
+== READ_CONTACTS: No operations.|Default mode: allow|
+== WRITE_CONTACTS: No operations.|Default mode: allow|
+== READ_CALENDAR: No operations.|Default mode: allow|
+== WRITE_CALENDAR: No operations.|Default mode: allow|
+== READ_CALL_LOG: No operations.|Default mode: allow|
+== WRITE_CALL_LOG: No operations.|Default mode: allow|
+== GET_ACCOUNTS: No operations.|Default mode: allow|
+== READ_CLIPBOARD: No operations.|Default mode: allow|
+== WRITE_CLIPBOARD: No operations.|Default mode: allow|
+== BODY_SENSORS: No operations.|Default mode: allow|
+== ACTIVITY_RECOGNITION: No operations.|Default mode: allow|
+== READ_PHONE_STATE: Uid mode: READ_PHONE_STATE: ignore|READ_PHONE_STATE: allow|
+== READ_SMS: No operations.|Default mode: allow|
+== RECEIVE_SMS: No operations.|Default mode: allow|
+== BLUETOOTH_SCAN: No operations.|Default mode: allow|
+== NEARBY_WIFI_DEVICES: No operations.|Default mode: allow|
+== BLUETOOTH_CONNECT: Uid mode: BLUETOOTH_CONNECT: ignore|
+== READ_PHONE_NUMBERS: No operations.|Default mode: allow|
+== CALL_PHONE: No operations.|Default mode: allow|
+== SEND_SMS: No operations.|Default mode: allow|
+== ACCESS_LOCAL_NETWORK: Error: Unknown operation string: ACCESS_LOCAL_NETWORK|
+== FINE_LOCATION: No operations.|Default mode: allow|
+== COARSE_LOCATION: No operations.|Default mode: allow|
+== ACCESS_BACKGROUND_LOCATION: Error: Unknown operation string: ACCESS_BACKGROUND_LOCATION|
+== ACCESS_MEDIA_LOCATION: No operations.|Default mode: allow|
+== READ_MEDIA_IMAGES: No operations.|Default mode: allow|
+== READ_MEDIA_VIDEO: No operations.|Default mode: allow|
+== READ_MEDIA_AUDIO: No operations.|Default mode: allow|
+== READ_MEDIA_VISUAL_USER_SELECTED: No operations.|Default mode: allow|
+== MANAGE_EXTERNAL_STORAGE: No operations.|Default mode: default|
+== READ_EXTERNAL_STORAGE: No operations.|Default mode: allow|
+== WRITE_EXTERNAL_STORAGE: No operations.|Default mode: allow|
+== RUN_IN_BACKGROUND: No operations.|Default mode: allow|
+== RUN_ANY_IN_BACKGROUND: No operations.|Default mode: allow|
+== START_FOREGROUND_SERVICES_FROM_BACKGROUND: Error: Unknown operation string: START_FOREGROUND_SERVICES_FROM_BACKGROUND|
+== GET_USAGE_STATS: No operations.|Default mode: default|
+== READ_DEVICE_IDENTIFIERS: No operations.|Default mode: deny|
+== MOCK_LOCATION: No operations.|Default mode: deny|
+== SYSTEM_ALERT_WINDOW: No operations.|Default mode: default|
+== ACCESS_NOTIFICATIONS: No operations.|Default mode: allow|
+== POST_NOTIFICATION: No operations.|Default mode: allow|
+== TURN_SCREEN_ON: No operations.|Default mode: default|
+== PICTURE_IN_PICTURE: No operations.|Default mode: allow|
+== REQUEST_INSTALL_PACKAGES: No operations.|Default mode: default|
+== WRITE_SETTINGS: No operations.|Default mode: default|
+== SCHEDULE_EXACT_ALARM: No operations.|Default mode: default|
+== USE_FULL_SCREEN_INTENT: No operations.|Default mode: default|

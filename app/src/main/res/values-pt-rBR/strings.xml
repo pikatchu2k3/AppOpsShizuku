@@ -137,6 +137,7 @@
     <string name="menu_dynamic_color_unavailable">Cores do sistema (disponível apenas no Android 12 ou superior)</string>
     <string name="menu_export_profiles">Exportar perfis</string>
     <string name="menu_import_profiles">Importar perfis</string>
+    <string name="menu_star_animation">Plano de fundo animado</string>
     <string name="net_bg_data">Bloquear dados em segundo plano</string>
     <string name="net_bg_data_hint">O app só pode carregar dados enquanto você o estiver usando. Recomendado.</string>
     <string name="net_bg_restrict">Restringir em segundo plano</string>
@@ -230,6 +231,7 @@
     <string name="screen_report_no_shizuku">%1$s: não é possível - o Shizuku não está conectado, nenhum app foi parado</string>
     <string name="screen_report_some_failed">%1$s: %2$d de %3$d NÃO aplicados - %4$s</string>
     <string name="search_hint">Pesquisar apps…</string>
+    <string name="settings_star_animation_hint">As estrelas cintilam devagar e de vez em quando passa uma estrela cadente. Só funciona com a tela visível e para sozinha no modo de economia de bateria ou com as animações do sistema desligadas.</string>
     <string name="shizuku_dialog_hint">Caixa de permissão não aparece? Autorize este app no app Shizuku, em "Apps autorizados".</string>
     <string name="sort_by">Ordenar por:</string>
     <string name="sort_hint">Ordem de classificação</string>
@@ -814,4 +816,9 @@
     <string name="errlog_notif_text">Novas entradas no registro de erros: %1$d · %2$s</string>
     <string name="errlog_action_share">Compartilhar</string>
     <string name="errlog_action_save">Salvar</string>
+    <string name="wiu_keep_fgs_check">Não revogar enquanto houver serviço em primeiro plano</string>
+    <string name="wiu_keep_fgs_hint">Vale para «somente durante o uso»: um serviço em primeiro plano ativo (música, navegação) mantém as permissões, pois revogar encerraria o app. Revogado quando o serviço termina. Padrão: desligado.</string>
+    <string name="auto_revoke_active">Revogação automática de permissões não usadas: ativa (padrão)</string>
+    <string name="auto_revoke_exempt">Revogação automática de permissões não usadas: app isento (ignore), não bloqueado</string>
+    <string name="auto_revoke_unsupported">Revogação automática de permissões não usadas: indisponível neste dispositivo</string>
 </resources>

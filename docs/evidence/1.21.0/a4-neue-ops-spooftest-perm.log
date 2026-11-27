@@ -1,0 +1,40 @@
+== WRITE_SETTINGS
+set deny -> WRITE_SETTINGS: deny|
+set allow -> WRITE_SETTINGS: allow|
+set default -> WRITE_SETTINGS: default|
+== SCHEDULE_EXACT_ALARM
+set deny -> SCHEDULE_EXACT_ALARM: deny|
+set allow -> SCHEDULE_EXACT_ALARM: allow|
+set default -> SCHEDULE_EXACT_ALARM: default|
+== USE_FULL_SCREEN_INTENT
+set deny -> USE_FULL_SCREEN_INTENT: deny|
+set allow -> USE_FULL_SCREEN_INTENT: allow|
+set default -> USE_FULL_SCREEN_INTENT: default|
+== REQUEST_INSTALL_PACKAGES
+set deny -> REQUEST_INSTALL_PACKAGES: deny|
+set allow -> REQUEST_INSTALL_PACKAGES: allow|
+set default -> REQUEST_INSTALL_PACKAGES: default|
+== BLUETOOTH_CONNECT (pm)
+        android.permission.BLUETOOTH_CONNECT: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+grant -> No operations.|Default mode: allow|  android.permission.BLUETOOTH_CONNECT: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+revoke -> Uid mode: BLUETOOTH_CONNECT: ignore|  android.permission.BLUETOOTH_CONNECT: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+== READ_PHONE_NUMBERS (pm)
+        android.permission.READ_PHONE_NUMBERS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+grant -> No operations.|Default mode: allow|  android.permission.READ_PHONE_NUMBERS: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+revoke -> Uid mode: READ_PHONE_NUMBERS: ignore|  android.permission.READ_PHONE_NUMBERS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+== CALL_PHONE (pm)
+        android.permission.CALL_PHONE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+grant -> No operations.|Default mode: allow|  android.permission.CALL_PHONE: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+revoke -> Uid mode: CALL_PHONE: ignore|  android.permission.CALL_PHONE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+== SEND_SMS (pm)
+        android.permission.SEND_SMS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+grant -> No operations.|Default mode: allow|  android.permission.SEND_SMS: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+revoke -> Uid mode: SEND_SMS: ignore|  android.permission.SEND_SMS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+== READ_EXTERNAL_STORAGE (pm)
+        android.permission.READ_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+grant -> No operations.|Default mode: allow|  android.permission.READ_EXTERNAL_STORAGE: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+revoke -> Uid mode: READ_EXTERNAL_STORAGE: ignore|  android.permission.READ_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+== WRITE_EXTERNAL_STORAGE (pm)
+        android.permission.WRITE_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+grant -> No operations.|Default mode: allow|  android.permission.WRITE_EXTERNAL_STORAGE: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+revoke -> Uid mode: WRITE_EXTERNAL_STORAGE: ignore|  android.permission.WRITE_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]

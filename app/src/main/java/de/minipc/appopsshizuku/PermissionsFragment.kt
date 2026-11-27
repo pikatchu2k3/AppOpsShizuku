@@ -264,6 +264,15 @@ class PermissionsFragment : Fragment() {
         // "Nur waehrend Nutzung" ist ein Modus dieser App, kein Systemzustand: so anzeigen
         if (op.permissionName != null && wiuStore.has(packageName, op.opName)) return WhileInUse.MODE
         if (!op.readViaPermission) {
+            // Nicht angeforderte Berechtigung: `cmd appops get` kennt dazu keine Zeile und lieferte "default" ->
+            // die UI liess "deny" zu und scheiterte an `pm revoke` (Exit 255). Zuerst die Deklaration pruefen.
+            val perm = op.permissionName
+            if (perm != null) {
+                val pkgDump = if (useCache) (dumpsysCache ?: readPackageDump()) else readPackageDump()
+                if (pkgDump != null && OpEffect.permissionState(pkgDump, perm) == OpEffect.NOT_REQUESTED) {
+                    return OpEffect.notRequestedOrUnknown(permissionsCache ?: readPermissionRegistry(), perm)
+                }
+            }
             val dump = appOpsDump
             if (dump != null) {
                 // Beim Laden: aus der Gesamtausgabe; unbekannte Ops (nur dieses Geraet weiss das) einmal pro Prozess pruefen
@@ -655,7 +664,8 @@ class PermissionsFragment : Fragment() {
      */
     private fun enableWhileInUse(op: AppOp) {
         if (packageName == appContext.packageName || opStates[op.opName] == OpEffect.NOT_REQUESTED || opStates[op.opName] == null) {
-            Toast.makeText(appContext, appContext.getString(R.string.op_not_settable, op.label), Toast.LENGTH_LONG).show()
+            val msg = if (opStates[op.opName] == OpEffect.NOT_REQUESTED) R.string.op_not_requested else R.string.op_not_settable
+            Toast.makeText(appContext, appContext.getString(msg, op.label), Toast.LENGTH_LONG).show()
             handler.post { refreshList() }
             return
         }

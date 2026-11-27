@@ -1,0 +1,28 @@
+== REQUEST_INSTALL_PACKAGES
+set deny: 
+get: REQUEST_INSTALL_PACKAGES: deny|
+set allow: 
+get: REQUEST_INSTALL_PACKAGES: allow|
+set default: 
+get: REQUEST_INSTALL_PACKAGES: default|
+== WRITE_SETTINGS
+set deny: 
+get: WRITE_SETTINGS: default|
+set allow: 
+get: WRITE_SETTINGS: default|
+set default: 
+get: WRITE_SETTINGS: default|
+== SCHEDULE_EXACT_ALARM
+set deny: 
+get: SCHEDULE_EXACT_ALARM: default|
+set allow: 
+get: SCHEDULE_EXACT_ALARM: default|
+set default: 
+get: SCHEDULE_EXACT_ALARM: default|
+== USE_FULL_SCREEN_INTENT
+set deny: 
+get: USE_FULL_SCREEN_INTENT: default|
+set allow: 
+get: USE_FULL_SCREEN_INTENT: default|
+set default: 
+get: USE_FULL_SCREEN_INTENT: default|
