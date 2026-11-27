@@ -20,6 +20,9 @@ object WhileInUse {
      * @param foreground Paket -> vorne? (null = keine Aussage, dann bleibt alles wie es ist)
      * @param grantedByUs Pakete, deren Berechtigungen WIR gerade erteilt haben
      * @param leftAt Paket -> seit wann nicht mehr vorne (wird hier gepflegt)
+     * @param hasForegroundService nur fuer Apps mit eingeschalteter Ausnahme true, wenn ein Vordergrunddienst
+     *   laeuft; wird nur gefragt, wenn ohnehin entzogen wuerde. Dann bleibt die Berechtigung (pm revoke
+     *   wuerde den Prozess samt Dienst beenden), spaetestens nach Ende des Dienstes wird entzogen.
      */
     fun decide(
         now: Long,
@@ -27,13 +30,14 @@ object WhileInUse {
         foreground: Map<String, Boolean?>,
         grantedByUs: Set<String>,
         leftAt: MutableMap<String, Long>,
-        screenOn: Boolean = true
+        screenOn: Boolean = true,
+        hasForegroundService: (String) -> Boolean = { false }
     ): Map<String, Action> {
         val out = mutableMapOf<String, Action>()
         for (pkg in apps) {
             if (!screenOn) {
                 leftAt.remove(pkg)
-                if (pkg in grantedByUs) out[pkg] = Action.REVOKE
+                if (pkg in grantedByUs && !hasForegroundService(pkg)) out[pkg] = Action.REVOKE
                 continue
             }
             when (foreground[pkg]) {
@@ -43,7 +47,7 @@ object WhileInUse {
                 }
                 false -> if (pkg in grantedByUs) {
                     val since = leftAt.getOrPut(pkg) { now }
-                    if (now - since >= GRACE_MS) {
+                    if (now - since >= GRACE_MS && !hasForegroundService(pkg)) {
                         out[pkg] = Action.REVOKE
                         leftAt.remove(pkg)
                     }
@@ -55,6 +59,14 @@ object WhileInUse {
         for (pkg in grantedByUs - apps) out[pkg] = Action.REVOKE
         return out
     }
+}
+
+/** Erkennung aus `dumpsys activity services <pkg>`: laeuft ein Dienst des Pakets als Vordergrunddienst? */
+object ForegroundServices {
+    fun isRunning(dump: String, pkg: String): Boolean =
+        dump.split("* ServiceRecord{").drop(1).any { block ->
+            block.substringBefore('\n').contains(" $pkg/") && "isForeground=true" in block
+        }
 }
 
 /** Speicher: Paket -> Ops im Modus "nur waehrend Nutzung"; dazu, wem WIR gerade erteilt haben. */
@@ -80,11 +92,17 @@ class WhileInUseStore(context: Context) {
 
     fun remove(pkg: String) = prefs.edit().remove(pkg).apply()
 
+    /** Apps, bei denen auch ein laufender Vordergrunddienst den Entzug aufschiebt (Standard: aus). */
+    var keepWithForegroundService: Set<String>
+        get() = prefs.getStringSet(KEY_FGS, emptySet()).orEmpty().toSet()
+        set(v) = prefs.edit().putStringSet(KEY_FGS, v).apply()
+
     var grantedByUs: Set<String>
         get() = prefs.getStringSet(KEY_GRANTED, emptySet()).orEmpty().toSet()
         set(v) = prefs.edit().putStringSet(KEY_GRANTED, v).apply()
 
     private companion object {
         const val KEY_GRANTED = "__granted"
+        const val KEY_FGS = "__fgs"
     }
 }

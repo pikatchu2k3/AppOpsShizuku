@@ -837,4 +837,9 @@
     <string name="errlog_notif_text">Neue Einträge im Fehlerprotokoll: %1$d · %2$s</string>
     <string name="errlog_action_share">Teilen</string>
     <string name="errlog_action_save">Speichern</string>
+    <string name="wiu_keep_fgs_check">Auch bei laufendem Vordergrunddienst nicht entziehen</string>
+    <string name="wiu_keep_fgs_hint">Gilt für „nur während Nutzung“: Ein laufender Vordergrunddienst (z. B. Musik, Navigation) behält seine Berechtigungen, weil das Entziehen die App beenden würde. Nach Ende des Dienstes wird entzogen. Standard: aus.</string>
+    <string name="auto_revoke_active">Automatik „Berechtigungen bei Nichtnutzung entziehen“: aktiv (Standard)</string>
+    <string name="auto_revoke_exempt">Automatik „Berechtigungen bei Nichtnutzung entziehen“: App ist ausgenommen (ignore) – nicht blockiert</string>
+    <string name="auto_revoke_unsupported">Automatik „Berechtigungen bei Nichtnutzung entziehen“: auf diesem Gerät nicht verfügbar</string>
 </resources>

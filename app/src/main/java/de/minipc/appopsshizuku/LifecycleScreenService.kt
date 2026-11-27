@@ -30,6 +30,7 @@ import de.minipc.appopsshizuku.appops.screenOffServiceNeeded
 import de.minipc.appopsshizuku.appops.updateSuspendedByUs
 import de.minipc.appopsshizuku.appops.AppOpsController
 import de.minipc.appopsshizuku.appops.PrivacyOps
+import de.minipc.appopsshizuku.appops.ForegroundServices
 import de.minipc.appopsshizuku.appops.WhileInUse
 import de.minipc.appopsshizuku.appops.WhileInUseStore
 import de.minipc.appopsshizuku.shizuku.ShizukuBackend
@@ -599,7 +600,12 @@ class LifecycleScreenService : Service() {
         for ((pkg, fg) in fresh) if (fg != null) wiuForeground[pkg] = fg
         wiuForeground.keys.retainAll(apps.keys)
         wiuLastPoll = now
-        val actions = WhileInUse.decide(now, apps.keys, wiuForeground.toMap(), granted, wiuLeftAt, screenOn)
+        val fgsExempt = wiuStore.keepWithForegroundService
+        val actions = WhileInUse.decide(now, apps.keys, wiuForeground.toMap(), granted, wiuLeftAt, screenOn) { pkg ->
+            pkg in fgsExempt && runCatching {
+                ForegroundServices.isRunning(backend.exec("dumpsys", "activity", "services", pkg).stdout, pkg)
+            }.getOrDefault(false)
+        }
         if (actions.isEmpty()) return
         val controller = AppOpsController(backend)
         var next = granted

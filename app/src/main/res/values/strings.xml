@@ -815,4 +815,9 @@
     <string name="errlog_notif_text">New error log entries: %1$d · %2$s</string>
     <string name="errlog_action_share">Share</string>
     <string name="errlog_action_save">Save</string>
+    <string name="wiu_keep_fgs_check">Do not revoke while a foreground service is running</string>
+    <string name="wiu_keep_fgs_hint">Applies to \"only while in use\": a running foreground service (e.g. music, navigation) keeps its permissions, because revoking would end the app. Revoked once the service stops. Default: off.</string>
+    <string name="auto_revoke_active">Auto-revoke of unused permissions: active (default)</string>
+    <string name="auto_revoke_exempt">Auto-revoke of unused permissions: app is exempt (ignore) – not blocked</string>
+    <string name="auto_revoke_unsupported">Auto-revoke of unused permissions: not available on this device</string>
 </resources>

@@ -1,0 +1,10 @@
+# B1 Geraet: Xiaomi mido, LineageOS 21
+package:com.android.theme.font.oneplusslate
+com.miui.powerkeeper: 
+com.miui.securitycenter: 
+com.oplus.battery: 
+com.oplus.securitypermission: 
+com.oplus.wirelesssettings: 
+lineage_mido-userdebug 14 AP2A.240705.005 eng.zeelog.20240712.085656 dev-keys
+Error: Unknown operation string: AUTO_START
+Error: Unknown operation string: AUTO_START
