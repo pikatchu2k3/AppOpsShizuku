@@ -1,0 +1,3 @@
+„Nur bei Bedarf“ sperrt keine Apps mehr mitten in der Benutzung.
+- Ursache: Beim Wechsel zwischen zwei Bildschirmen derselben App kam zuletzt „STOPPED“ an, obwohl ein anderer Bildschirm vorne war — die App galt als verlassen und wurde nach Ablauf der Frist gesperrt.
+- Jetzt wird je Bildschirm ausgewertet; zusätzlich prüft die App vor dem Sperren, ob sie laut System gerade sichtbar vorne ist.

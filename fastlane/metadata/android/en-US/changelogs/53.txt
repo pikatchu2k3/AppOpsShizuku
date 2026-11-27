@@ -1,0 +1,3 @@
+"On demand" no longer locks apps while they are being used.
+- Cause: when switching between two screens of the same app, the last event was STOPPED even though another screen was in front — the app counted as left and was locked after the grace period.
+- Now evaluated per screen; additionally the app checks right before locking whether the system still shows it in front.

@@ -11,8 +11,8 @@ android {
         applicationId = "de.minipc.appopsshizuku"
         minSdk = 26
         targetSdk = 35
-        versionCode = 52
-        versionName = "1.21.2"
+        versionCode = 53
+        versionName = "1.21.3"
     }
 
     // F-Droid/IzzyOnDroid: keinen verschluesselten Abhaengigkeits-Block (Google-Blob) in die APK schreiben.
