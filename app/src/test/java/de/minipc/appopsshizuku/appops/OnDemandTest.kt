@@ -174,3 +174,38 @@ class OnDemandTest {
         assertEquals(300, merged.onDemandGraceSeconds)
     }
 }
+
+/** Vordergrund je Activity: ein Bildschirmwechsel innerhalb der App ist KEIN Verlassen. */
+class OnDemandActivityEventsTest {
+    private val R = OnDemand.EVENT_RESUMED
+    private val P = OnDemand.EVENT_PAUSED
+    private val S = OnDemand.EVENT_STOPPED
+
+    @Test fun wechselInnerhalbDerAppBleibtVorne() {
+        // A pausiert, B fortgesetzt, A gestoppt: B ist vorne
+        val ev = listOf("A" to R, "A" to P, "B" to R, "A" to S)
+        org.junit.Assert.assertEquals(true, OnDemand.foregroundFromActivityEvents(ev))
+        // der alte, paketweite Weg haette das als "verlassen" gelesen
+        org.junit.Assert.assertEquals(false, OnDemand.foregroundFromEvents(ev.map { it.second }))
+    }
+
+    @Test fun appVerlassen() {
+        val ev = listOf("A" to R, "A" to P, "B" to R, "A" to S, "B" to P, "B" to S)
+        org.junit.Assert.assertEquals(false, OnDemand.foregroundFromActivityEvents(ev))
+    }
+
+    @Test fun zurueckZurErstenActivity() {
+        val ev = listOf("A" to R, "A" to P, "B" to R, "A" to S, "B" to P, "A" to R, "B" to S)
+        org.junit.Assert.assertEquals(true, OnDemand.foregroundFromActivityEvents(ev))
+    }
+
+    @Test fun keineEreignisseKeineAussage() {
+        org.junit.Assert.assertNull(OnDemand.foregroundFromActivityEvents(emptyList()))
+        org.junit.Assert.assertNull(OnDemand.foregroundFromActivityEvents(listOf("A" to 5, "A" to 7)))
+    }
+
+    @Test fun ohneKlassennameWieFrueher() {
+        org.junit.Assert.assertEquals(false, OnDemand.foregroundFromActivityEvents(listOf(null to R, null to P)))
+        org.junit.Assert.assertEquals(true, OnDemand.foregroundFromActivityEvents(listOf(null to P, null to R)))
+    }
+}

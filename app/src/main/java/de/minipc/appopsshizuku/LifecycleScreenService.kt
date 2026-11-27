@@ -500,6 +500,12 @@ class LifecycleScreenService : Service() {
                 pollShizukuReported = true
                 continue
             }
+            // Letzte Sicherung vor dem Sperren: ist die App laut System gerade sichtbar vorne, NICHT sperren
+            // (eine Sperre mitten in der Benutzung ist schlimmer als eine verspaetete).
+            if (isVisiblyInFront(backend, pkg)) {
+                leftAt.remove(pkg)
+                continue
+            }
             lockOne(pkg, e, onDemandExecutor(backend), getString(R.string.ondemand_report_left))
         }
     }
@@ -542,6 +548,12 @@ class LifecycleScreenService : Service() {
             }
             lockOne(pkg, e, exec, reason)
         }
+    }
+
+    /** `dumpsys activity activities`: steht eine Activity von [pkg] als oberste fortgesetzte da? */
+    private fun isVisiblyInFront(backend: de.minipc.appopsshizuku.shizuku.ShellBackend, pkg: String): Boolean {
+        val dump = runCatching { backend.exec("dumpsys", "activity", "activities") }.getOrNull() ?: return false
+        return dump.exitCode == 0 && OnDemand.foregroundFromDumpsys(dump.stdout, pkg) == true
     }
 
     private fun lockOne(pkg: String, e: LifecycleEntry, exec: OnDemandExecutor, reason: String) {

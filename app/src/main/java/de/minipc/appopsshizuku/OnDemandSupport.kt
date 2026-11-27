@@ -51,13 +51,13 @@ object OnDemandSupport {
         if (hasUsageAccess(context)) {
             val usm = context.getSystemService(UsageStatsManager::class.java)
             val events = usm.queryEvents(sinceMs, System.currentTimeMillis())
-            val types = ArrayList<Int>()
+            val types = ArrayList<Pair<String?, Int>>()
             val e = UsageEvents.Event()
             while (events.hasNextEvent()) {
                 events.getNextEvent(e)
-                if (e.packageName == packageName) types.add(e.eventType)
+                if (e.packageName == packageName) types.add(e.className to e.eventType)
             }
-            OnDemand.foregroundFromEvents(types)?.let { return it }
+            OnDemand.foregroundFromActivityEvents(types)?.let { return it }
         }
         if (backend == null) return null
         val dump = backend.exec("dumpsys", "activity", "activities")
@@ -78,13 +78,13 @@ object OnDemandSupport {
         if (hasUsageAccess(context)) {
             val usm = context.getSystemService(UsageStatsManager::class.java)
             val events = usm.queryEvents(sinceMs, System.currentTimeMillis())
-            val types = HashMap<String, ArrayList<Int>>()
+            val types = HashMap<String, ArrayList<Pair<String?, Int>>>()
             val e = UsageEvents.Event()
             while (events.hasNextEvent()) {
                 events.getNextEvent(e)
-                if (e.packageName in packages) types.getOrPut(e.packageName) { ArrayList() }.add(e.eventType)
+                if (e.packageName in packages) types.getOrPut(e.packageName) { ArrayList() }.add(e.className to e.eventType)
             }
-            return packages.associateWith { p -> types[p]?.let { OnDemand.foregroundFromEvents(it) } }
+            return packages.associateWith { p -> types[p]?.let { OnDemand.foregroundFromActivityEvents(it) } }
         }
         if (backend == null) return packages.associateWith { null }
         val dump = backend.exec("dumpsys", "activity", "activities")
