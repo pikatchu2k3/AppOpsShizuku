@@ -20,7 +20,7 @@ object ImportGuard {
     private val PACKAGE = Regex("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+$")
 
     /** Modi, die in einem Profil stehen duerfen. */
-    val MODES: Set<String> = setOf("default", "allow", "ignore", "deny", WhileInUse.MODE)
+    val MODES: Set<String> = setOf("default", "reset", "allow", "ignore", "deny", WhileInUse.MODE)
 
     /** Standby-Stufen, die `am set-standby-bucket` kennt (siehe [standbyName]). */
     private val STANDBY_BUCKETS = setOf(10, 20, 30, 40, 45, 50)

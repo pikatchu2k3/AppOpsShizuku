@@ -190,7 +190,7 @@ class AppOpsControllerTest {
     // ---------- restoreAll / Noop ----------
 
     @Test
-    fun `restoreAll grants permission ops and resets clipboard ops`() {
+    fun `restoreAll entzieht Berechtigungen (erteilt nie) und setzt Zwischenablage auf default`() {
         val backend = FakeBackend()
         backend.result = ShellResult(0, "", "")
         val controller = AppOpsController(backend)
@@ -200,12 +200,13 @@ class AppOpsControllerTest {
 
         assertEquals(2, results.size)
         assertEquals(
-            listOf("pm", "grant", "com.example.app", "android.permission.CAMERA"),
+            listOf("pm", "revoke", "com.example.app", "android.permission.CAMERA"),
             backend.commands[0]
         )
+        assertTrue(backend.commands.none { it.getOrNull(1) == "grant" })
         assertEquals(
             listOf("cmd", "appops", "set", "com.example.app", "READ_CLIPBOARD", "default"),
-            backend.commands.filterNot { it.getOrNull(1)?.endsWith("permission-flags") == true }[1]
+            backend.commands.last()
         )
     }
 

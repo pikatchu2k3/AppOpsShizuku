@@ -51,7 +51,17 @@ object OpLabels {
         "ACCESS_NOTIFICATIONS" to R.string.op_label_access_notifications,
         "POST_NOTIFICATION" to R.string.op_label_post_notification,
         "TURN_SCREEN_ON" to R.string.op_label_turn_screen_on,
-        "PICTURE_IN_PICTURE" to R.string.op_label_picture_in_picture
+        "PICTURE_IN_PICTURE" to R.string.op_label_picture_in_picture,
+        "BLUETOOTH_CONNECT" to R.string.op_label_bluetooth_connect,
+        "READ_PHONE_NUMBERS" to R.string.op_label_read_phone_numbers,
+        "CALL_PHONE" to R.string.op_label_call_phone,
+        "SEND_SMS" to R.string.op_label_send_sms,
+        "READ_EXTERNAL_STORAGE" to R.string.op_label_read_external_storage,
+        "WRITE_EXTERNAL_STORAGE" to R.string.op_label_write_external_storage,
+        "REQUEST_INSTALL_PACKAGES" to R.string.op_label_request_install_packages,
+        "WRITE_SETTINGS" to R.string.op_label_write_settings,
+        "SCHEDULE_EXACT_ALARM" to R.string.op_label_schedule_exact_alarm,
+        "USE_FULL_SCREEN_INTENT" to R.string.op_label_use_full_screen_intent
     )
 
     /** Op-Namen, fuer die ein lokalisierter Text existiert (fuer den Abdeckungs-Test). */

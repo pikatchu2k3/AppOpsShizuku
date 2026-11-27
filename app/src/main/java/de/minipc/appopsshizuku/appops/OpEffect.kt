@@ -21,7 +21,8 @@ object OpEffect {
     fun isSetEffective(permissionName: String?, requested: String, actual: String?): Boolean {
         if (actual == null) return false
         if (permissionName != null) {
-            val requestedBlocked = requested == "deny" || requested == "ignore"
+            // "reset" entzieht (die App darf neu fragen): wirksam, wenn die Berechtigung danach nicht erteilt ist
+            val requestedBlocked = requested == "deny" || requested == "ignore" || requested == "reset"
             val actualBlocked = actual == "deny" || actual == "ignore"
             val requestedAllowed = requested == "allow" || requested == "default"
             val actualAllowed = actual == "allow" || actual == "default"
@@ -48,6 +49,29 @@ object OpEffect {
         }
         return null
     }
+
+    /**
+     * Flags einer Laufzeit-Berechtigung aus `dumpsys package` (Zeile
+     * `android.permission.CAMERA: granted=false, flags=[ USER_SET|USER_FIXED]`), z. B. {USER_SET, USER_FIXED}.
+     * null = Zeile oder Flag-Liste nicht vorhanden (Format dieses Geraets unbekannt).
+     */
+    fun permissionFlags(dumpsysPackage: String, permission: String): Set<String>? {
+        val prefix = "$permission: granted="
+        for (line in dumpsysPackage.lineSequence()) {
+            val t = line.trim()
+            if (!t.startsWith(prefix)) continue
+            val m = Regex("""flags=\[([^\]]*)]""").find(t) ?: return null
+            return m.groupValues[1].split('|').map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        }
+        return null
+    }
+
+    /**
+     * Steht nach dem Blockieren wirklich "nicht mehr fragen" (USER_FIXED)? null = nicht pruefbar.
+     * false heisst: gesperrt, aber die App darf die Berechtigung neu anfordern.
+     */
+    fun isUserFixed(dumpsysPackage: String, permission: String): Boolean? =
+        permissionFlags(dumpsysPackage, permission)?.contains("USER_FIXED")
 
     /**
      * Kennung fuer "die App fordert diese Berechtigung gar nicht an".
