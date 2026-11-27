@@ -16,13 +16,17 @@ Without Shizuku the app only *shows* state; it changes nothing.
 
 Download the APK from the [latest GitHub release](https://github.com/pikatchu2k3/AppOpsShizuku/releases/latest).
 
+**F-Droid:** the app is prepared for [F-Droid](https://f-droid.org) (build from source, metadata under `fastlane/`, see [docs/fdroid](docs/fdroid/README.md)). F-Droid signs with its own key, so switching between F-Droid and GitHub builds needs a reinstall (export your backup first).
+
+**Two editions** with the same app ID: **full** (as before, incl. Wi-Fi rules, which need location permissions to read the Wi-Fi name) and **lite** (no location permissions at all, no Wi-Fi rules). The GitHub release is *full*.
+
 To get updates automatically, add the repository to [Obtainium](https://github.com/ImranR98/Obtainium) (source: *GitHub Releases*, URL `https://github.com/pikatchu2k3/AppOpsShizuku`). The signing certificate stays the same, so an update installs in place and keeps your data.
 
 ## At a glance
 
 App Ops Shizuku is a **privacy control panel for the other apps on your phone**. It can:
 
-- **See and restrict** what each app may do: 33 permissions and App Ops (camera, microphone, location, contacts, calendar, call log, SMS, clipboard, media, background running, overlays, …) — with an **access log** showing when an app last used each one and which attempts were refused.
+- **See and restrict** what each app may do: 49 permissions and App Ops (camera, microphone, location, contacts, calendar, call log, SMS, clipboard, media, background running, overlays, …) — with an **access log** showing when an app last used each one and which attempts were refused.
 - **Grant only while needed**: *only while in use* (permission exists only while the app is in front), *only on demand* (app stays closed until you open it) and a *quick lockdown* that takes camera and microphone away from every app at once.
 - **Cut network access**: block background data, take an app fully offline, see **per-app traffic** (background shown separately), and switch **private DNS** (with tracker-blocking presets) for the whole phone.
 - **Automate**: rules by time or Wi-Fi, a quarantine for newly installed apps, one-tap profile templates, a Quick Settings tile.
@@ -54,7 +58,7 @@ The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and
 - Gradient cards in the colour of each app icon on a calm star-field background (light and dark). A notice appears while Shizuku is not connected.
 
 ### Permissions per app (tab *Permissions*)
-- **33 privacy permissions** in eight groups — *sensors* (camera, microphone, body sensors, activity recognition, Bluetooth scan, nearby Wi-Fi, local network), *location* (precise, approximate, background, photo location), *data* (contacts, calendar, call log, clipboard, phone state, SMS), *media* (photos, videos, audio, selected media, all files), *accounts*, *background* (run in background, foreground services from background, usage stats), *identity* (device IDs, mock location) and *system UI* (overlay, notifications, screen on, picture-in-picture).
+- **49 privacy permissions and special accesses** in nine groups — *sensors* (camera, microphone, body sensors, activity recognition, Bluetooth scan, nearby Wi-Fi, local network), *location* (precise, approximate, background, photo location), *data* (contacts, calendar, call log, clipboard, phone state, SMS), *media* (photos, videos, audio, selected media, all files), *accounts*, *background* (run in background, foreground services from background, usage stats), *identity* (device IDs, mock location) *system UI* (overlay, notifications, screen on, picture-in-picture) and *special access* (install unknown apps, system settings, exact alarms, full-screen notifications).
 - Each one can be set to default / allow / ignore / deny. Permissions with a runtime grant use `pm grant|revoke` (blocking also sets `user-fixed`, so the app cannot simply ask again); pure App Ops use `cmd appops set`. Ops the device does not know are shown as "not settable", permissions the app never requests as "not requested".
 - **Block all** and **Reset all to default** (a reset never grants anything). Profiles are stored and exported as JSON.
 - **Access log**: last use, refused attempts and "in use right now" per permission, from a single `cmd appops get`.
@@ -101,7 +105,7 @@ The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and
 
 ### Settings and backup
 - Shizuku status, quarantine switch, *System colors (Material You)*, **standing access**, export / import and the app version.
-- **Backup** is one JSON file, saved wherever you choose (the system save dialog suggests `appopsshizuku-backup-<date>.json`, e.g. in *Downloads*): privacy profiles, behaviour settings, lifecycle profiles, automatic rules, "only while in use", the quarantine switch and the lockdown selection. Older files stay readable; on import only known permissions are accepted. Live device state (which apps are in quarantine right now) is deliberately not backed up. For scripts and Tasker the import also works without a file dialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <path>`.
+- **Backup** is one JSON file, saved wherever you choose (the system save dialog suggests `appopsshizuku-backup-<date>.json`, e.g. in *Downloads*): privacy profiles, behaviour settings, lifecycle profiles, automatic rules, "only while in use", the quarantine switch and the lockdown selection. Before anything is applied, an import shows what the file contains and discards invalid entries and disable/freeze requests for protected system apps. Older files stay readable; on import only known permissions are accepted. Live device state (which apps are in quarantine right now) is deliberately not backed up. For scripts and Tasker the import also works without a file dialog: `am start -n de.minipc.appopsshizuku/.MainActivity --es import_file <path>`.
 
 ## Safety principles
 
@@ -177,15 +181,13 @@ Open an [issue](https://github.com/pikatchu2k3/AppOpsShizuku/issues/new/choose) 
 ## Build from source
 
 ```bash
-export JAVA_HOME=/path/to/jdk        # JDK 17+ (the project targets Java 17)
-export ANDROID_HOME=/path/to/android-sdk
-export ANDROID_SDK_ROOT=$ANDROID_HOME
-./gradlew :app:assembleDebug
+export ANDROID_HOME=/path/to/android-sdk     # or sdk.dir in local.properties
+./gradlew :app:assembleFullDebug             # or :app:assembleLiteDebug
 ```
 
-The APK ends up in `app/build/outputs/apk/debug/`. Unit tests: `./gradlew :app:testDebugUnitTest`. `scripts/release.sh` builds, tests, checks the signature and publishes a GitHub release (maintainer use).
+JDK 17 or newer is enough (the project targets Java 17); no machine-specific paths are needed. The APK ends up in `app/build/outputs/apk/<edition>/debug/`. Tests: `./gradlew :app:testFullDebugUnitTest :app:testLiteDebugUnitTest`, lint: `:app:lintFullDebug :app:lintLiteDebug`. `./gradlew :app:assembleRelease` builds unsigned release APKs (what F-Droid builds). Optional R8 shrinking: `-Pminify=true` (not verified on a device, off by default). `scripts/release.sh` builds, tests, checks the signature and publishes a GitHub release (maintainer use; reads `ANDROID_HOME`, optional `ARTIFACT_DIR`).
 
-Note: `app/src/main/res/raw/calcyou.apk` (the calculator-vault build, see *License*) is **not** in the repository because `*.apk` is git-ignored. To build, put that file there (a placeholder is enough for development; the vault then cannot install its calculator).
+The repository contains **no prebuilt binaries** (only the standard Gradle wrapper). The calculator vault's companion app (`de.minipc.calcyou`, a separate GPL-3.0 project) is no longer bundled; if it is missing after a vault patch, the result tells you to install it separately.
 
 ## Design and colours
 
@@ -193,13 +195,13 @@ The app uses a **complete Material 3 palette** derived systematically from a cal
 
 ## Signature
 
-Releases are signed with the debug certificate, SHA-256 `652394f7…7226e` (full value: `652394f75d9ed1ea168561e4056556fd82d3645a6c88020cd30b18c0a3d7226e`). An update can only be installed over an existing install if it has the **same signature**; an APK you build yourself with a different debug key will not update the released app (uninstall first, which deletes app data).
+GitHub releases are release builds (not debuggable) signed with the debug certificate, SHA-256 `652394f7…7226e` (full value: `652394f75d9ed1ea168561e4056556fd82d3645a6c88020cd30b18c0a3d7226e`). An update can only be installed over an existing install if it has the **same signature**; an APK you build yourself with a different debug key will not update the released app (uninstall first, which deletes app data).
 
 ## License
 
 This project is under the **GNU General Public License, version 3.0** — full text in [LICENSE](LICENSE).
 
-Reason: the app bundles a build of a CalcYou fork (`app/src/main/res/raw/calcyou.apk`) as a raw resource for the calculator vault, and that is GPL-3.0 itself. Since the app is distributed publicly anyway, the whole project uses the same license — consistent and legally clean.
+The calculator vault works together with a CalcYou fork (GPL-3.0). Since the app is distributed publicly anyway, the whole project uses the same license.
 
 Because the repository is public, the source that belongs to every released package is available in the same place (repository + releases). There is **no warranty**: patching other apps can damage them, and the Stealth tab is used at your own risk.
 

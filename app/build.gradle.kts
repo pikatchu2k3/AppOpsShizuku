@@ -11,8 +11,8 @@ android {
         applicationId = "de.minipc.appopsshizuku"
         minSdk = 26
         targetSdk = 35
-        versionCode = 49
-        versionName = "1.20.9"
+        versionCode = 50
+        versionName = "1.21.0"
     }
 
     // F-Droid/IzzyOnDroid: keinen verschluesselten Abhaengigkeits-Block (Google-Blob) in die APK schreiben.
@@ -42,11 +42,21 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 (Verkleinern, ohne Umbenennen) ist ein Opt-in: -Pminify=true. Standard ist aus, weil smali/dexlib2,
+            // BouncyCastle und Shizuku nicht auf dem Geraet geprueft sind - siehe app/proguard-rules.pro.
+            val minify = providers.gradleProperty("minify").orNull == "true"
+            isMinifyEnabled = minify
+            isShrinkResources = minify
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
+                getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro"
             )
+            // Veroeffentlichte APKs behalten das bisherige Zertifikat (Updates ueber bestehende Installationen,
+            // siehe README "Signatur"), sind aber echte Release-Builds (nicht debuggable).
+            // Ohne die Property bleibt das APK unsigniert - so baut F-Droid und signiert selbst.
+            if (providers.gradleProperty("debugSignedRelease").orNull == "true") {
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 

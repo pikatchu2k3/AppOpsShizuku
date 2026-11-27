@@ -521,6 +521,7 @@
 
             <ImageView
                 android:id="@+id/navAppsIcon"
+                android:importantForAccessibility="no"
                 style="@style/PillNavIcon"
                 android:src="@drawable/ic_apps" />
 
@@ -536,6 +537,7 @@
 
             <ImageView
                 android:id="@+id/navToolsIcon"
+                android:importantForAccessibility="no"
                 style="@style/PillNavIcon"
                 android:src="@drawable/ic_tools" />
 
@@ -551,6 +553,7 @@
 
             <ImageView
                 android:id="@+id/navSettingsIcon"
+                android:importantForAccessibility="no"
                 style="@style/PillNavIcon"
                 android:src="@drawable/ic_settings" />
 

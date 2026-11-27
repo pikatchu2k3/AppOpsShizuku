@@ -3,7 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- App-Liste anzeigen (alle installierten Apps, Android 11+) -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <!-- Kernfunktion: Berechtigungen ALLER installierten Apps anzeigen und steuern - eine <queries>-Liste kann das
+         nicht leisten. (Google Play verlangt dafuer eine Begruendung; F-Droid/GitHub nicht.) -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
     <!-- Foreground-Service fuer den Stealth-Patch (laeuft auch bei App-Wechsel weiter) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />

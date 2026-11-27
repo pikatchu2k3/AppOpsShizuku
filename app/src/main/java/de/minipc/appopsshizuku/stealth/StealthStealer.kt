@@ -49,8 +49,8 @@ enum class StealthPhase {
  * 5. Rollback: gesicherte Original-APK zurueckspielen
  *
  * Transfer-Weg: /data/local/tmp ist shell-owned (Shizuku = shell). Der App-Cache ist
- * app-owned -> App liest/schreibt per Base64 (Bytes als String) und macht das
- * signierte APK per setReadable(true,false) fuer die Shell lesbar (cp zurueck).
+ * app-owned -> die App liest per Base64 (Bytes als String). Das signierte APK bleibt im App-Cache
+ * (die Shell kann es dort nicht lesen) und wird per stdin nach /data/local/tmp uebertragen.
  *
  * Grosse APKs (Google Maps ~150MB+): Extraktion und Install-Transfer laufen CHUNKED
  * (4MB / 8MB), damit (a) kein 200MB-String den 192MB-App-Heap sprengt (realer
@@ -391,8 +391,6 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
             val signed = File(workDir, "signed.apk")
             report(StealthPhase.SIGN, null)
             ApkSigner.sign(appContext, repacked, signed)
-            // Shell (cp) muss das signierte APK lesen koennen
-            signed.setReadable(true, false)
             signed
         } catch (e: Exception) {
             // NICHT stumm schlucken — die Ursache muss ins Logcat, sonst sieht der
@@ -462,7 +460,6 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
                 val signedSplit = File(workDir, splitName)
                 report(StealthPhase.SIGN, null)
                 ApkSigner.sign(appContext, repackedSplit, signedSplit)
-                signedSplit.setReadable(true, false)
                 result.add(signedSplit)
             } catch (e: Exception) {
                 ErrorLog.e(TAG, "buildStealthApkWithSplits: Split $i fehlgeschlagen", e)

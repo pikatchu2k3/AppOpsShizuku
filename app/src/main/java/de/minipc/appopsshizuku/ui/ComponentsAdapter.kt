@@ -135,8 +135,9 @@ class ComponentsAdapter : ListAdapter<ComponentListItem, RecyclerView.ViewHolder
                 oldItem is ComponentListItem.SectionHeader && newItem is ComponentListItem.SectionHeader ->
                     oldItem.title == newItem.title
                 oldItem is ComponentListItem.SectionActions && newItem is ComponentListItem.SectionActions ->
-                    oldItem.sectionId == newItem.sectionId &&
-                        oldItem.components == newItem.components
+                    // List.equals vergleicht elementweise (data class) - Lint-Fehlalarm "DiffUtilEquals"
+                    @Suppress("DiffUtilEquals")
+                    (oldItem.sectionId == newItem.sectionId && oldItem.components == newItem.components)
                 else -> false
             }
     }

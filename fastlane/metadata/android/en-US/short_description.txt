@@ -1,0 +1,1 @@
+Control app permissions, App Ops and background behavior via Shizuku

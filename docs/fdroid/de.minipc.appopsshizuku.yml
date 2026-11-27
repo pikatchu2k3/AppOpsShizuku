@@ -1,0 +1,33 @@
+# Entwurf fuer fdroiddata (https://gitlab.com/fdroid/fdroiddata): als metadata/de.minipc.appopsshizuku.yml
+# in einen Merge Request legen. Beschreibung, Screenshots und Changelog liest F-Droid aus fastlane/metadata/android/
+# dieses Repositories - hier steht nur, was F-Droid selbst braucht.
+Categories:
+  - Security
+  - System
+License: GPL-3.0-only
+AuthorName: pikatchu2k3
+WebSite: https://github.com/pikatchu2k3/AppOpsShizuku
+SourceCode: https://github.com/pikatchu2k3/AppOpsShizuku
+IssueTracker: https://github.com/pikatchu2k3/AppOpsShizuku/issues
+Changelog: https://github.com/pikatchu2k3/AppOpsShizuku/releases
+
+AutoName: App Ops Shizuku
+
+RepoType: git
+Repo: https://github.com/pikatchu2k3/AppOpsShizuku.git
+
+Builds:
+  - versionName: 1.21.0
+    versionCode: 50
+    commit: v1.21.0
+    subdir: app
+    gradle:
+      - full
+    # Test-Fixture mit Google Play Services (Werbe-ID) - gehoert nicht in den F-Droid-Quellbaum
+    rm:
+      - spooftest
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.21.0
+CurrentVersionCode: 50
