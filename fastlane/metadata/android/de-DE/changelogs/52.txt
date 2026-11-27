@@ -1,0 +1,6 @@
+Bewegter Sternenhimmel und Fehlerbehebungen.
+- Neu: Sterne funkeln, treiben langsam, ab und zu eine Sternschnuppe (abschaltbar unter Einstellungen → Bewegter Hintergrund)
+- Nicht angeforderte Berechtigungen zeigen „nicht angefordert“ statt „Exit 255“
+- App-Liste lädt nach Shizuku-Reconnect neu
+- WLAN-Regeln im full-Flavor funktionieren wieder
+- Neu: Auto-Revoke-Status; Option „bei laufendem Vordergrunddienst nicht entziehen“

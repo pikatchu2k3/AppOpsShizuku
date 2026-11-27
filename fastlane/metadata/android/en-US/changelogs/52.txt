@@ -1,0 +1,6 @@
+Animated starfield and bug fixes.
+- New: stars twinkle, drift slowly, occasional shooting star (can be turned off in Settings → Animated background)
+- Permissions an app does not request show "not requested" instead of "Exit 255"
+- App list refreshes after Shizuku reconnects
+- Wi-Fi rules work in the full flavor again
+- New: auto-revoke status; option "do not revoke while a foreground service runs"

@@ -17,9 +17,9 @@ RepoType: git
 Repo: https://github.com/pikatchu2k3/AppOpsShizuku.git
 
 Builds:
-  - versionName: 1.21.1
-    versionCode: 51
-    commit: v1.21.1
+  - versionName: 1.21.2
+    versionCode: 52
+    commit: v1.21.2
     subdir: app
     gradle:
       - full
@@ -29,5 +29,5 @@ Builds:
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.21.1
-CurrentVersionCode: 51
+CurrentVersion: 1.21.2
+CurrentVersionCode: 52
