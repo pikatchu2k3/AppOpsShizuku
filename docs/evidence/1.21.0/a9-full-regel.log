@@ -1,0 +1,24 @@
+== A9 full: WLAN-Regel 'A9wlan' (SSID SchneckenhausG, aktiv wenn verbunden, Aktion: Apps offline: de.minipc.spooftest)
+-- VOR Speichern:
+Default restrict background allowlist uids:
+Admin restricted uids for metered data:
+  2026-11-27T14:28:54:082 - Firewall rule changed: 10278-restricted-allow
+  2026-11-27T14:28:54:076 - Firewall rule changed: 10278-restricted-allow
+  2026-11-27T14:23:31:001 - Firewall rule changed: 10277-restricted-allow
+Restrict background blacklisted UIDs: none
+
+de.minipc.spooftest:allow
+-- NACH Speichern (Regel greift?):
+name="rules"
+A9wlan&quot;
+de.minipc.spooftest:deny
+Restrict background blacklisted UIDs: none
+
+grep: bad regex 'uid=|': empty (sub)expression
+Failed to write while dumping service netpolicy: Broken pipe
+-- Aufraeumen: Netz fuer spooftest wieder erlaubt, Regel/Net-Eintrag entfernt, Standort-Modus 0, Standort-Rechte der App entzogen
+de.minipc.spooftest:allow
+0
+        android.permission.ACCESS_FINE_LOCATION: granted=false, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.ACCESS_COARSE_LOCATION: granted=false, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.ACCESS_BACKGROUND_LOCATION: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
