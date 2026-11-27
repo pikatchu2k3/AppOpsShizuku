@@ -62,6 +62,13 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
     companion object {
         private const val TAG = "StealthStealer"
         private const val TMP_PREFIX = "/data/local/tmp/stealth_"
+
+        /**
+         * Pfade landen in `sh -c "..."`: nur Zeichen, die dort nichts bedeuten. Dateinamen kommen vom System
+         * (`pm path`), Paketnamen vom Nutzer (Klon) - geprueft wird trotzdem, nicht angenommen.
+         */
+        private val SAFE_NAME = Regex("^[A-Za-z0-9._-]+$")
+        internal fun safeTmpName(name: String): Boolean = name.isNotEmpty() && SAFE_NAME.matches(name)
         private const val BASE64_TIMEOUT = 120L
         /** Extraktion: 4MB-Binaerchunk -> ~5.5MB Base64-String pro IPC-Roundtrip. */
         private const val EXTRACT_CHUNK = 4 * 1024 * 1024
@@ -131,7 +138,12 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
         val sizes = ArrayList<Long>()
         var totalSize = 0L
         for (apkPath in apkPaths) {
-            val tmp = "$TMP_PREFIX${apkPath.substringAfterLast('/')}"
+            val fileName = apkPath.substringAfterLast('/')
+            if (!safeTmpName(fileName)) {
+                tmpFiles.forEach { backend.exec("rm", "-f", it) }
+                return null
+            }
+            val tmp = "$TMP_PREFIX$fileName"
             val copy = backend.exec("cp", apkPath, tmp)
             if (copy.exitCode != 0) {
                 tmpFiles.forEach { backend.exec("rm", "-f", it) }
@@ -482,6 +494,7 @@ class StealthStealer(private val backend: ShellBackend, private val appContext: 
      */
     fun installApk(apks: List<File>, packageName: String, allowAutoUninstall: Boolean = false): InstallResult {
         if (apks.isEmpty()) return InstallResult(false, "Keine APK-Dateien")
+        if (!safeTmpName(packageName)) return InstallResult(false, "Ungültiger Paketname: $packageName")
         val tmpApks = ArrayList<String>(apks.size)
         val splitNames = ArrayList<String>(apks.size)
         val sizes = ArrayList<Long>(apks.size)

@@ -7,6 +7,10 @@
     <string name="btn_check">Prüfen</string>
     <string name="btn_restore_all">Alle auf Standard</string>
     <string name="btn_refresh">Aktualisieren</string>
+    <string name="import_preview_apply">Importieren</string>
+    <string name="import_preview_dropped">%1$d ungültige oder geschützte Einträge wurden verworfen.</string>
+    <string name="import_preview_message">Diese Datei enthält:\n• %1$d Apps mit Berechtigungsprofilen\n• %2$d Apps mit Verhaltens-Einstellungen (davon %3$d zum Deaktivieren oder Einfrieren)\n• %4$d Automatik-Regeln\n\nVor deiner Bestätigung wird nichts geändert. Importiere nur Dateien, denen du vertraust.</string>
+    <string name="import_preview_title">Diese Sicherung importieren?</string>
     <string name="search_hint">App suchen…</string>
     <string name="sort_hint">Sortierung</string>
     <string name="sort_by">Sortieren:</string>

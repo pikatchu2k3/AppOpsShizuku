@@ -108,6 +108,10 @@
     <string name="error_start_activity">Não foi possível iniciar a atividade</string>
     <string name="filter_all">Todos</string>
     <string name="filter_blocked">Bloqueados</string>
+    <string name="import_preview_apply">Importar</string>
+    <string name="import_preview_dropped">%1$d entradas inválidas ou protegidas foram descartadas.</string>
+    <string name="import_preview_message">Este arquivo contém:\n• %1$d apps com perfis de permissões\n• %2$d apps com configurações de comportamento (%3$d delas serão desativadas ou congeladas)\n• %4$d regras automáticas\n\nNada é alterado antes da sua confirmação. Importe apenas arquivos em que você confia.</string>
+    <string name="import_preview_title">Importar este backup?</string>
     <string name="lifecycle_apply">Aplicar perfil</string>
     <string name="lifecycle_battery_check">Conceder isenção de bateria</string>
     <string name="lifecycle_battery_hint">Observação: com isenção de bateria, o próprio Android coloca o grupo em \"Isento pelo sistema\". O grupo escolhido acima é ignorado e mostrado como \"não aplicado\" – isso é esperado, não um erro.</string>

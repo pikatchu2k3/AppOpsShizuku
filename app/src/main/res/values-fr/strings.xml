@@ -108,6 +108,10 @@
     <string name="error_start_activity">Impossible de démarrer l\'activité</string>
     <string name="filter_all">Toutes</string>
     <string name="filter_blocked">Bloquées</string>
+    <string name="import_preview_apply">Importer</string>
+    <string name="import_preview_dropped">%1$d entrées invalides ou protégées ont été ignorées.</string>
+    <string name="import_preview_message">Ce fichier contient :\n• %1$d applications avec des profils d\'autorisations\n• %2$d applications avec des réglages de comportement (dont %3$d à désactiver ou à geler)\n• %4$d règles automatiques\n\nRien n\'est modifié avant votre confirmation. N\'importez que des fichiers de confiance.</string>
+    <string name="import_preview_title">Importer cette sauvegarde ?</string>
     <string name="lifecycle_apply">Appliquer le profil</string>
     <string name="lifecycle_battery_check">Accorder l\'exemption de batterie</string>
     <string name="lifecycle_battery_hint">Remarque : avec une exemption de batterie, Android met lui-même le groupe sur « Exemptée par le système ». Le groupe choisi ci-dessus est alors ignoré et affiché comme « non appliqué » – c\'est voulu, pas une erreur.</string>

@@ -108,6 +108,10 @@
     <string name="error_start_activity">No se pudo iniciar la actividad</string>
     <string name="filter_all">Todas</string>
     <string name="filter_blocked">Bloqueadas</string>
+    <string name="import_preview_apply">Importar</string>
+    <string name="import_preview_dropped">Se descartaron %1$d entradas no válidas o protegidas.</string>
+    <string name="import_preview_message">Este archivo contiene:\n• %1$d aplicaciones con perfiles de permisos\n• %2$d aplicaciones con ajustes de comportamiento (%3$d de ellas se desactivarán o congelarán)\n• %4$d reglas automáticas\n\nNo se cambia nada antes de que confirmes. Importa solo archivos de confianza.</string>
+    <string name="import_preview_title">¿Importar esta copia de seguridad?</string>
     <string name="lifecycle_apply">Aplicar perfil</string>
     <string name="lifecycle_battery_check">Conceder excepción de batería</string>
     <string name="lifecycle_battery_hint">Nota: con una exención de batería, Android pone él mismo el grupo en \"Excluida por el sistema\". El grupo elegido arriba se ignora y se muestra como \"no aplicado\"; es lo esperado, no un error.</string>

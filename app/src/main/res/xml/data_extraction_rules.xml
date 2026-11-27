@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ (targetSdk 31+): Datensicherung.
+  - Cloud-Backup: nichts. Profile, Regeln und Paketlisten verraten, welche Apps installiert sind.
+  - Geraete-zu-Geraete-Uebertragung: Einstellungen duerfen mit, aber NIE der Signaturschluessel der
+    gepatchten Apps und das Fehlerprotokoll. (Der Schluessel ist zusaetzlich an den Keystore dieses
+    Geraets gebunden und waere auf einem anderen Geraet ohnehin unbrauchbar.)
+  Der Nutzer sichert bewusst ueber Einstellungen > Sicherung (JSON-Datei).
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="apk_signer_key.der" />
+        <exclude domain="file" path="apk_signer_cert.der" />
+        <exclude domain="file" path="error_log.txt" />
+    </device-transfer>
+</data-extraction-rules>

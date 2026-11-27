@@ -108,6 +108,10 @@
     <string name="error_start_activity">アクティビティを起動できませんでした</string>
     <string name="filter_all">すべて</string>
     <string name="filter_blocked">ブロック済み</string>
+    <string name="import_preview_apply">インポート</string>
+    <string name="import_preview_dropped">無効または保護された項目 %1$d 件を破棄しました。</string>
+    <string name="import_preview_message">このファイルの内容:\n• 権限プロファイル付きアプリ %1$d 件\n• 動作設定付きアプリ %2$d 件（うち %3$d 件は無効化または凍結されます）\n• 自動ルール %4$d 件\n\n確認するまで何も変更されません。信頼できるファイルだけをインポートしてください。</string>
+    <string name="import_preview_title">このバックアップをインポートしますか？</string>
     <string name="lifecycle_apply">プロファイルを適用</string>
     <string name="lifecycle_battery_check">バッテリー除外を許可</string>
     <string name="lifecycle_battery_hint">注意：バッテリー最適化から除外すると、Android がバケットを自動的に「システムにより除外」にします。上で選んだバケットは無視され「未適用」と表示されますが、これは想定どおりでエラーではありません。</string>

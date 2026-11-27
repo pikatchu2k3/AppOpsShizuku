@@ -201,6 +201,10 @@
     <string name="header_subtitle">Shizuku · privacy control</string>
     <string name="header_title">App Ops</string>
     <string name="header_tune">Sort and filter</string>
+    <string name="import_preview_apply">Import</string>
+    <string name="import_preview_dropped">%1$d invalid or protected entries were discarded.</string>
+    <string name="import_preview_message">This file contains:\n• %1$d apps with permission profiles\n• %2$d apps with behavior settings (%3$d of them to be disabled or frozen)\n• %4$d automatic rules\n\nNothing is changed before you confirm. Only import files you trust.</string>
+    <string name="import_preview_title">Import this backup?</string>
     <string name="lifecycle_apply">Apply profile</string>
     <string name="lifecycle_battery_check">Grant battery exemption</string>
     <string name="lifecycle_battery_hint">Note: with a battery exemption Android sets the bucket itself to \"Exempted by system\". The bucket chosen above is then ignored and shown as \"not applied\" – that is expected, not an error.</string>

@@ -108,6 +108,10 @@
     <string name="error_start_activity">गतिविधि शुरू नहीं की जा सकी</string>
     <string name="filter_all">सभी</string>
     <string name="filter_blocked">ब्लॉक किए गए</string>
+    <string name="import_preview_apply">आयात करें</string>
+    <string name="import_preview_dropped">%1$d अमान्य या सुरक्षित प्रविष्टियाँ हटा दी गईं।</string>
+    <string name="import_preview_message">इस फ़ाइल में है:\n• अनुमति प्रोफ़ाइल वाले %1$d ऐप\n• व्यवहार सेटिंग वाले %2$d ऐप (इनमें से %3$d अक्षम या फ़्रीज़ होंगे)\n• %4$d स्वचालित नियम\n\nआपकी पुष्टि से पहले कुछ नहीं बदलता। केवल भरोसेमंद फ़ाइलें आयात करें।</string>
+    <string name="import_preview_title">यह बैकअप आयात करें?</string>
     <string name="lifecycle_apply">प्रोफ़ाइल लागू करें</string>
     <string name="lifecycle_battery_check">बैटरी अपवाद दें</string>
     <string name="lifecycle_battery_hint">ध्यान दें: बैटरी छूट होने पर Android स्तर को ख़ुद \"सिस्टम द्वारा छूट प्राप्त\" पर सेट करता है। ऊपर चुना गया स्तर तब अनदेखा होता है और \"लागू नहीं\" दिखता है – यह अपेक्षित है, कोई त्रुटि नहीं।</string>

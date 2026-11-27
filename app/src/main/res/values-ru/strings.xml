@@ -108,6 +108,10 @@
     <string name="error_start_activity">Не удалось запустить активность</string>
     <string name="filter_all">Все</string>
     <string name="filter_blocked">Заблокированные</string>
+    <string name="import_preview_apply">Импортировать</string>
+    <string name="import_preview_dropped">Отброшено записей (недопустимых или защищённых): %1$d.</string>
+    <string name="import_preview_message">Файл содержит:\n• %1$d приложений с профилями разрешений\n• %2$d приложений с настройками поведения (из них %3$d будут отключены или заморожены)\n• %4$d автоматических правил\n\nДо подтверждения ничего не изменяется. Импортируйте только файлы, которым доверяете.</string>
+    <string name="import_preview_title">Импортировать эту резервную копию?</string>
     <string name="lifecycle_apply">Применить профиль</string>
     <string name="lifecycle_battery_check">Выдать исключение из оптимизации батареи</string>
     <string name="lifecycle_battery_hint">Примечание: при исключении из экономии заряда Android сам ставит группу «Исключено системой». Выбранная выше группа тогда игнорируется и показывается как «не применено» – это ожидаемо, а не ошибка.</string>

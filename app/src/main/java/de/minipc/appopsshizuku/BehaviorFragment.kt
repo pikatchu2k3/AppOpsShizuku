@@ -1156,7 +1156,7 @@ class BehaviorFragment : Fragment() {
             if (OnDemandSupport.isPinned(ctx, packageName) == false) lines.add(getString(R.string.ondemand_state_no_shortcut))
             if (!OnDemandSupport.hasUsageAccess(ctx)) lines.add(getString(R.string.ondemand_state_no_usage))
             callers.takeIf { it.isNotEmpty() }?.let { c ->
-                lines.add(getString(R.string.ondemand_state_callers, c.joinToString(", ") { labelOf(ctx, it) }))
+                lines.add(getString(R.string.ondemand_state_callers, c.map { it.substringBefore('@') }.distinct().joinToString(", ") { labelOf(ctx, it) }))
             }
             screenOffSyncError?.let { lines.add(getString(R.string.screen_off_service_failed, it)) }
             if (OnDemand.lockOf(e) == OnDemandLock.SUSPEND) lines.add(getString(R.string.ondemand_state_suspend_limit))

@@ -95,6 +95,7 @@ class BehaviorBackup(
      * Die eigene App wird nie deaktiviert oder eingefroren.
      */
     fun restoreToDevice(packageName: String, state: BehaviorState, ownPackage: String): List<String> {
+        if (!ImportGuard.validPackage(packageName)) return listOf("ungültiger Paketname")
         val errors = mutableListOf<String>()
         val isSelf = packageName == ownPackage
 

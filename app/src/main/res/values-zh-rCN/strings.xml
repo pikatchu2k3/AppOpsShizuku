@@ -108,6 +108,10 @@
     <string name="error_start_activity">无法启动活动</string>
     <string name="filter_all">全部</string>
     <string name="filter_blocked">已禁止</string>
+    <string name="import_preview_apply">导入</string>
+    <string name="import_preview_dropped">已丢弃 %1$d 个无效或受保护的条目。</string>
+    <string name="import_preview_message">此文件包含：\n• %1$d 个带权限配置的应用\n• %2$d 个带行为设置的应用（其中 %3$d 个将被停用或冻结）\n• %4$d 条自动规则\n\n确认之前不会更改任何内容。请只导入你信任的文件。</string>
+    <string name="import_preview_title">导入此备份？</string>
     <string name="lifecycle_apply">应用配置</string>
     <string name="lifecycle_battery_check">授予电池豁免</string>
     <string name="lifecycle_battery_hint">提示：设置电池优化豁免后，Android 会自动把分组设为“系统豁免”。上方选择的分组将被忽略并显示为“未生效”——这是预期行为，不是错误。</string>

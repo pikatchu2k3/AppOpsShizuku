@@ -157,10 +157,13 @@ class MainActivity : AppCompatActivity() {
 
         // Direkt-Import ohne Dateidialog: am start ... --es import_file <pfad>
         // (praktisch fuer Skripte/Tasker und fuer Tests; der System-Dialog ist headless unzuverlaessig)
-        intent?.getStringExtra(EXTRA_IMPORT_FILE)?.takeIf { it.isNotBlank() }?.let { path ->
+        // NUR in Debug-Builds: MainActivity ist exportiert, ein Release-Build darf sich von fremden Apps
+        // keinen Import ohne Rückfrage auslösen lassen.
+        val debuggable = (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        intent?.getStringExtra(EXTRA_IMPORT_FILE)?.takeIf { debuggable && it.isNotBlank() }?.let { path ->
             val file = File(path)
             if (file.isFile) {
-                importProfiles(Uri.fromFile(file))
+                importProfiles(Uri.fromFile(file), confirm = false)
             } else {
                 setBackupStatus(
                     getString(R.string.backup_status_import_fail, "Datei nicht lesbar: $path"), true
@@ -608,20 +611,16 @@ class MainActivity : AppCompatActivity() {
             val backend = if (manager.isConnected && manager.hasPermission) ShizukuBackend() else NoopBackend()
             if (backend is ShizukuBackend) {
                 val res = backend.exec("pm", "list", "packages", "-d")
-                android.util.Log.d("AppOpsShizuku", "pm list -d: exit=${res.exitCode} stderr=${res.stderr.take(200)}")
-                android.util.Log.d("AppOpsShizuku", "pm list -d stdout=${res.stdout.take(400)}")
                 val disabled = if (res.exitCode == 0 && !res.stderr.contains("Exception", true) && !res.stdout.contains("Exception", true)) {
                     Regex("package:([\\w.]+)").findAll(res.stdout).map { it.groupValues[1] }
                         .filter { it != packageName && it !in seen }
                         .toList()
                 } else emptyList()
-                android.util.Log.d("AppOpsShizuku", "disabled gefiltert: $disabled")
                 for (pkg in disabled) {
                     seen.add(pkg)
                     val label = try {
                         pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
                     } catch (e: Exception) {
-                        android.util.Log.d("AppOpsShizuku", "label fail $pkg: ${e.message}")
                         pkg
                     }
                     val icon = cachedIcon(pm, pkg)
@@ -633,7 +632,6 @@ class MainActivity : AppCompatActivity() {
                             0L, 0L
                         )
                     )
-                    android.util.Log.d("AppOpsShizuku", "added disabled: $pkg")
                 }
             }
 
@@ -988,74 +986,92 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** JSON-Datei (SAF) einlesen und in die Prefs mergen (global, alle Apps). */
-    private fun importProfiles(uri: Uri) {
+    /**
+     * JSON-Datei (SAF) einlesen und prüfen. Eine Sicherung ist eine fremde Datei: erst nach der
+     * Rückfrage ("Was steht drin?") wird etwas gespeichert oder auf das Gerät angewendet.
+     */
+    private fun importProfiles(uri: Uri, confirm: Boolean = true) {
         executor.execute {
-            val result = runCatching { profileBackup.import(uri) }
+            val parsed = runCatching { profileBackup.parse(uri) }
             handler.post {
-                result.onSuccess { imported ->
-                    val shizukuOk = manager.isConnected && manager.hasPermission
-                    val message = when {
-                        imported.behavior.isEmpty() ->
-                            getString(R.string.profiles_import_ok_global, imported.profiles.size)
+                parsed.onSuccess { r -> if (confirm) confirmImport(r) else applyImport(r) }
+                    .onFailure { e -> reportImportFailure(e) }
+            }
+        }
+    }
 
-                        !shizukuOk ->
-                            getString(R.string.profiles_import_ok_global, imported.profiles.size) + " – " +
-                                getString(R.string.profiles_import_behavior_need_shizuku)
+    private fun confirmImport(r: ProfileBackup.ImportResult) {
+        var msg = getString(
+            R.string.import_preview_message,
+            r.profiles.size, r.behavior.size, r.disableOrFreezeCount, r.extras.rules.size
+        )
+        if (r.dropped > 0) msg += "\n\n" + getString(R.string.import_preview_dropped, r.dropped)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.import_preview_title)
+            .setMessage(msg)
+            .setPositiveButton(R.string.import_preview_apply) { _, _ -> applyImport(r) }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
+    }
 
-                        else -> {
-                            // Ehrlich: die Zahl der Einstellungen, die das Geraet NICHT uebernommen hat
-                            val errors = runCatching {
-                                val backup = BehaviorBackup(ShizukuBackend())
-                                imported.behavior.flatMap { (pkg, state) ->
-                                    backup.restoreToDevice(pkg, state, applicationContext.packageName)
-                                }
-                            }.getOrElse { listOf(it.message ?: it.javaClass.simpleName) }
+    private fun reportImportFailure(e: Throwable) {
+        val reason = e.message ?: e.javaClass.simpleName
+        setBackupStatus(getString(R.string.backup_status_import_fail, reason), true)
+        Toast.makeText(this, getString(R.string.profiles_import_fail, reason), Toast.LENGTH_LONG).show()
+    }
 
-                            if (errors.isEmpty()) {
-                                setBackupStatus(
-                                    getString(
-                                        R.string.backup_status_import_ok,
-                                        imported.profiles.size, imported.behavior.size
-                                    ), false
-                                )
-                                getString(
-                                    R.string.profiles_import_ok_full,
-                                    imported.profiles.size, imported.behavior.size
-                                )
-                            } else {
-                                // Klartext-Grund mitschreiben: so ist der Fehler auch spaeter lesbar
-                                setBackupStatus(
-                                    getString(
-                                        R.string.backup_status_import_warn,
-                                        imported.profiles.size, errors.size,
-                                        errors.take(3).joinToString("; ")
-                                    ), true
-                                )
-                                getString(
-                                    R.string.profiles_import_ok_with_errors,
-                                    imported.profiles.size, errors.size
-                                )
-                            }
-                        }
-                    }
-                    // Importierte Screen-Off-Haken wirken erst mit laufendem Dienst
-                    if (imported.lifecycle.isNotEmpty() || imported.extras.whileInUse.isNotEmpty()) {
-                        LifecycleScreenService.sync(this)
-                    }
-                    if (imported.extras.rules.isNotEmpty()) {
-                        executor.execute { runCatching { AutoRuleManager.evaluate(this) } }
-                    }
-                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-                }.onFailure { e ->
-                    val reason = e.message ?: e.javaClass.simpleName
-                    setBackupStatus(getString(R.string.backup_status_import_fail, reason), true)
-                    Toast.makeText(
-                        this,
-                        getString(R.string.profiles_import_fail, reason),
-                        Toast.LENGTH_LONG
-                    ).show()
+    /** Geprüftes Ergebnis übernehmen und die Verhaltens-Einstellungen auf das Gerät anwenden (Hintergrund-Thread). */
+    private fun applyImport(imported: ProfileBackup.ImportResult) {
+        executor.execute {
+            val stored = runCatching { profileBackup.commit(imported) }
+            if (stored.isFailure) {
+                handler.post { reportImportFailure(stored.exceptionOrNull()!!) }
+                return@execute
+            }
+            val shizukuOk = manager.isConnected && manager.hasPermission
+            // Ehrlich: die Zahl der Einstellungen, die das Gerät NICHT übernommen hat
+            val errors: List<String>? = if (imported.behavior.isEmpty() || !shizukuOk) null else runCatching {
+                val backup = BehaviorBackup(ShizukuBackend())
+                imported.behavior.flatMap { (pkg, state) ->
+                    backup.restoreToDevice(pkg, state, applicationContext.packageName)
                 }
+            }.getOrElse { listOf(it.message ?: it.javaClass.simpleName) }
+            handler.post {
+                val message = when {
+                    imported.behavior.isEmpty() ->
+                        getString(R.string.profiles_import_ok_global, imported.profiles.size)
+
+                    errors == null ->
+                        getString(R.string.profiles_import_ok_global, imported.profiles.size) + " – " +
+                            getString(R.string.profiles_import_behavior_need_shizuku)
+
+                    errors.isEmpty() -> {
+                        setBackupStatus(
+                            getString(R.string.backup_status_import_ok, imported.profiles.size, imported.behavior.size),
+                            false
+                        )
+                        getString(R.string.profiles_import_ok_full, imported.profiles.size, imported.behavior.size)
+                    }
+
+                    else -> {
+                        // Klartext-Grund mitschreiben: so ist der Fehler auch später lesbar
+                        setBackupStatus(
+                            getString(
+                                R.string.backup_status_import_warn,
+                                imported.profiles.size, errors.size, errors.take(3).joinToString("; ")
+                            ), true
+                        )
+                        getString(R.string.profiles_import_ok_with_errors, imported.profiles.size, errors.size)
+                    }
+                }
+                // Importierte Screen-Off-Haken wirken erst mit laufendem Dienst
+                if (imported.lifecycle.isNotEmpty() || imported.extras.whileInUse.isNotEmpty()) {
+                    LifecycleScreenService.sync(this)
+                }
+                if (imported.extras.rules.isNotEmpty()) {
+                    executor.execute { runCatching { AutoRuleManager.evaluate(this) } }
+                }
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             }
         }
     }
