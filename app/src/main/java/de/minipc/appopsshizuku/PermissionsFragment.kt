@@ -664,7 +664,8 @@ class PermissionsFragment : Fragment() {
      */
     private fun enableWhileInUse(op: AppOp) {
         if (packageName == appContext.packageName || opStates[op.opName] == OpEffect.NOT_REQUESTED || opStates[op.opName] == null) {
-            Toast.makeText(appContext, appContext.getString(R.string.op_not_settable, op.label), Toast.LENGTH_LONG).show()
+            val msg = if (opStates[op.opName] == OpEffect.NOT_REQUESTED) R.string.op_not_requested else R.string.op_not_settable
+            Toast.makeText(appContext, appContext.getString(msg, op.label), Toast.LENGTH_LONG).show()
             handler.post { refreshList() }
             return
         }

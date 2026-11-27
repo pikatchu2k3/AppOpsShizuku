@@ -1,0 +1,19 @@
+### vorher
+        android.permission.READ_PHONE_STATE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+Uid mode: READ_PHONE_STATE: ignore
+### UI->allow
+        android.permission.READ_PHONE_STATE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+Uid mode: READ_PHONE_STATE: ignore
+UI zeigt: [('Telefonstatus', 'ignore')]
+### UI->deny
+        android.permission.READ_PHONE_STATE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+Uid mode: READ_PHONE_STATE: ignore
+UI zeigt: [('Telefonstatus', 'ignore')]
+### UI->in-use
+        android.permission.READ_PHONE_STATE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+Uid mode: READ_PHONE_STATE: ignore
+UI zeigt: []
+### UI->reset
+        android.permission.READ_PHONE_STATE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+Uid mode: READ_PHONE_STATE: ignore
+UI zeigt: []
