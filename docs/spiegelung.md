@@ -20,7 +20,7 @@ cp tools/systemd/git-mirror-sync.* ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now git-mirror-sync.timer
 ```
-Der Timer läuft 2 Minuten nach dem Start und danach alle 15 Minuten (`Persistent=true`).
+Der Timer läuft 5 Minuten nach dem Start und danach stündlich (`Persistent=true`).
 
 ## Log und manueller Lauf
 ```

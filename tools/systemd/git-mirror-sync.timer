@@ -1,9 +1,9 @@
 [Unit]
-Description=GitHub -> GitLab Spiegel alle 15 Minuten
+Description=GitHub -> GitLab Spiegel (stündlich)
 
 [Timer]
-OnBootSec=2min
-OnUnitActiveSec=15min
+OnBootSec=5min
+OnUnitActiveSec=1h
 Persistent=true
 
 [Install]
