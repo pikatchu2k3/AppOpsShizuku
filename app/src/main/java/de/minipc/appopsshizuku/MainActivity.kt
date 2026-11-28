@@ -447,6 +447,56 @@ class MainActivity : AppCompatActivity() {
             v.setOnClickListener { startActivity(Intent(this, t.target)) }
             container.addView(v)
         }
+
+        val header = TextView(this).apply {
+            setText(R.string.sources_title)
+            setTextColor(getColor(R.color.on_glass_dim))
+            textSize = 14f
+            setPadding((24 * resources.displayMetrics.density).toInt(), (16 * resources.displayMetrics.density).toInt(), 0, 0)
+        }
+        container.addView(header)
+        val sources = listOf(
+            Triple(R.string.source_obtainium, R.string.source_obtainium_desc, ProjectLinks.OBTAINIUM),
+            Triple(R.string.source_fdroid, R.string.source_fdroid_desc, ProjectLinks.FDROID),
+            Triple(R.string.source_github, R.string.source_github_desc, ProjectLinks.GITHUB),
+            Triple(R.string.source_gitlab, R.string.source_gitlab_desc, ProjectLinks.GITLAB)
+        )
+        for ((title, desc, url) in sources) {
+            val v = inflater.inflate(R.layout.item_source, container, false)
+            v.background = AppListAdapter.gradient(v, de.minipc.appopsshizuku.ui.CardColors.cardStart(0xFF2E6FA0.toInt()))
+            v.findViewById<TextView>(R.id.sourceTitle).setText(title)
+            v.findViewById<TextView>(R.id.sourceDesc).setText(desc)
+            v.setOnClickListener { openLink(url) }
+            container.addView(v)
+        }
+    }
+
+    private fun openLink(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (_: android.content.ActivityNotFoundException) {
+            if (url != ProjectLinks.OBTAINIUM) {
+                Toast.makeText(this, R.string.source_no_app, Toast.LENGTH_SHORT).show()
+                return
+            }
+            Toast.makeText(this, R.string.source_obtainium_missing, Toast.LENGTH_LONG).show()
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(ProjectLinks.GITHUB)))
+            } catch (_: android.content.ActivityNotFoundException) {
+                Toast.makeText(this, R.string.source_no_app, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showAbout(version: String?) {
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.about_title)
+            .setMessage(getString(R.string.about_message, version ?: "?", ProjectLinks.GITHUB, ProjectLinks.GITLAB, ProjectLinks.FDROID))
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+        dialog.findViewById<TextView>(android.R.id.message)?.let {
+            android.text.util.Linkify.addLinks(it, android.text.util.Linkify.WEB_URLS)
+        }
     }
 
     // ------------------------------------------------------------------ Einstellungen
@@ -485,7 +535,10 @@ class MainActivity : AppCompatActivity() {
             importPicker.launch(arrayOf("application/json", "text/*", "*/*"))
         }
         val version = runCatching { packageManager.getPackageInfo(packageName, 0).versionName }.getOrNull()
-        findViewById<TextView>(R.id.settingsAbout).text = getString(R.string.settings_about, version ?: "?")
+        findViewById<TextView>(R.id.settingsAbout).apply {
+            text = getString(R.string.settings_about, version ?: "?")
+            setOnClickListener { showAbout(version) }
+        }
         findViewById<View>(R.id.shizukuHint).setOnClickListener { showPanel(PANEL_SETTINGS) }
         findViewById<View>(R.id.standingButton).setOnClickListener { toggleStanding() }
         renderStanding()

@@ -844,4 +844,17 @@
     <string name="auto_revoke_active">Automatik „Berechtigungen bei Nichtnutzung entziehen“: aktiv (Standard)</string>
     <string name="auto_revoke_exempt">Automatik „Berechtigungen bei Nichtnutzung entziehen“: App ist ausgenommen (ignore) – nicht blockiert</string>
     <string name="auto_revoke_unsupported">Automatik „Berechtigungen bei Nichtnutzung entziehen“: auf diesem Gerät nicht verfügbar</string>
+    <string name="sources_title">Bezugsquellen &amp; Updates</string>
+    <string name="source_obtainium">Obtainium</string>
+    <string name="source_obtainium_desc">Updates direkt aus dem Release</string>
+    <string name="source_fdroid">F-Droid (Aufnahme läuft)</string>
+    <string name="source_fdroid_desc">Store-Aufnahme beantragt</string>
+    <string name="source_github">GitHub</string>
+    <string name="source_github_desc">Quellcode &amp; Releases</string>
+    <string name="source_gitlab">GitLab</string>
+    <string name="source_gitlab_desc">Spiegel des Repositorys</string>
+    <string name="source_obtainium_missing">Obtainium ist nicht installiert. Es bezieht Updates direkt aus dem GitHub-Release.</string>
+    <string name="source_no_app">Keine App zum Öffnen des Links gefunden</string>
+    <string name="about_title">Über App Ops Shizuku</string>
+    <string name="about_message">Version %1$s\nLizenz: GPL-3.0-only\n\nGitHub (Quelle):\n%2$s\n\nGitLab (Spiegel):\n%3$s\n\nF-Droid (Aufnahme beantragt):\n%4$s</string>
 </resources>

@@ -822,4 +822,17 @@
     <string name="auto_revoke_active">Auto-revoke of unused permissions: active (default)</string>
     <string name="auto_revoke_exempt">Auto-revoke of unused permissions: app is exempt (ignore) – not blocked</string>
     <string name="auto_revoke_unsupported">Auto-revoke of unused permissions: not available on this device</string>
+    <string name="sources_title">Sources &amp; updates</string>
+    <string name="source_obtainium">Obtainium</string>
+    <string name="source_obtainium_desc">Updates straight from the release</string>
+    <string name="source_fdroid">F-Droid (listing in progress)</string>
+    <string name="source_fdroid_desc">Store listing requested</string>
+    <string name="source_github">GitHub</string>
+    <string name="source_github_desc">Source code &amp; releases</string>
+    <string name="source_gitlab">GitLab</string>
+    <string name="source_gitlab_desc">Mirror of the repository</string>
+    <string name="source_obtainium_missing">Obtainium is not installed. It fetches updates directly from the GitHub release.</string>
+    <string name="source_no_app">No app found to open the link</string>
+    <string name="about_title">About App Ops Shizuku</string>
+    <string name="about_message">Version %1$s\nLicense: GPL-3.0-only\n\nGitHub (source):\n%2$s\n\nGitLab (mirror):\n%3$s\n\nF-Droid (listing requested):\n%4$s</string>
 </resources>

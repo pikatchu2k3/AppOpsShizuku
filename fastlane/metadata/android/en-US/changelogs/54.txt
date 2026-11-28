@@ -1,0 +1,4 @@
+- New "Sources & updates" card under Tools: Obtainium, F-Droid, GitHub, GitLab
+- Obtainium support: add via deep link, falls back to the browser
+- GitLab mirror of the repository
+- About dialog (tap the version line in Settings) shows version, license and both repos

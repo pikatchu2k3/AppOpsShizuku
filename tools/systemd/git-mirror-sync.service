@@ -1,0 +1,7 @@
+[Unit]
+Description=GitHub -> GitLab Spiegel (AppOpsShizuku)
+
+[Service]
+Type=oneshot
+Nice=10
+ExecStart=/home/mini/AppOpsShizuku/tools/git-mirror-sync.sh

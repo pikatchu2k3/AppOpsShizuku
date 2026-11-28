@@ -1,0 +1,4 @@
+- Neue Karte „Bezugsquellen & Updates“ unter Werkzeuge: Obtainium, F-Droid, GitHub, GitLab
+- Obtainium-Unterstützung: Hinzufügen per Deep-Link, mit Rückfall auf den Browser
+- GitLab-Spiegel des Repositorys
+- „Über“-Dialog (Tipp auf die Versionszeile in den Einstellungen) nennt Version, Lizenz und beide Repos

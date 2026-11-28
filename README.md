@@ -50,6 +50,15 @@ The app has three areas in a floating bar at the bottom: **Apps**, **Tools** and
 | Shizuku status, quarantine, system colours, backup, standing access | *Settings* |
 | Lockdown | *Tools → System-wide*, and as Quick Settings tile |
 
+## Where to get it
+
+- **GitHub** (source and releases): <https://github.com/pikatchu2k3/AppOpsShizuku>
+- **GitLab** (public mirror): <https://gitlab.com/1SilentEYE1/AppOpsShizuku>
+- **Obtainium** (updates straight from the GitHub release): `obtainium://add/https://github.com/pikatchu2k3/AppOpsShizuku`
+- **F-Droid**: listing requested, not published yet — <https://f-droid.org/packages/de.minipc.appopsshizuku/>
+
+GitHub is the source of truth; GitLab is kept in sync automatically, see [docs/spiegelung.md](docs/spiegelung.md). The same links are in the app under *Tools → Sources & updates*.
+
 ## Features
 
 ### App list
