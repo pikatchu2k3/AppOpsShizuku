@@ -52,6 +52,8 @@ fail=0
 while read -r ref; do
   b=${ref#refs/remotes/origin/}
   [ "$b" = HEAD ] && continue
+  # ccr-* = kurzlebige Sandbox-Branches von Claude Code, gehoeren nicht in den oeffentlichen Spiegel
+  case "$b" in ccr-*) continue ;; esac
   if [ "$dry" = 1 ]; then
     say "wuerde pushen: $b"
   elif git push gitlab "$ref:refs/heads/$b" >/dev/null 2>&1; then
